@@ -57,25 +57,45 @@ options = parser.parse_args()
 
 output = open(options.filename,"w")
 
+#Standard Canle, all source has same lumionsity at z = 1.0
 dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
 
-TotalFlux = 0
 
+#The idea is to put all calculation outside for loop
 #Generate the declination
 sinDec = np.random.rand(100000)
+sinDec = sinDec*2. -1.
+#Get z
+z = np.power(10, random_from_cdf)-1
+#get luminosity distance at z
+dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
+#get flux at z
+flux = 1.86e-13 * (dL1*dL1)/(dL*dL) 
+
+#total flux
+TotalFlux = np.sum(flux)
+
+#Calculate the effectivearea at icecube for each source
+EA = [0]*len(sinDec)
+for i in range(0, len(sinDec)):
+	EA[i] = IceCubeResponse(sinDec[i])
+
+#Get mean no. of event due to each source
+events = EA*flux/1e-8
+#Get the number of event from poisson distribution
+obs = np.random.poisson(events, (1, len(events)))
+
+#Calculate the declination
+declin = 180*np.arcsin(sinDec)/np.pi
+
+### The following two lines may be a faster way to output the array, will save it for later
+#finalset = zip(declin, z, flux, obs[0])
+#np.savetxt(options.filename, finalset, delimiter=" ", fmt='%f, %f, %f, %i')
 
 for i in range(0, len(random_from_cdf)):
-	z = pow(10, random_from_cdf[i])-1
-	dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
-	flux = 1.86e-13 * (dL1*dL1)/(dL*dL)                 #1.86e-13 is here to match the total flux to 1e-8Gev/cm2/s/sr
+	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
 
-	sinDec[i] = sinDec[i]*2. -1.
-	events = IceCubeResponse(sinDec[i])*flux/1e-8
-
-	obs = np.random.poisson(events,1)
-	output.write(str(180*math.asin(sinDec[i])/np.pi) + " " + str(z) + " " + str(flux) + " " + str(obs[0]) + "\n")
-	TotalFlux = TotalFlux + flux
-
+print ('Total Flux is ' + str(TotalFlux))
 output.write("# " + str(TotalFlux) + "\n")
 
 output.close()
