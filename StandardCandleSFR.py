@@ -19,23 +19,21 @@ def StarFormationHistory(x):
     if x>=0.73878:
         return math.pow(10,-8.0*x+4.99)
 
-def ObservedRate(x):
-    return 4*np.pi*StarFormationHistory(x)*cosmolopy.distance.diff_comoving_volume(math.pow(10,x)-1, **cosmology)
+def ObservedRate(z):
+    return 4*np.pi*StarFormationHistory(np.log10(1+z))*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
 
-#Generate the bins
-numbin = 10000                                     # this one is arbitrary right now
-bins = range(0, numbin)
-for i in range(0,numbin):
-	bins[i] = bins[i]/numbin
+#Generate the bins of z
+bins = np.arange(0, 10, 0.001)
 
 #Generate the histogram
 binmid = bins[:-1] + np.diff(bins)/2.
 hist = [ObservedRate(binmid[i]) for i in range(0,len(binmid))]
 
-#Generate the random number of log(1+z)
+#Generate the random number of z
 cdf = np.cumsum(hist)
 cdf = cdf / cdf[-1]
-values = np.random.rand(100000)                     # We will have 100000 trials
+N_sample = 100000                  # Constrainted by the local source density, we should have number of sample = 14921752
+values = np.random.rand(N_sample)                     
 value_bins = np.searchsorted(cdf, values)
 random_from_cdf = binmid[value_bins]
 
@@ -56,19 +54,20 @@ options = parser.parse_args()
 
 output = open(options.filename,"w")
 
-#Standard Canle, all source has same lumionsity at z = 1.0
+#Standard Canle, all source has same lumionsity at z = 1.0, so we calculate the luminosity distance at z=1
 dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
 
 
-#The idea is to put all calculation outside for loop
+#The idea is to put all calculations outside for loop
 #Generate the declination
-sinDec = np.random.rand(100000)
+sinDec = np.random.rand(N_sample)
 sinDec = sinDec*2. -1.
 #Get z
-z = np.power(10, random_from_cdf)-1
+z = random_from_cdf
 #get luminosity distance at z
 dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
-#get flux at z
+#get flux at z, the coefficient here should match the Total flux = 1e-8 Gev / cm^2 / s / sr
+#for N_sample = 14921752, facctor is 2.13E-15
 flux = 1.86e-13 * (dL1*dL1)/(dL*dL) 
 
 #total flux
@@ -90,6 +89,8 @@ declin = 180*np.arcsin(sinDec)/np.pi
 ### The following two lines may be a faster way to output the array, will save it for later
 #finalset = zip(declin, z, flux, obs[0])
 #np.savetxt(options.filename, finalset, delimiter=" ", fmt='%f, %f, %f, %i')
+
+output.write("# declination     z      flux       observed" + "\n")
 
 for i in range(0, len(random_from_cdf)):
 	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
