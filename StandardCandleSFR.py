@@ -42,7 +42,6 @@ def Fluxz1StandardCandleSFT(density):
 #
 # Process command line options
 #
-#
 parser = argparse.ArgumentParser()
 parser.add_argument('-o', action='store', dest='filename',
                     help='Output filename')
