@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from __future__ import division
 import numpy as np
 import random
@@ -22,6 +24,42 @@ def StarFormationHistory(x):
 def ObservedRate(z):
     return 4*np.pi*StarFormationHistory(np.log10(1+z))*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
 
+# Assuming Star formation rate evolution and Standard Candles results in
+# 18,460,312 sources for a local source density of 1e-6 / Mpc3.
+#
+def NumberOfSourcesStandardCandleSFR(density):
+    return int(18460312.*density/1e-6)
+
+# Flux at redshift z=1 scaled according to density
+# The output is in units of GeV/cm^2.s
+# It assumes that the total desired diffuse flux is
+#
+# E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr
+#
+def Fluxz1StandardCandleSFT(density):
+    return 2.20e-14*(1e-6/density)
+
+#
+# Process command line options
+#
+parser = argparse.ArgumentParser()
+parser.add_argument('-o', action='store', dest='filename',
+                    help='Output filename')
+parser.add_argument('-d', action='store', dest='density', type=float,
+                    help='Local neutrino source density [Mpc^3]')
+options = parser.parse_args()
+output = open(options.filename,"w")
+N_sample = NumberOfSourcesStandardCandleSFR(options.density)
+flux_z1 = Fluxz1StandardCandleSFT(options.density)
+print ("##############################################################################")
+print ("FIRESONG initialization:")
+print ("Model: standard candle sources")
+print ("Model: star formation evolution")
+print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr")
+print ("Local density of neutrino sources: " + str(options.density))
+print ("Number of neutrinos sources in the Universe: " + str(N_sample))
+print ("##############################################################################")
+
 #Generate the bins of z
 bins = np.arange(0, 10, 0.001)
 
@@ -32,7 +70,6 @@ hist = [ObservedRate(binmid[i]) for i in range(0,len(binmid))]
 #Generate the random number of z
 cdf = np.cumsum(hist)
 cdf = cdf / cdf[-1]
-N_sample = 100000                  # Constrainted by the local source density, we should have number of sample = 14921752
 values = np.random.rand(N_sample)                     
 value_bins = np.searchsorted(cdf, values)
 random_from_cdf = binmid[value_bins]
@@ -47,16 +84,8 @@ def IceCubeResponse(sinDec):
     else:
         return 0
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-f', action='store', dest='filename',
-                    help='Output filename')
-options = parser.parse_args()
-
-output = open(options.filename,"w")
-
 #Standard Canle, all source has same lumionsity at z = 1.0, so we calculate the luminosity distance at z=1
 dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
-
 
 #The idea is to put all calculations outside for loop
 #Generate the declination
@@ -68,7 +97,7 @@ z = random_from_cdf
 dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
 #get flux at z, the coefficient here should match the Total flux = 1e-8 Gev / cm^2 / s / sr
 #for N_sample = 14921752, facctor is 2.13E-15
-flux = 1.86e-13 * (dL1*dL1)/(dL*dL) 
+flux = flux_z1 * (dL1*dL1)/(dL*dL) 
 
 #total flux
 TotalFlux = np.sum(flux)
@@ -89,14 +118,20 @@ declin = 180*np.arcsin(sinDec)/np.pi
 ### The following two lines may be a faster way to output the array, will save it for later
 #finalset = zip(declin, z, flux, obs[0])
 #np.savetxt(options.filename, finalset, delimiter=" ", fmt='%f, %f, %f, %i')
-
+output.write("# FIRESONG Output description\n")
+output.write("# Declination: degrees\n")
+output.write("# Redshift\n")
+output.write("# flux: E^2 dN/dE assuming (E/100 TeV)^(-0.1) GeV/cm^2.s.sr\n")
+output.write("#     Note that as of 2016, IceCube can detect point sources of ~10^-9 in the\n")
+output.write("#     qunits used here.\n")
+output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
 for i in range(0, len(random_from_cdf)):
 	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
 
-print ('Total Flux is ' + str(TotalFlux))
-output.write("# " + str(TotalFlux) + "\n")
+print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
+output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 output.close()
 
