@@ -27,10 +27,10 @@ def ObservedRate(z):
 norm = scipy.integrate.quad(lambda z: ObservedRate(z), 0, 10)[0]
 
 #area under the Observed Rate, from z=0 to z=0.1
-area = scipy.integrate.quad(lambda z: ObservedRate(z), 0, 0.1)[0]
+area = scipy.integrate.quad(lambda z: ObservedRate(z), 0, 0.01)[0]
 
 #comoving volume of the local universe
-vlocal = cosmolopy.distance.comoving_volume(0.1, **cosmology)
+vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
 
 #guess of neutrino source density
 rho0 = 1e-6
@@ -48,7 +48,8 @@ dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
 def dL(z):
 	return cosmolopy.distance.luminosity_distance(z, **cosmology)
 
-Flux_norm = 1e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/(dL(z)*dL(z))*ObservedRate(z)/norm, 0, 10)[0]
+# Diffuse Flux E^2 dN/dE =  1e-8 (E/100Tev)^-0.1 Gev/cm^2/sr/s
+Flux_norm = 4*nu.pi*1e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/(dL(z)*dL(z))*ObservedRate(z)/norm, 0, 10)[0]
 
 print Flux_norm
 
