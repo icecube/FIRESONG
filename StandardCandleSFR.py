@@ -61,18 +61,18 @@ print ("Number of neutrinos sources in the Universe: " + str(N_sample))
 print ("##############################################################################")
 
 #Generate the bins of z
-bins = np.arange(0, 10, 0.001)
+redshift_bins = np.arange(0, 10, 0.001)
 
 #Generate the histogram
-binmid = bins[:-1] + np.diff(bins)/2.
-hist = [ObservedRate(binmid[i]) for i in range(0,len(binmid))]
+redshift_binmid = redshift_bins[:-1] + np.diff(redshift_bins)/2.
+sfh = [ObservedRate(redshift_binmid[i]) for i in range(0,len(redshift_binmid))]
 
 #Generate the random number of z
-cdf = np.cumsum(hist)
+cdf = np.cumsum(sfh)
 cdf = cdf / cdf[-1]
-values = np.random.rand(N_sample)                     
-value_bins = np.searchsorted(cdf, values)
-random_from_cdf = binmid[value_bins]
+test = np.random.rand(N_sample)                     
+bin_index = np.searchsorted(cdf, test)
+redshift_list = redshift_binmid[bin_index]
 
 # This is the number of events as a function of declination (Effective Area?)
 def IceCubeResponse(sinDec):
@@ -92,11 +92,11 @@ dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
 sinDec = np.random.rand(N_sample)
 sinDec = sinDec*2. -1.
 #Get z
-z = random_from_cdf
+z = redshift_list
 #get luminosity distance at z
 dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
-#get flux at z, the coefficient here should match the Total flux = 1e-8 Gev / cm^2 / s / sr
-#for N_sample = 14921752, facctor is 2.13E-15
+#get point source flux at z, the coefficient here should match the Total flux = 1e-8 Gev / cm^2 / s / sr
+#for N_sample = 14921752, facctor is 2.20e-14
 flux = flux_z1 * (dL1*dL1)/(dL*dL) 
 
 #total flux
@@ -127,7 +127,7 @@ output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
-for i in range(0, len(random_from_cdf)):
+for i in range(0, len(redshift_list)):
 	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
 
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
