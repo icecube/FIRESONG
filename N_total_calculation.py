@@ -49,7 +49,8 @@ def dL(z):
 	return cosmolopy.distance.luminosity_distance(z, **cosmology)
 
 # Diffuse Flux E^2 dN/dE =  1e-8 (E/100Tev)^-0.1 Gev/cm^2/sr/s
-Flux_norm = 4*nu.pi*1e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/(dL(z)*dL(z))*ObservedRate(z)/norm, 0, 10)[0]
+Flux_norm = 4*np.pi*1e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/(dL(z)*dL(z))*ObservedRate(z)/norm, 0, 
+10)[0]
 
 print Flux_norm
 
