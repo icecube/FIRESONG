@@ -8,6 +8,18 @@ import cosmolopy
 from scipy.interpolate import UnivariateSpline
 import argparse
 
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
+
 # Plack 2015 parameters
 cosmology = {'omega_M_0' : 0.308, 'omega_lambda_0' : 0.692, 'h' : 0.678}
 cosmology = cosmolopy.distance.set_omega_k_0(cosmology) #Flat universe
@@ -52,13 +64,13 @@ output = open(options.filename,"w")
 N_sample = NumberOfSourcesStandardCandleSFR(options.density)
 flux_z1 = Fluxz1StandardCandleSFT(options.density)
 print ("##############################################################################")
-print ("FIRESONG initialization:")
-print ("Model: standard candle sources")
-print ("Model: star formation evolution")
+print (color.BOLD + "FIRESONG initialization:" + color.END)
+print (color.GREEN + "Model: standard candle sources" + color.END)
+print (color.GREEN + "Model: star formation evolution" + color.END)
 print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr")
-print ("Local density of neutrino sources: " + str(options.density))
+print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("##############################################################################")
+print ("#####")
 
 #Generate the bins of z
 bins = np.arange(0, 10, 0.001)
@@ -129,7 +141,7 @@ output.write("# declination     z      flux       observed" + "\n")
 
 for i in range(0, len(random_from_cdf)):
 	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
-
+print ("Results:")
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
