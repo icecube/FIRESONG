@@ -53,8 +53,8 @@ N_sample = NumberOfSourcesStandardCandleSFR(options.density)
 flux_z1 = Fluxz1StandardCandleSFT(options.density)
 print ("##############################################################################")
 print ("FIRESONG initialization:")
-print ("Standard Candle Sources")
-print ("Star Formation Evolution")
+print ("Model: standard candle sources")
+print ("Model: star formation evolution")
 print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
@@ -118,7 +118,13 @@ declin = 180*np.arcsin(sinDec)/np.pi
 ### The following two lines may be a faster way to output the array, will save it for later
 #finalset = zip(declin, z, flux, obs[0])
 #np.savetxt(options.filename, finalset, delimiter=" ", fmt='%f, %f, %f, %i')
-
+output.write("# FIRESONG Output description\n")
+output.write("# Declination: degrees\n")
+output.write("# Redshift\n")
+output.write("# flux: E^2 dN/dE assuming (E/100 TeV)^(-0.1) GeV/cm^2.s.sr\n")
+output.write("#     Note that as of 2016, IceCube can detect point sources of ~10^-9 in the\n")
+output.write("#     qunits used here.\n")
+output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
 for i in range(0, len(random_from_cdf)):
