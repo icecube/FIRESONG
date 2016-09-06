@@ -5,6 +5,7 @@ import numpy as np
 import random
 import math
 import cosmolopy
+import scipy.integrate
 from scipy.interpolate import UnivariateSpline
 import argparse
 
@@ -33,14 +34,14 @@ def StarFormationHistory(x):
     if x>=0.73878:
         return math.pow(10,-8.0*x+4.99)
 
-def ObservedRate(z):
+def Redshift_distribution(z):
     return 4*np.pi*StarFormationHistory(np.log10(1+z))*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
 
 # Assuming Star formation rate evolution and Standard Candles results in
 # 18,460,312 sources for a local source density of 1e-6 / Mpc3.
 #
-def NumberOfSourcesStandardCandleSFR(density):
-    return int(18460312.*density/1e-6)
+#def NumberOfSourcesStandardCandleSFR(density):
+#    return int(18460312.*density/1e-6)
 
 # Flux at redshift z=1 scaled according to density
 # The output is in units of GeV/cm^2.s
@@ -48,8 +49,17 @@ def NumberOfSourcesStandardCandleSFR(density):
 #
 # E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr
 #
-def Fluxz1StandardCandleSFT(density):
-    return 2.20e-14*(1e-6/density)
+#def Fluxz1StandardCandleSFT(density):
+#    return 2.20e-14*(1e-6/density)
+
+def NumberOfSourcesStandardCandleSFR(rho0):
+  norm = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, 10)[0]
+  area = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, 0.01)[0]
+  vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
+  Ntotal = rho0 * vlocal / (area/norm)
+  dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
+  Fluxnorm = 4*np.pi*1e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, 10)[0]
+  return [int(Ntotal), Fluxnorm] 
 
 #
 # Process command line options
@@ -64,8 +74,8 @@ parser.add_argument("-p", action="store_false",
                     help="Calculate detectable point sources")
 options = parser.parse_args()
 output = open(options.filename,"w")
-N_sample = NumberOfSourcesStandardCandleSFR(options.density)
-flux_z1 = Fluxz1StandardCandleSFT(options.density)
+N_sample = NumberOfSourcesStandardCandleSFR(options.density)[0]
+flux_z1 = NumberOfSourcesStandardCandleSFR(options.density)[1]
 
 print ("##############################################################################")
 print (color.BOLD + "FIRESONG initializing" + color.END)
@@ -81,7 +91,7 @@ redshift_bins = np.arange(0, 10, 0.001)
 
 #Generate the histogram
 redshift_binmid = redshift_bins[:-1] + np.diff(redshift_bins)/2.
-sfh = [ObservedRate(redshift_binmid[i]) for i in range(0,len(redshift_binmid))]
+sfh = [Redshift_distribution(redshift_binmid[i]) for i in range(0,len(redshift_binmid))]
 
 #Generate the random number of z
 cdf = np.cumsum(sfh)
