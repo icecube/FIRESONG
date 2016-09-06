@@ -6,6 +6,7 @@ FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays
 Reference: http://stackoverflow.com/questions/17821458/random-number-from-histogram
 
 The way we generate random number according to the observed rate function is like this
+
 1. generate a histogram using observed rate function
 
 2. use py.cumsum to sum the histogram
