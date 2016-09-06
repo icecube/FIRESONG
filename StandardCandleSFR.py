@@ -59,18 +59,22 @@ parser.add_argument('-o', action='store', dest='filename',
                     help='Output filename')
 parser.add_argument('-d', action='store', dest='density', type=float,
                     help='Local neutrino source density [Mpc^3]')
+parser.add_argument("-p", action="store_false",
+                    dest="NoPSComparison", default=True,
+                    help="Calculate detectable point sources")
 options = parser.parse_args()
 output = open(options.filename,"w")
 N_sample = NumberOfSourcesStandardCandleSFR(options.density)
 flux_z1 = Fluxz1StandardCandleSFT(options.density)
+
 print ("##############################################################################")
-print (color.BOLD + "FIRESONG initialization:" + color.END)
-print (color.GREEN + "Model: standard candle sources" + color.END)
-print (color.GREEN + "Model: star formation evolution" + color.END)
+print (color.BOLD + "FIRESONG initializing" + color.END)
+print (color.BLUE + "Model: standard candle sources" + color.END)
+print (color.BLUE + "Model: star formation evolution" + color.END)
 print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("#####")
+print (color.BOLD + "FIRESONG initialization done" + color.END)
 
 #Generate the bins of z
 bins = np.arange(0, 10, 0.001)
@@ -130,6 +134,7 @@ declin = 180*np.arcsin(sinDec)/np.pi
 ### The following two lines may be a faster way to output the array, will save it for later
 #finalset = zip(declin, z, flux, obs[0])
 #np.savetxt(options.filename, finalset, delimiter=" ", fmt='%f, %f, %f, %i')
+
 output.write("# FIRESONG Output description\n")
 output.write("# Declination: degrees\n")
 output.write("# Redshift\n")
@@ -141,9 +146,19 @@ output.write("# declination     z      flux       observed" + "\n")
 
 for i in range(0, len(random_from_cdf)):
 	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
-print ("Results:")
+
+print (color.BOLD + "RESULTS" + color.END)
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
+
+################################
+#Find out if there are sources that exceed IceCube's limit
+#
+if (options.NoPSComparison==False):
+    fluxToPointSourceSentivity = flux / 1e-9
+    detectable  = [i for i in fluxToPointSourceSentivity if i >= 1.]
+    print detectable
+    output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
 
 output.close()
 
