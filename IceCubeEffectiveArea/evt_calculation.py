@@ -12,6 +12,11 @@ filelist = open('filelist.txt', 'r')
 #This is the total event
 Total = 0
 
+#sinDec list
+sinDec = np.arange(-0.075, 1.025, 0.05)
+i = 0
+
+print('# sin(Declin)  Observed_Events')
 #loop through all files
 for fn in filelist :
 	fn = fn.rstrip('\n')
@@ -31,7 +36,7 @@ for fn in filelist :
 	input.close()
 
 	#number of event per energy (i.e. flux * exposure * delta_steradian)
-	Devt = 1e4*1e-8*np.power(e_list/1e5, -0.1)*np.power(e_list, -2)*expose_list*2*np.pi*0.05
+	Devt = 1e4*0.90e-8*np.power(e_list/1e5, -0.13)*np.power(e_list, -2)*expose_list*2*np.pi*0.05
 
 	#get mid point of the number of event, too get more accurate result
 	Devt_mid = Devt[:-1] + np.diff(Devt)/2.
@@ -40,11 +45,14 @@ for fn in filelist :
 	evt = Devt_mid * np.diff(e_list)
 
 	#print the total number of event in each steradian bin
-	print np.sum(evt)
+	print (str(sinDec[i])+ " " + str(np.sum(evt)))
+
+	#increase i
+	i += 1
 
 	#print the total number of event for all steradian bin
 	Total += np.sum(evt)
 
-print ('The total observed events above 200TeV is:' + str(Total))
+print ('# The total observed events above 200TeV is:' + str(Total))
 
 filelist.close()
