@@ -76,7 +76,7 @@ print ("FIRESONG initializing")
 print ("Standard candle sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.1) GeV/cm^2.s.sr")
+print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.15) GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("FIRESONG initialization done")
 
@@ -97,7 +97,7 @@ redshift_list = redshift_binmid[bin_index]
 # This is the number of events as a function of declination (Effective Area?)
 def IceCubeResponse(sinDec):
     sinDecbin = np.array([-0.075,-0.025,0.025,0.075,0.125,0.175,0.225,0.275,0.325,0.375,0.425,0.475,0.525,0.575,0.625,0.675,0.725,0.775,0.825,0.875,0.925,0.975])
-    response = np.array([105.896, 185.11, 177.775, 155.445, 133.492, 113.77, 99.8513, 87.4213, 76.7264, 63.8566, 57.6465, 48.2527, 44.1256, 34.2095, 30.4975, 25.8617, 22.4174, 19.0691, 15.683, 9.20381, 5.12658, 3.40891])
+    response = np.array([3.0045159553,5.23805141341,5.06305313652,4.46148652478,3.87178177528,3.33860890989,2.9548202181,2.59882547308,2.28863696777,1.91307779179,1.73842278415,1.46080267643,1.33905080306,1.0396627545,0.93215007891,0.79381842605,0.68845527303,0.587733763733,0.485520322361,0.288448884334,0.161564911692,0.108454763794])
     spline = UnivariateSpline(sinDecbin,response)
     if sinDec>=-0.1 and sinDec<=1.:
         return spline(sinDec)
