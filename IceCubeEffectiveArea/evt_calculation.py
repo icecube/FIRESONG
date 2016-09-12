@@ -36,7 +36,7 @@ for fn in filelist :
 	input.close()
 
 	#number of event per energy (i.e. flux * exposure * delta_steradian)
-	Devt = 1e4*0.90e-8*np.power(e_list/1e5, -0.13)*np.power(e_list, -2)*expose_list*2*np.pi*0.05
+	Devt = 1e4*0.5*0.90e-8*np.power(e_list/1e5, -0.13)*np.power(e_list, -2)*expose_list*2*np.pi*0.05
 
 	#get mid point of the number of event, too get more accurate result
 	Devt_mid = Devt[:-1] + np.diff(Devt)/2.
