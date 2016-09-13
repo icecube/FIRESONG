@@ -87,11 +87,13 @@ print ("Number of neutrinos sources in the Universe: " + str(N_sample))
 print (color.BOLD + "FIRESONG initialization done" + color.END)
 
 #Generate the bins of z
-redshift_bins = np.arange(0, 10, 0.001)
+redshift_bins = np.arange(0, 10, 0.0001)
 
 #Generate the histogram
 redshift_binmid = redshift_bins[:-1] + np.diff(redshift_bins)/2.
 sfh = [Redshift_distribution(redshift_binmid[i]) for i in range(0,len(redshift_binmid))]
+#vRedshift = np.vectorize(Redshift_distribution)
+#sfh = vRedshift(redshift_binmid)
 
 #Generate the random number of z
 cdf = np.cumsum(sfh)
@@ -130,9 +132,9 @@ flux = flux_z1 * (dL1*dL1)/(dL*dL)
 TotalFlux = np.sum(flux)
 
 #Calculate the effectivearea at icecube for each source
-EA = [0]*len(sinDec)
-for i in range(0, len(sinDec)):
-	EA[i] = IceCubeResponse(sinDec[i])
+#vectorize the function to speed up
+icecuberesponse = np.vectorize(IceCubeResponse)
+EA = icecuberesponse(sinDec)
 
 #Get mean no. of event due to each source
 events = EA*flux/1e-8
@@ -142,9 +144,6 @@ obs = np.random.poisson(events, (1, len(events)))
 #Calculate the declination
 declin = 180*np.arcsin(sinDec)/np.pi
 
-### The following two lines may be a faster way to output the array, will save it for later
-#finalset = zip(declin, z, flux, obs[0])
-#np.savetxt(options.filename, finalset, delimiter=" ", fmt='%f, %f, %f, %i')
 
 output.write("# FIRESONG Output description\n")
 output.write("# Declination: degrees\n")
@@ -157,6 +156,11 @@ output.write("# declination     z      flux       observed" + "\n")
 
 for i in range(0, len(redshift_list)):
 	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+### The following two lines may be a faster way to output the array, will save it for later
+#finalset = zip(declin, z, flux, obs[0])
+#np.savetxt(options.filename, flux, delimiter=" ", fmt='%f')
+
+
 
 print (color.BOLD + "RESULTS" + color.END)
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
