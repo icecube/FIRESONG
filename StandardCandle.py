@@ -97,7 +97,7 @@ redshift_list = redshift_binmid[bin_index]
 # This is the number of events as a function of declination (Effective Area?)
 def IceCubeResponse(sinDec):
     sinDecbin = np.array([-0.075,-0.025,0.025,0.075,0.125,0.175,0.225,0.275,0.325,0.375,0.425,0.475,0.525,0.575,0.625,0.675,0.725,0.775,0.825,0.875,0.925,0.975])
-    response = np.array([3.0045159553,5.23805141341,5.06305313652,4.46148652478,3.87178177528,3.33860890989,2.9548202181,2.59882547308,2.28863696777,1.91307779179,1.73842278415,1.46080267643,1.33905080306,1.0396627545,0.93215007891,0.79381842605,0.68845527303,0.587733763733,0.485520322361,0.288448884334,0.161564911692,0.108454763794])
+    response = np.array([ 1.43157782,  2.49805012,  2.40922875,  2.11850236,  1.83260528,  1.57407987,  1.38901673,  1.21928423,  1.07254951,  0.89507228,  0.8112872 ,  0.68070604,  0.62340165,  0.48375603,  0.43273429,  0.36790242,  0.31901041,  0.27194677,  0.22425169,  0.13257925,  0.07409182,  0.04955012])
     spline = UnivariateSpline(sinDecbin,response)
     if sinDec>=-0.1 and sinDec<=1.:
         return spline(sinDec)
@@ -160,8 +160,9 @@ output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 #
 if (options.NoPSComparison==False):
     fluxToPointSourceSentivity = flux / 1e-9
-    detectable  = [i for i in fluxToPointSourceSentivity if i >= 1.]
+    detectable  = [[i, j] for i, j in zip(fluxToPointSourceSentivity, declin) if i >= 1. and j > 0]
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
 
+    
 output.close()
