@@ -122,10 +122,8 @@ flux = flux_z1 * (dL1*dL1)/(dL*dL)
 #total flux
 TotalFlux = np.sum(flux)
 
-#Calculate the effectivearea at icecube for each source
-EA = np.array([0]*len(sinDec))
-for i in range(0, len(sinDec)):
-	EA[i] = IceCubeResponse(sinDec[i])
+#Calculate the number of events at icecube for each source's declination angle
+EA = [IceCubeResponse(sinDec[i]) for i in range(0, len(sinDec))]
 
 #Get mean no. of event due to each source
 events = EA*flux/(0.9e-8*2*np.pi*0.05)
@@ -153,6 +151,7 @@ for i in range(0, len(redshift_list)):
 
 print ("RESULTS")
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
+print ('Total number of detected events = ' + str(np.sum(obs[0])))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################
