@@ -123,12 +123,12 @@ flux = flux_z1 * (dL1*dL1)/(dL*dL)
 TotalFlux = np.sum(flux)
 
 #Calculate the effectivearea at icecube for each source
-EA = [0]*len(sinDec)
+EA = np.array([0]*len(sinDec))
 for i in range(0, len(sinDec)):
 	EA[i] = IceCubeResponse(sinDec[i])
 
 #Get mean no. of event due to each source
-events = EA*flux/1e-8
+events = EA*flux/(0.9e-8*2*np.pi*0.05)
 #Get the number of event from poisson distribution
 obs = np.random.poisson(events, (1, len(events)))
 
@@ -164,5 +164,5 @@ if (options.NoPSComparison==False):
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
 
-    
+
 output.close()
