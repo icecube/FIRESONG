@@ -9,8 +9,6 @@ import scipy.integrate
 from scipy.interpolate import UnivariateSpline
 import argparse
 
-
-
 # Plack 2015 parameters
 cosmology = {'omega_M_0' : 0.308, 'omega_lambda_0' : 0.692, 'h' : 0.678}
 cosmology = cosmolopy.distance.set_omega_k_0(cosmology) #Flat universe
@@ -46,6 +44,9 @@ parser.add_argument("-p", action="store_false",
 parser.add_argument("--noevolution", action="store_false",
                     dest="NoEvolution", default=True,
                     help="Disable Star Formation History Evolution")
+parser.add_argument("--zmax", action="store",
+                    dest="zmax", default=10.,
+                    help="Highest redshift")
 options = parser.parse_args()
 output = open(options.filename,"w")
 
@@ -53,19 +54,20 @@ if (options.NoEvolution==False):
     Evolution=NoEvolution
 else:
     Evolution=StarFormationHistory
-
+zmax = float(options.zmax)
+print zmax
 
 # This is the redshift distribution for arbitrary evolution    
 def Redshift_distribution(z):
     return 4*np.pi*Evolution(np.log10(1+z))*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
 
 def NumberOfSourcesStandardCandle(rho0):
-  norm = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, 10)[0]
+  norm = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, zmax)[0]
   area = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, 0.01)[0]
   vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
   Ntotal = rho0 * vlocal / (area/norm)
   dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
-  Fluxnorm = 4*np.pi*1e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, 10)[0]
+  Fluxnorm = 4*np.pi*0.9e-8 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, zmax)[0]
   return [int(Ntotal), Fluxnorm] 
 N_sample = NumberOfSourcesStandardCandle(options.density)[0]
 
@@ -76,12 +78,13 @@ print ("FIRESONG initializing")
 print ("Standard candle sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.15) GeV/cm^2.s.sr")
+print ("Uses neutrino diffuse flux: E^2 dN/dE = 0.9e-8 (E/100 TeV)^(-0.13) GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
+print ("Redshift range: 0 - " + str(options.zmax)) 
 print ("FIRESONG initialization done")
 
 #Generate the bins of z
-redshift_bins = np.arange(0, 10, 0.001)
+redshift_bins = np.arange(0, zmax, 0.001)
 
 #Generate the histogram
 redshift_binmid = redshift_bins[:-1] + np.diff(redshift_bins)/2.
@@ -115,7 +118,7 @@ sinDec = sinDec*2. -1.
 z = redshift_list
 #get luminosity distance at z
 dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
-#get point source flux at z, the coefficient here should match the Total flux = 1e-8 Gev / cm^2 / s / sr
+#get point source flux at z, the coefficient here should match the Total flux = 0.9e-8 Gev / cm^2 / s / sr
 #for N_sample = 14921752, facctor is 2.20e-14
 flux = flux_z1 * (dL1*dL1)/(dL*dL) 
 
@@ -140,7 +143,7 @@ declin = 180*np.arcsin(sinDec)/np.pi
 output.write("# FIRESONG Output description\n")
 output.write("# Declination: degrees\n")
 output.write("# Redshift\n")
-output.write("# flux: E^2 dN/dE assuming (E/100 TeV)^(-0.1) GeV/cm^2.s.sr\n")
+output.write("# flux: E^2 dN/dE assuming 0.9e-8 (E/100 TeV)^(-0.13) GeV/cm^2.s.sr\n")
 output.write("#     Note that as of 2016, IceCube can detect point sources of ~10^-9 in the\n")
 output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
@@ -162,6 +165,5 @@ if (options.NoPSComparison==False):
     detectable  = [[i, j] for i, j in zip(fluxToPointSourceSentivity, declin) if i >= 1. and j > 0]
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
-
-
+    
 output.close()
