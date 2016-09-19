@@ -8,6 +8,7 @@ import cosmolopy
 import scipy.integrate
 from scipy.interpolate import UnivariateSpline
 import argparse
+from evt_calculation import IceCubeEvt
 
 
 
@@ -46,6 +47,10 @@ parser.add_argument("-p", action="store_false",
 parser.add_argument("--noevolution", action="store_false",
                     dest="NoEvolution", default=True,
                     help="Disable Star Formation History Evolution")
+parser.add_argument("--fit", action="store", dest='fit', type=float, default=0.9e-8,
+                    help="best fit of the diffuse flux")
+parser.add_argument("--index", action="store", dest='index', type=float, default=-0.13,
+                    help="Index of the diffuse flux")
 options = parser.parse_args()
 output = open(options.filename,"w")
 
@@ -54,6 +59,10 @@ if (options.NoEvolution==False):
 else:
     Evolution=StarFormationHistory
 
+if (options.fit==0.9e-8 and options.index==-0.13):
+    icecubeevtlist = [ 1.43157782,  2.49805012,  2.40922875,  2.11850236,  1.83260528,  1.57407987,  1.38901673,  1.21928423,  1.07254951,  0.89507228,  0.8112872 ,  0.68070604,  0.62340165,  0.48375603,  0.43273429,  0.36790242,  0.31901041,  0.27194677,  0.22425169,  0.13257925,  0.07409182,  0.04955012]
+else:
+    icecubeevtlist = IceCubeEvt(options.fit, options.index)
 
 # This is the redshift distribution for arbitrary evolution    
 def Redshift_distribution(z):
@@ -76,7 +85,7 @@ print ("FIRESONG initializing")
 print ("Standard candle sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(-0.15) GeV/cm^2.s.sr")
+print ("Uses neutrino diffuse flux: E^2 dN/dE = 1e-8 (E/100 TeV)^(" + str(options.index) +") GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("FIRESONG initialization done")
 
@@ -97,7 +106,7 @@ redshift_list = redshift_binmid[bin_index]
 # This is the number of events as a function of declination (Effective Area?)
 def IceCubeResponse(sinDec):
     sinDecbin = np.array([-0.075,-0.025,0.025,0.075,0.125,0.175,0.225,0.275,0.325,0.375,0.425,0.475,0.525,0.575,0.625,0.675,0.725,0.775,0.825,0.875,0.925,0.975])
-    response = np.array([ 1.43157782,  2.49805012,  2.40922875,  2.11850236,  1.83260528,  1.57407987,  1.38901673,  1.21928423,  1.07254951,  0.89507228,  0.8112872 ,  0.68070604,  0.62340165,  0.48375603,  0.43273429,  0.36790242,  0.31901041,  0.27194677,  0.22425169,  0.13257925,  0.07409182,  0.04955012])
+    response = np.array(icecubeevtlist)
     spline = UnivariateSpline(sinDecbin,response)
     if sinDec>=-0.1 and sinDec<=1.:
         return spline(sinDec)
