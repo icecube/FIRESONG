@@ -8,6 +8,7 @@ import cosmolopy
 import scipy.integrate
 from scipy.interpolate import UnivariateSpline
 import argparse
+from evt_calculation import IceCubeEvt
 
 # Plack 2015 parameters
 cosmology = {'omega_M_0' : 0.308, 'omega_lambda_0' : 0.692, 'h' : 0.678}
@@ -47,6 +48,11 @@ parser.add_argument("--noevolution", action="store_false",
 parser.add_argument("--zmax", action="store",
                     dest="zmax", default=10.,
                     help="Highest redshift")
+#The following two options normal and index, are for tweaking the IceCubeResponse function
+parser.add_argument("--fluxnorm", action="store", dest='fluxnorm', type=float, default=0.9e-8,
+                    help="flux normalization of the diffuse flux for IceCubeResponse")
+parser.add_argument("--index", action="store", dest='index', type=float, default=2.13,
+                    help="Index of the diffuse flux for IceCubeResponse")
 options = parser.parse_args()
 output = open(options.filename,"w")
 
@@ -54,6 +60,12 @@ if (options.NoEvolution==False):
     Evolution=NoEvolution
 else:
     Evolution=StarFormationHistory
+
+if (options.fluxnorm==0.9e-8 and options.index==-0.13):
+    icecubeevtlist = [ 1.43157782,  2.49805012,  2.40922875,  2.11850236,  1.83260528,  1.57407987,  1.38901673,  1.21928423,  1.07254951,  0.89507228,  0.8112872 ,  0.68070604,  0.62340165,  0.48375603,  0.43273429,  0.36790242,  0.31901041,  0.27194677,  0.22425169,  0.13257925,  0.07409182,  0.04955012]
+else:
+    icecubeevtlist = IceCubeEvt(options.fluxnorm, options.index)
+
 zmax = float(options.zmax)
 print zmax
 
@@ -78,7 +90,7 @@ print ("FIRESONG initializing")
 print ("Standard candle sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("Uses neutrino diffuse flux: E^2 dN/dE = 0.9e-8 (E/100 TeV)^(-0.13) GeV/cm^2.s.sr")
+print ("Uses neutrino diffuse flux: E^2 dN/dE = 0.9e-8 (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("Redshift range: 0 - " + str(options.zmax)) 
 print ("FIRESONG initialization done")
@@ -100,7 +112,7 @@ redshift_list = redshift_binmid[bin_index]
 # This is the number of events as a function of declination (Effective Area?)
 def IceCubeResponse(sinDec):
     sinDecbin = np.array([-0.075,-0.025,0.025,0.075,0.125,0.175,0.225,0.275,0.325,0.375,0.425,0.475,0.525,0.575,0.625,0.675,0.725,0.775,0.825,0.875,0.925,0.975])
-    response = np.array([ 1.43157782,  2.49805012,  2.40922875,  2.11850236,  1.83260528,  1.57407987,  1.38901673,  1.21928423,  1.07254951,  0.89507228,  0.8112872 ,  0.68070604,  0.62340165,  0.48375603,  0.43273429,  0.36790242,  0.31901041,  0.27194677,  0.22425169,  0.13257925,  0.07409182,  0.04955012])
+    response = np.array(icecubeevtlist)
     spline = UnivariateSpline(sinDecbin,response)
     if sinDec>=-0.1 and sinDec<=1.:
         return spline(sinDec)
@@ -129,7 +141,7 @@ TotalFlux = np.sum(flux)
 EA = [IceCubeResponse(sinDec[i]) for i in range(0, len(sinDec))]
 
 #Get mean no. of event due to each source
-events = EA*flux/(0.9e-8*2*np.pi*0.05)
+events = EA*flux/(options.fluxnorm*2*np.pi*0.05)
 #Get the number of event from poisson distribution
 obs = np.random.poisson(events, (1, len(events)))
 
@@ -143,7 +155,7 @@ declin = 180*np.arcsin(sinDec)/np.pi
 output.write("# FIRESONG Output description\n")
 output.write("# Declination: degrees\n")
 output.write("# Redshift\n")
-output.write("# flux: E^2 dN/dE assuming 0.9e-8 (E/100 TeV)^(-0.13) GeV/cm^2.s.sr\n")
+output.write("# flux: E^2 dN/dE assuming " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr\n")
 output.write("#     Note that as of 2016, IceCube can detect point sources of ~10^-9 in the\n")
 output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
