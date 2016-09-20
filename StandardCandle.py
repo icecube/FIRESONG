@@ -39,8 +39,6 @@ parser.add_argument('-o', action='store', dest='filename',
                     help='Output filename')
 parser.add_argument('-d', action='store', dest='density', type=float,
                     help='Local neutrino source density [1/Mpc^3]')
-parser.add_argument('-f', action='store', dest='fluxsum', type=float, default=0.9e-8,
-                    help="diffuse flux sum of all the point sources")
 parser.add_argument("-p", action="store_false",
                     dest="NoPSComparison", default=True,
                     help="Calculate detectable point sources")
@@ -69,7 +67,6 @@ else:
     icecubeevtlist = IceCubeEvt(options.fluxnorm, options.index)
 
 zmax = float(options.zmax)
-print zmax
 
 # This is the redshift distribution for arbitrary evolution    
 def Redshift_distribution(z):
@@ -81,18 +78,18 @@ def NumberOfSourcesStandardCandle(rho0, norm):
   vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
   Ntotal = rho0 * vlocal / (area/norm)
   dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
-  Fluxnorm = 4*np.pi*options.fluxsum / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, zmax)[0]
+  Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, zmax)[0]
   return [int(Ntotal), Fluxnorm] 
-N_sample = NumberOfSourcesStandardCandle(options.density, options.fluxsum)[0]
+N_sample = NumberOfSourcesStandardCandle(options.density, options.fluxnorm)[0]
 
-flux_z1 = NumberOfSourcesStandardCandle(options.density, options.fluxsum)[1]
+flux_z1 = NumberOfSourcesStandardCandle(options.density, options.fluxnorm)[1]
 
 print ("##############################################################################")
 print ("FIRESONG initializing")
 print ("Standard candle sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
-print ("Uses neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxsum) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
+print ("Uses neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("Redshift range: 0 - " + str(options.zmax)) 
 print ("FIRESONG initialization done")
