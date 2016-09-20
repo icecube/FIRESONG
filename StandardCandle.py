@@ -53,6 +53,9 @@ parser.add_argument("--fluxnorm", action="store", dest='fluxnorm', type=float, d
                     help="flux normalization of the diffuse flux for IceCubeResponse")
 parser.add_argument("--index", action="store", dest='index', type=float, default=2.13,
                     help="Index of the diffuse flux for IceCubeResponse")
+parser.add_argument("--lognormal", action="store_true",
+                    dest="lognormal", default=False,
+                    help="Luminosity of star follows a log normal distribution")
 options = parser.parse_args()
 output = open(options.filename,"w")
 
@@ -131,10 +134,18 @@ z = redshift_list
 dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
 #get point source flux at z, the coefficient here should match the Total flux = 0.9e-8 Gev / cm^2 / s / sr
 #for N_sample = 14921752, facctor is 2.20e-14
+
 flux = flux_z1 * (dL1*dL1)/(dL*dL) 
 
 #total flux
 TotalFlux = np.sum(flux)
+
+if options.lognormal == True:
+    logfluxz1 = np.log(flux_z1)
+    flux_z1 = np.exp(np.random.normal(logfluxz1, 0.05*np.absolute(logfluxz1), N_sample))
+    flux = flux_z1 * (dL1*dL1)/(dL*dL) 
+    flux = flux * TotalFlux/np.sum(flux)
+
 
 #Calculate the number of events at icecube for each source's declination angle
 EA = [IceCubeResponse(sinDec[i]) for i in range(0, len(sinDec))]
