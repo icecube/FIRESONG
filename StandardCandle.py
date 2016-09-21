@@ -56,6 +56,9 @@ parser.add_argument("--index", action="store", dest='index', type=float, default
 parser.add_argument("--lognormal", action="store_true",
                     dest="lognormal", default=False,
                     help="Luminosity of star follows a log normal distribution")
+parser.add_argument("--sigma", action="store",
+                    dest="sigma", type=float, default=0.05,
+                    help="The width of log normal distribution, width = sigma*avg. flux at z=1")
 options = parser.parse_args()
 output = open(options.filename,"w")
 
@@ -142,7 +145,7 @@ TotalFlux = np.sum(flux)
 
 if options.lognormal == True:
     logfluxz1 = np.log(flux_z1)
-    flux_z1 = np.exp(np.random.normal(logfluxz1, 0.05*np.absolute(logfluxz1), N_sample))
+    flux_z1 = np.exp(np.random.normal(logfluxz1, options.sigma*np.absolute(logfluxz1), N_sample))
     flux = flux_z1 * (dL1*dL1)/(dL*dL) 
     flux = flux * TotalFlux/np.sum(flux)
 
@@ -171,12 +174,17 @@ output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
+multiple_evt = []
+
 for i in range(0, len(redshift_list)):
-	output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+    output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+    if obs[0][i] >= 2:
+        multiple_evt = np.append(multiple_evt, obs[0][i])
 
 print ("RESULTS")
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
 print ('Total number of detected events = ' + str(np.sum(obs[0])))
+print ('Total number of sources that give multiple neutrino events = ' + str(len(multiple_evt)))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################
@@ -185,6 +193,7 @@ output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 if (options.NoPSComparison==False):
     fluxToPointSourceSentivity = flux / 1e-9
     detectable  = [[i, j] for i, j in zip(fluxToPointSourceSentivity, declin) if i >= 1. and j > 0]
+    print ("Detectable sources are: ")
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
     
