@@ -31,6 +31,14 @@ def StarFormationHistory(x):
 def NoEvolution(x):
     return 1.
 
+def sourcefluxdistribution(logoption, mean, width, size):
+    if logoption == True:
+        logmean = np.log(mean)
+        lognormaldistribution = np.exp(np.random.normal(logmean, width*np.absolute(logmean), size))
+        return lognormaldistribution
+    if logoption == False:
+        return mean
+
 #
 # Process command line options
 #
@@ -86,13 +94,17 @@ def NumberOfSourcesStandardCandle(rho0, norm):
   dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
   Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, zmax)[0]
   return [int(Ntotal), Fluxnorm] 
-N_sample = NumberOfSourcesStandardCandle(options.density, options.fluxnorm)[0]
 
-flux_z1 = NumberOfSourcesStandardCandle(options.density, options.fluxnorm)[1]
+N_sample, candleflux = NumberOfSourcesStandardCandle(options.density, options.fluxnorm)
+
+flux_z1 = sourcefluxdistribution(options.lognormal, candleflux, options.sigma, N_sample)
 
 print ("##############################################################################")
 print ("FIRESONG initializing")
-print ("Standard candle sources")
+if options.lognormal == False:
+    print ("Standard candle sources")
+if options.lognormal == True:
+    print ("Lognormal distributed sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
 print ("Uses neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
@@ -137,17 +149,10 @@ z = redshift_list
 dL = cosmolopy.distance.luminosity_distance(z, **cosmology)
 #get point source flux at z, the coefficient here should match the Total flux = 0.9e-8 Gev / cm^2 / s / sr
 #for N_sample = 14921752, facctor is 2.20e-14
-
 flux = flux_z1 * (dL1*dL1)/(dL*dL) 
 
 #total flux
 TotalFlux = np.sum(flux)
-
-if options.lognormal == True:
-    logfluxz1 = np.log(flux_z1)
-    flux_z1 = np.exp(np.random.normal(logfluxz1, options.sigma*np.absolute(logfluxz1), N_sample))
-    flux = flux_z1 * (dL1*dL1)/(dL*dL) 
-    flux = flux * TotalFlux/np.sum(flux)
 
 
 #Calculate the number of events at icecube for each source's declination angle
