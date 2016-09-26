@@ -34,7 +34,8 @@ def NoEvolution(x):
 def sourcefluxdistribution(logoption, mean, width, size):
     if logoption == True:
         logmean = np.log(mean)
-        lognormaldistribution = np.exp(np.random.normal(logmean, width*np.absolute(logmean), size))
+        sigma=width*np.absolute(logmean)
+        lognormaldistribution = np.exp(np.random.normal(logmean-1/2*sigma**2, sigma, size))
         return lognormaldistribution
     if logoption == False:
         return mean
