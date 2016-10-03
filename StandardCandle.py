@@ -34,7 +34,7 @@ def NoEvolution(x):
 def sourcefluxdistribution(logoption, mean, width, size):
     if logoption == True:
         logmean = np.log(mean)
-        sigma=width*np.absolute(logmean)
+        sigma=np.log(np.power(10,width))
         lognormaldistribution = np.exp(np.random.normal(logmean-1/2*sigma**2, sigma, size))
         return lognormaldistribution
     if logoption == False:
@@ -66,8 +66,8 @@ parser.add_argument("--lognormal", action="store_true",
                     dest="lognormal", default=False,
                     help="Luminosity of star follows a log normal distribution")
 parser.add_argument("--sigma", action="store",
-                    dest="sigma", type=float, default=0.05,
-                    help="The width of log normal distribution, width = sigma*avg. flux at z=1")
+                    dest="sigma", type=float, default=0.3,
+                    help="The width of log normal distribution, in unit of dex, default is 0.3")
 options = parser.parse_args()
 output = open(options.filename,"w")
 
