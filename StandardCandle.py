@@ -62,6 +62,8 @@ parser.add_argument("--fluxnorm", action="store", dest='fluxnorm', type=float, d
                     help="flux normalization of the diffuse flux for IceCubeResponse")
 parser.add_argument("--index", action="store", dest='index', type=float, default=2.13,
                     help="Index of the diffuse flux for IceCubeResponse")
+parser.add_argument("--notruncate", action="store_true", dest='notruncate', default=False,
+                    help="Switch to use non-truncated exposure data")
 parser.add_argument("--lognormal", action="store_true",
                     dest="lognormal", default=False,
                     help="Luminosity of star follows a log normal distribution")
@@ -76,10 +78,7 @@ if (options.NoEvolution==False):
 else:
     Evolution=StarFormationHistory
 
-if (options.fluxnorm==0.9e-8 and options.index==-0.13):
-    icecubeevtlist = [ 1.43157782,  2.49805012,  2.40922875,  2.11850236,  1.83260528,  1.57407987,  1.38901673,  1.21928423,  1.07254951,  0.89507228,  0.8112872 ,  0.68070604,  0.62340165,  0.48375603,  0.43273429,  0.36790242,  0.31901041,  0.27194677,  0.22425169,  0.13257925,  0.07409182,  0.04955012]
-else:
-    icecubeevtlist = IceCubeEvt(options.fluxnorm, options.index)
+icecubeevtlist = IceCubeEvt(options.fluxnorm, options.index, options.notruncate)
 
 zmax = float(options.zmax)
 
@@ -110,6 +109,7 @@ print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
 print ("Uses neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
+print ("Use 200TeV truncated exposure data? " + str(not options.notruncate))
 print ("Redshift range: 0 - " + str(options.zmax)) 
 print ("FIRESONG initialization done")
 
@@ -181,16 +181,20 @@ output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 y
 output.write("# declination     z      flux       observed" + "\n")
 
 multiple_evt = []
+tenplus_evt = []
 
 for i in range(0, len(redshift_list)):
     output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
     if obs[0][i] >= 2:
         multiple_evt = np.append(multiple_evt, obs[0][i])
+    if obs[0][i] >= 10:
+        tenplus_evt = np.append(tenplus_evt, obs[0][i])
 
 print ("RESULTS")
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
 print ('Total number of detected events = ' + str(np.sum(obs[0])))
 print ('Total number of sources that give multiple neutrino events = ' + str(len(multiple_evt)))
+print ('Total number of sources that give more than 10 events = ' + str(len(tenplus_evt)))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################

@@ -5,10 +5,13 @@
 
 import numpy as np
 
-def IceCubeEvt(norm, index):
+def IceCubeEvt(norm, index, notruncate):
 
 	#Get file name for all truncated data files
-	filelist = open('IceCubeEffectiveArea/filelist.txt', 'r')
+	if notruncate == False:
+		filelist = open('IceCubeEffectiveArea/filelist.txt', 'r')
+	else:
+		filelist = open('IceCubeEffectiveArea/filelist_2.txt', 'r')
 
 	#sinDec list
 	sinDec = np.arange(-0.075, 1.025, 0.05)
