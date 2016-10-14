@@ -132,9 +132,9 @@ def IceCubeResponse(sinDec):
     sinDecbin = np.array([-0.075,-0.025,0.025,0.075,0.125,0.175,0.225,0.275,0.325,0.375,0.425,0.475,0.525,0.575,0.625,0.675,0.725,0.775,0.825,0.875,0.925,0.975])
     response = np.array(icecubeevtlist)
     spline = UnivariateSpline(sinDecbin,response)
-    splineresponse = spline(sinDec)
-    if sinDec>=-0.1 and sinDec<=1. and splineresponse > 0:
-        return splineresponse
+    SignalExpectation = spline(sinDec)
+    if sinDec>=-0.1 and sinDec<=1. and SignalExpectation>0:
+        return SignalExpectation
     else:
         return 0
 
