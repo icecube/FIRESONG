@@ -51,6 +51,9 @@ parser.add_argument('-d', action='store', dest='density', type=float,
 parser.add_argument("-p", action="store_false",
                     dest="NoPSComparison", default=True,
                     help="Calculate detectable point sources")
+parser.add_argument("--hawc", action="store_false",
+                    dest="NoHAWC", default=True,
+                    help="Calculate detectable point sources")
 parser.add_argument("--noevolution", action="store_false",
                     dest="NoEvolution", default=True,
                     help="Disable Star Formation History Evolution")
@@ -207,5 +210,11 @@ if (options.NoPSComparison==False):
     print ("Detectable sources are: ")
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
-    
+
+if (options.NoHAWC==False):
+    hawc_output = open("hawc_" + options.filename,"w")
+    detectable = ([[i, j, k] for i, j, k in zip(flux, declin, redshift_list) if j>-26. and j < 64. and k<0.1])
+    for i in range(0,len(detectable)):
+        hawc_output.write('%.3e %.3f %.3f\n' % (detectable[i][0], detectable[i][1], detectable[i][2]))
+    hawc_output.close()
 output.close()
