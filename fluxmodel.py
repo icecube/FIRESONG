@@ -1,17 +1,33 @@
 import numpy as np
 
 def PowerLawFlux(meanflux, index, nsource, width):
-	width = 10**width
-	F_min = meanflux / (width*np.log(10))
-	F_max = F_min*10**width
+## index = -2, f_mean ~= 2ln(10)*F_min
+## index < -2, f_mean ~= (index+1)/(index+2)*F_min
+	if index == -2:
+		width = 10**width
+		F_min = meanflux / (width*np.log(10))
+		F_max = F_min*10**width
+		
+		F_bin  = np.linspace(F_min, F_max, 10000)
+		pdf = F_bin**index
+		cdf = np.cumsum(pdf)
+		cdf = cdf / cdf[-1]
+		test = np.random.rand(nsource)
+		F_id = np.searchsorted(cdf, test)
+		flux = np.array([F_bin[i] for i in F_id])
 
-	F_bin  = np.linspace(F_min, F_max, 10000)
-	pdf = F_bin**index
-	cdf = np.cumsum(pdf)
-	cdf = cdf / cdf[-1]
-	test = np.random.rand(nsource)
-	F_id = np.searchsorted(cdf, test)
-	flux = np.array([F_bin[i] for i in F_id])
+	if index < -2:
+		width = 10**width
+		F_min = (index+2.)/(index+1.)*meanflux
+		F_max = F_min*10**width
+
+		F_bin  = np.linspace(F_min, F_max, 10000)
+		pdf = F_bin**index
+		cdf = np.cumsum(pdf)
+		cdf = cdf / cdf[-1]
+		test = np.random.rand(nsource)
+		F_id = np.searchsorted(cdf, test)
+		flux = np.array([F_bin[i] for i in F_id])
 
 	return flux
 
