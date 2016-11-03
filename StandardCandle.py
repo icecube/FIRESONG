@@ -9,6 +9,7 @@ import scipy.integrate
 from scipy.interpolate import UnivariateSpline
 import argparse
 from evt_calculation import IceCubeEvt
+from fluxmodel import PowerLawFlux, LognormalFlux
 
 # Plack 2015 parameters
 cosmology = {'omega_M_0' : 0.308, 'omega_lambda_0' : 0.692, 'h' : 0.678}
@@ -31,15 +32,14 @@ def StarFormationHistory(x):
 def NoEvolution(x):
     return 1.
 
-def sourcefluxdistribution(logoption, mean, width, size):
-    if logoption == True:
-        logmean = np.log(mean)
-        sigma=np.log(np.power(10,width))
-        lognormaldistribution = np.exp(np.random.normal(logmean-1/2*sigma**2, sigma, size))
-        return lognormaldistribution
-    if logoption == False:
+def sourcefluxdistribution(fluxoption, mean, width, size):
+    if fluxoption == 0:
         return mean
-
+    if fluxoption == 1:
+        return LognormalFlux(mean, size, width)
+    if fluxoption == 2:
+        return PowerLawFlux(mean, -2, size, width)
+    
 #
 # Process command line options
 #
@@ -51,9 +51,15 @@ parser.add_argument('-d', action='store', dest='density', type=float,
 parser.add_argument("-p", action="store_false",
                     dest="NoPSComparison", default=True,
                     help="Calculate detectable point sources")
+parser.add_argument("--hawc", action="store_false",
+                    dest="NoHAWC", default=True,
+                    help="Calculate detectable point sources")
 parser.add_argument("--noevolution", action="store_false",
                     dest="NoEvolution", default=True,
                     help="Disable Star Formation History Evolution")
+parser.add_argument("--transient", action='store_true',
+                    dest='transient', default=False,
+                    help='Simulate transient sources, NOT FULLY WORKING YET!')
 parser.add_argument("--zmax", action="store",
                     dest="zmax", default=10.,
                     help="Highest redshift")
@@ -64,9 +70,9 @@ parser.add_argument("--index", action="store", dest='index', type=float, default
                     help="Index of the diffuse flux for IceCubeResponse")
 parser.add_argument("--notruncate", action="store_true", dest='notruncate', default=False,
                     help="Switch to use non-truncated exposure data")
-parser.add_argument("--lognormal", action="store_true",
-                    dest="lognormal", default=False,
-                    help="Luminosity of star follows a log normal distribution")
+parser.add_argument("--fluxmodel", action="store", 
+                    dest="fluxmodel", type=int, default=0,
+                    help="Type of fluxmodel, 0 for standard model, 1 for lognormal, 2 for powerlaw")
 parser.add_argument("--sigma", action="store",
                     dest="sigma", type=float, default=0.3,
                     help="The width of log normal distribution, in unit of dex, default is 0.3")
@@ -83,28 +89,33 @@ icecubeevtlist = IceCubeEvt(options.fluxnorm, options.index, options.notruncate)
 zmax = float(options.zmax)
 
 # This is the redshift distribution for arbitrary evolution    
-def Redshift_distribution(z):
-    return 4*np.pi*Evolution(np.log10(1+z))*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
+def Redshift_distribution(z, transient):
+    if transient == False:
+        return 4*np.pi*Evolution(np.log10(1+z))*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
+    if transient == True:
+        return 4*np.pi*Evolution(np.log10(1+z))*1/(1+z)*cosmolopy.distance.diff_comoving_volume(z, **cosmology)
 
-def NumberOfSourcesStandardCandle(rho0, norm):
-  norm = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, zmax)[0]
-  area = scipy.integrate.quad(lambda z: Redshift_distribution(z), 0, 0.01)[0]
+def NumberOfSourcesStandardCandle(rho0, norm, transient):
+  norm = scipy.integrate.quad(lambda z: Redshift_distribution(z, transient), 0, zmax)[0]
+  area = scipy.integrate.quad(lambda z: Redshift_distribution(z, transient), 0, 0.01)[0]
   vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
   Ntotal = rho0 * vlocal / (area/norm)
   dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
-  Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z)/norm, 0, zmax)[0]
+  Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*Redshift_distribution(z, transient)/norm, 0, zmax)[0]
   return [int(Ntotal), Fluxnorm] 
 
-N_sample, candleflux = NumberOfSourcesStandardCandle(options.density, options.fluxnorm)
+N_sample, candleflux = NumberOfSourcesStandardCandle(options.density, options.fluxnorm, options.transient)
 
-flux_z1 = sourcefluxdistribution(options.lognormal, candleflux, options.sigma, N_sample)
+flux_z1 = sourcefluxdistribution(options.fluxmodel, candleflux, options.sigma, N_sample)
 
 print ("##############################################################################")
 print ("FIRESONG initializing")
-if options.lognormal == False:
+if options.fluxmodel == 0:
     print ("Standard candle sources")
-if options.lognormal == True:
+if options.fluxmodel == 1:
     print ("Lognormal distributed sources")
+if options.fluxmodel == 2:
+    print ("PowerLaw distributed sources")
 print ("Star formation evolution? " + str(options.NoEvolution))
 print ("Number of neutrinos sources in the Universe: " + str(N_sample))
 print ("Uses neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
@@ -118,7 +129,7 @@ redshift_bins = np.arange(0, zmax, 0.001)
 
 #Generate the histogram
 redshift_binmid = redshift_bins[:-1] + np.diff(redshift_bins)/2.
-sfh = [Redshift_distribution(redshift_binmid[i]) for i in range(0,len(redshift_binmid))]
+sfh = [Redshift_distribution(redshift_binmid[i], options.transient) for i in range(0,len(redshift_binmid))]
 
 #Generate the random number of z
 cdf = np.cumsum(sfh)
@@ -181,21 +192,18 @@ output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
-multiple_evt = []
-tenplus_evt = []
 
 for i in range(0, len(redshift_list)):
     output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
-    if obs[0][i] >= 2:
-        multiple_evt = np.append(multiple_evt, obs[0][i])
-    if obs[0][i] >= 10:
-        tenplus_evt = np.append(tenplus_evt, obs[0][i])
+
+histofreq, histobin = np.histogram(obs[0], bins=int(obs[0].max())+1, range=(0, obs[0].max()+1)) 
 
 print ("RESULTS")
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
-print ('Total number of detected events = ' + str(np.sum(obs[0])))
-print ('Total number of sources that give multiple neutrino events = ' + str(len(multiple_evt)))
-print ('Total number of sources that give more than 10 events = ' + str(len(tenplus_evt)))
+print ('Event Distribution')
+for i, j in zip(histobin, histofreq):
+    print(str(i)+"  "+str(j))
+print('-END-')
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################
@@ -207,5 +215,13 @@ if (options.NoPSComparison==False):
     print ("Detectable sources are: ")
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
-    
+ 
+if (options.NoHAWC==False):
+    hawc_output = open("hawc_" + options.filename,"w")
+    detectable = ([[i, j, k] for i, j, k in zip(flux, declin, redshift_list) if j>-26. and j < 64. and k<0.1])
+    for i in range(0,len(detectable)):
+        hawc_output.write('%.3e %.3f %.3f\n' % (detectable[i][0], detectable[i][1], detectable[i][2]))
+    hawc_output.close()
+
 output.close()
+
