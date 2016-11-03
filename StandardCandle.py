@@ -215,7 +215,7 @@ if (options.NoPSComparison==False):
     print ("Detectable sources are: ")
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
- 
+
 if (options.NoHAWC==False):
     hawc_output = open("hawc_" + options.filename,"w")
     detectable = ([[i, j, k] for i, j, k in zip(flux, declin, redshift_list) if j>-26. and j < 64. and k<0.1])
