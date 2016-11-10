@@ -76,6 +76,10 @@ parser.add_argument("--fluxmodel", action="store",
 parser.add_argument("--sigma", action="store",
                     dest="sigma", type=float, default=0.3,
                     help="The width of log normal distribution, in unit of dex, default is 0.3")
+parser.add_argument("--nohistogram", action="store_false",
+                    dest="histogram", default=True,
+                    help="Output the statistic of events, default is True, recommended False for notruncate")
+
 options = parser.parse_args()
 output = open(options.filename,"w")
 
@@ -192,18 +196,21 @@ output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
+if options.histogram == True:
+    for i in range(0, len(redshift_list)):
+        output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
 
-for i in range(0, len(redshift_list)):
-    output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
-
-histofreq, histobin = np.histogram(obs[0], bins=int(obs[0].max())+1, range=(0, obs[0].max()+1)) 
+    histofreq, histobin = np.histogram(obs[0], bins=int(obs[0].max())+1, range=(0, obs[0].max()+1)) 
 
 print ("RESULTS")
 print ('E^2 dNdE = ' + str(TotalFlux/(4*np.pi)))
-print ('Event Distribution')
-for i, j in zip(histobin, histofreq):
-    print(str(i)+"  "+str(j))
-print('-END-')
+if options.histogram == True:
+    print ('Event Distribution')
+    for i, j in zip(histobin, histofreq):
+        print(str(i)+"  "+str(j))
+    print('-END-')
+else:
+    print ('Total no. of event is: '+str(np.sum(events)))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################
