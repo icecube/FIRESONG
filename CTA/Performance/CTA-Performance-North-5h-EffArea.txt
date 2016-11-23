@@ -1,13 +1,12 @@
-
-CTA Performance - Northern site
-for further details, see www.cta-observatory.org (2015-05-11)
-=======================================================
-Effective area (after gamma/hadron separation and direction cuts)
-=======================================================
-
-E (TeV) 	 Effective
-        	 Area (m^2)
-------- 	------------------
+#CTA Performance - Northern site
+#for further details, see www.cta-observatory.org (2015-05-11)
+#=======================================================
+#Effective area (after gamma/hadron separation and direction cuts)
+#=======================================================
+#
+#E (TeV) 	 Effective
+#       	 Area (m^2)
+#------- 	------------------
 0.0158		 225
 0.0178		 518
 0.02		 1.02e+03
