@@ -1,0 +1,18 @@
+
+CTA Performance - Southern site
+for further details, see www.cta-observatory.org (2015-05-11)
+=======================================================
+Off-axis sensitivity
+(point-source sensitivity relative to FoV center)
+=======================================================
+
+Angle w.r. to       50-80 GeV    0.5 - 0.8 TeV     5-8 TeV      50 - 80 TeV
+the FoV center   
+(deg)                      
+---------------   -------------  -------------  -------------  -------------
+0.5                      1.01          1.01          1             1.01          
+1.0                      1.23          1.14          1.15          1.01          
+1.5                      1.45          1.34          1.31          1.01          
+2.5                      3.6           1.98          1.88          1.04          
+3.5                      -             4.17          2.75          1.17          
+4.5                      -             -             4.86          1.34          
