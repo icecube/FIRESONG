@@ -7,6 +7,7 @@ import math
 import cosmolopy
 import scipy.integrate
 from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import interp1d
 import argparse
 from evt_calculation import IceCubeEvt
 from fluxmodel import PowerLawFlux, LognormalFlux
@@ -196,10 +197,10 @@ output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
 output.write("# declination     z      flux       observed" + "\n")
 
-if options.histogram == True:
-    for i in range(0, len(redshift_list)):
-        output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+for i in range(0, len(redshift_list)):
+    output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
 
+if options.histogram == True:
     histofreq, histobin = np.histogram(obs[0], bins=int(obs[0].max())+1, range=(0, obs[0].max()+1)) 
 
 print ("RESULTS")
@@ -210,15 +211,17 @@ if options.histogram == True:
         print(str(i)+"  "+str(j))
     print('-END-')
 else:
-    print ('Total no. of event is: '+str(np.sum(events)))
+    print ('Total no. of event is: '+str(np.sum(obs)))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################
 #Find out if there are sources that exceed IceCube's limit
 #
 if (options.NoPSComparison==False):
-    fluxToPointSourceSentivity = flux / 1e-9
-    detectable  = [[i, j] for i, j in zip(fluxToPointSourceSentivity, declin) if i >= 1. and j > 0]
+    sens = np.load('sens.npy')
+    sensspline = interp1d(sens['dec'], sens['2'], kind='linear', fill_value="extrapolate")
+    fluxToPointSourceSentivity = flux/(sensspline(np.arcsin(sinDec))*1e3)  #1e3 to change from TeV to GeV
+    detectable  = [[i, j] for i, j in zip(fluxToPointSourceSentivity, declin) if i >= 1.]
     print ("Detectable sources are: ")
     print detectable
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
