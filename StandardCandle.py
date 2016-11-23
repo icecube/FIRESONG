@@ -6,8 +6,7 @@ import random
 import math
 import cosmolopy
 import scipy.integrate
-from scipy.interpolate import UnivariateSpline
-from scipy.interpolate import interp1d
+from scipy.interpolate import UnivariateSpline, InterpolatedUnivariateSpline
 import argparse
 from evt_calculation import IceCubeEvt
 from fluxmodel import PowerLawFlux, LognormalFlux
@@ -200,6 +199,8 @@ output.write("# declination     z      flux       observed" + "\n")
 for i in range(0, len(redshift_list)):
     output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
 
+output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
+
 if options.histogram == True:
     histofreq, histobin = np.histogram(obs[0], bins=int(obs[0].max())+1, range=(0, obs[0].max()+1)) 
 
@@ -212,14 +213,13 @@ if options.histogram == True:
     print('-END-')
 else:
     print ('Total no. of event is: '+str(np.sum(obs)))
-output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
 ################################
 #Find out if there are sources that exceed IceCube's limit
 #
 if (options.NoPSComparison==False):
     sens = np.load('sens.npy')
-    sensspline = interp1d(sens['dec'], sens['2'], kind='linear', fill_value="extrapolate")
+    sensspline = InterpolatedUnivariateSpline(sens['dec'], sens['2'], k=5, ext=3)
     fluxToPointSourceSentivity = flux/(sensspline(np.arcsin(sinDec))*1e3)  #1e3 to change from TeV to GeV
     detectable  = [[i, j] for i, j in zip(fluxToPointSourceSentivity, declin) if i >= 1.]
     print ("Detectable sources are: ")
