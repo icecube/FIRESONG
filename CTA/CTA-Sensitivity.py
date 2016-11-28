@@ -41,13 +41,11 @@ area = np.empty([80,1])
 delta = np.empty([80,1])
 
 signal = 0
-# HACK ALERT!!!!! I integrate only the first 77 entries, to ensure the energy is 100 or lower
+# HACK ALERT!!!!! I integrate only the first 77 entries, to ensure the energy is 100 TeV or lower
 # The EBL attenuation is not available above 100 TeV
 for i in range(0,77):
 #   Generate spectrum as a numpy array
-#   Begin with 1e-12 (E/TEV)^(-2.1) 1/(TeV.cm^2.s)
-#   This is a very bright spectrum approximately (but not exactly) that of a
-#   single point source responsible for the IceCube diffuse flux
+#   Units: 1/(TeV.cm^2.s)
     spectrum[i] = options.fluxnorm * math.pow(EffArea[i,0],options.index) * math.exp(-ebl.TAU(EffArea[i,0],options.redshift))
     energy[i] = EffArea[i][0]
     area[i] = EffArea[i][1]
