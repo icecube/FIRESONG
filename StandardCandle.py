@@ -53,7 +53,10 @@ parser.add_argument("-p", action="store_false",
                     help="Calculate detectable point sources")
 parser.add_argument("--hawc", action="store_false",
                     dest="NoHAWC", default=True,
-                    help="Calculate detectable point sources")
+                    help="Calculate detectable point sources for HAWC")
+parser.add_argument("--cta", action="store_false",
+                    dest="NoCTA", default=True,
+                    help="Calculate detectable point sources for CTA")
 parser.add_argument("--noevolution", action="store_false",
                     dest="NoEvolution", default=True,
                     help="Disable Star Formation History Evolution")
@@ -233,5 +236,12 @@ if (options.NoHAWC==False):
         hawc_output.write('%.3e %.3f %.3f\n' % (detectable[i][0], detectable[i][1], detectable[i][2]))
     hawc_output.close()
 
+if (options.NoCTA==False):
+    cta_output = open("cta_" + options.filename,"w")
+    for i in range(0, len(redshift_list)):
+        if obs[0][i]>0:
+            cta_output.write( str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+    cta_output.close()
+    
 output.close()
 
