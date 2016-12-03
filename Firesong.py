@@ -51,7 +51,7 @@ outputdir = firesongdir + "/Results/"
 # Process command line options
 #
 parser = argparse.ArgumentParser()
-parser.add_argument('-o', action='store', dest='filename',defual= 'Firesong.out'
+parser.add_argument('-o', action='store', dest='filename',defual= 'Firesong.out',
                     help='Output filename')
 parser.add_argument('-d', action='store', dest='density', type=float, default = 1e-9,
                     help='Local neutrino source density [1/Mpc^3]')
