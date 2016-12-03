@@ -51,7 +51,7 @@ outputdir = firesongdir + "/Results/"
 # Process command line options
 #
 parser = argparse.ArgumentParser()
-parser.add_argument('-o', action='store', dest='filename',defual= 'Firesong.out',
+parser.add_argument('-o', action='store', dest='filename',default= 'Firesong.out',
                     help='Output filename')
 parser.add_argument('-d', action='store', dest='density', type=float, default = 1e-9,
                     help='Local neutrino source density [1/Mpc^3]')
@@ -237,14 +237,14 @@ if (options.NoPSComparison==False):
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
 
 if (options.NoHAWC==False):
-    hawc_output = open(firesongdir + "hawc_" + options.filename,"w")
+    hawc_output = open(outputdir + "hawc_" + options.filename,"w")
     detectable = ([[i, j, k] for i, j, k in zip(flux, declin, redshift_list) if j>-26. and j < 64. and k<0.1])
     for i in range(0,len(detectable)):
         hawc_output.write('%.3e %.3f %.3f\n' % (detectable[i][0], detectable[i][1], detectable[i][2]))
     hawc_output.close()
 
 if (options.NoCTA==False):
-    cta_output = open(firesongdir + "cta_" + options.filename,"w")
+    cta_output = open(outputdir + "cta_" + options.filename,"w")
     for i in range(0, len(redshift_list)):
         if obs[0][i]>0:
             cta_output.write( str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
