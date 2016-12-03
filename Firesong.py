@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import division
+import os
 import numpy as np
 import random
 import math
@@ -39,14 +40,20 @@ def sourcefluxdistribution(fluxoption, mean, width, size):
         return LognormalFlux(mean, size, width)
     if fluxoption == 2:
         return PowerLawFlux(mean, -2, size, width)
-    
+
+try:
+    firesongdir = os.environ['FIRESONG']
+except:
+    print "Enviromental variable FIRESONG not set"
+    quit()
+outputdir = firesongdir + "/Results/"
 #
 # Process command line options
 #
 parser = argparse.ArgumentParser()
-parser.add_argument('-o', action='store', dest='filename',
+parser.add_argument('-o', action='store', dest='filename',defual= 'Firesong.out'
                     help='Output filename')
-parser.add_argument('-d', action='store', dest='density', type=float,
+parser.add_argument('-d', action='store', dest='density', type=float, default = 1e-9,
                     help='Local neutrino source density [1/Mpc^3]')
 parser.add_argument("-p", action="store_false",
                     dest="NoPSComparison", default=True,
@@ -84,7 +91,7 @@ parser.add_argument("--nohistogram", action="store_false",
                     help="Output the statistic of events, default is True, recommended False for notruncate")
 
 options = parser.parse_args()
-output = open(options.filename,"w")
+output = open(outputdir+str(options.filename),"w")
 
 if (options.NoEvolution==False):
     Evolution=NoEvolution
@@ -230,14 +237,14 @@ if (options.NoPSComparison==False):
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
 
 if (options.NoHAWC==False):
-    hawc_output = open("hawc_" + options.filename,"w")
+    hawc_output = open(firesongdir + "hawc_" + options.filename,"w")
     detectable = ([[i, j, k] for i, j, k in zip(flux, declin, redshift_list) if j>-26. and j < 64. and k<0.1])
     for i in range(0,len(detectable)):
         hawc_output.write('%.3e %.3f %.3f\n' % (detectable[i][0], detectable[i][1], detectable[i][2]))
     hawc_output.close()
 
 if (options.NoCTA==False):
-    cta_output = open("cta_" + options.filename,"w")
+    cta_output = open(firesongdir + "cta_" + options.filename,"w")
     for i in range(0, len(redshift_list)):
         if obs[0][i]>0:
             cta_output.write( str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")

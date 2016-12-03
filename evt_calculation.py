@@ -2,16 +2,23 @@
 
 #	Calculate the number of observed events by carrying out numerical integration:
 #	N_evt = Sum{Flux * Exposure * dE * dSteradian} 
-
+import os
 import numpy as np
+
+try:
+    firesongdir = os.environ['FIRESONG']
+except:
+    print "Enviromental variable FIRESONG not set"
+    quit()
+icecubedir = firesongdir + "/IceCube/"
 
 def IceCubeEvt(norm, index, notruncate):
 
 	#Get file name for all truncated data files
 	if notruncate == False:
-		filelist = open('IceCube/filelist.txt', 'r')
+		filelist = open(icecubedir + 'filelist.txt', 'r')
 	else:
-		filelist = open('IceCube/filelist_2.txt', 'r')
+		filelist = open(icecubedir + 'filelist_2.txt', 'r')
 
 	#sinDec list
 	sinDec = np.arange(-0.075, 1.025, 0.05)
@@ -21,7 +28,7 @@ def IceCubeEvt(norm, index, notruncate):
 
 	#loop through all files
 	for fn in filelist :
-		fn = "IceCubeEffectiveArea/" + fn.rstrip('\n')
+		fn = icecubedir + fn.rstrip('\n')
 		input = open(fn, 'r')
 
 		#Set array for storing the energy and the exposure
