@@ -6,7 +6,7 @@ import glob
 import subprocess
 import re
 
-list = glob.glob("../cta*")
+list = glob.glob("../Results/CTA/cta*")
 
 TotalObserved = 0
 TotalNeutrinos = 0
