@@ -3,7 +3,7 @@ FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays
 
 # Instructions
 Set up the enviromental error FIRESONG so
-export FIRESONG=<firesongdir>
+export FIRESONG=/location/of/firesong/
 
 This is needed to read data files (e.g. exposure data from IceCube)
 and to write output data.
