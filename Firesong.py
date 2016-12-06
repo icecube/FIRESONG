@@ -1,4 +1,8 @@
 #!/usr/bin/python
+# Authors: Chris Tung
+#          Igncio Taboada
+# Date: December 5, 2016
+      
 
 from __future__ import division
 import os
