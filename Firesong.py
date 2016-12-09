@@ -98,7 +98,7 @@ parser.add_argument("--nohistogram", action="store_false",
 
 options = parser.parse_args()
 if re.search('.gz$', options.filename):
-    output = gzip.open(outputdir+str(options.filename), 'w')
+    output = gzip.open(outputdir+str(options.filename), 'wb')
 else:
     output = open(outputdir+str(options.filename),"w")
 
@@ -214,10 +214,12 @@ output.write("# flux: E^2 dN/dE assuming " + str(options.fluxnorm) + " (E/100 Te
 output.write("#     Note that as of 2016, IceCube can detect point sources of ~10^-9 in the\n")
 output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
-output.write("# declination     z      flux       observed" + "\n")
+output.write("# Dec(deg) Redshift Flux Observed\n")
 
+# This format is chosen for compactness
+# I find that many jobs on the cluster are limited by data I/O
 for i in range(0, len(redshift_list)):
-    output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+    output.write('{:.3f} {:.4f} {:.4e} {:d} \n'.format(declin[i], z[i], flux[i], obs[0][i]))
 
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
