@@ -16,7 +16,7 @@ We acknowledge help and ideas by Markus Ahlers and Georga Japaridze
 
 # Tagged Versions
 
-v0.1 - alpha
+v0.1 - alpha - December 16, 2016
 Major functionality is in place.
 Problems to be solved:
 * There is private IceCube information that needs to be removed before a
