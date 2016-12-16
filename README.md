@@ -13,3 +13,16 @@ Chris Tung
 Ignacio Taboada
 
 We acknowledge help and ideas by Markus Ahlers and Georga Japaridze
+
+# Tagged Versions
+
+v0.1 - alpha
+Major functionality is in place.
+Problems to be solved:
+* There is private IceCube information that needs to be removed before a
+beta release. In particular to be able to share with VERITAS/Magic.
+* The processing loop is vectorized into numpy. This is ~30% faster than
+a "for" loop in python. However it means that data I/O is done at the
+end of the run. Data I/O is a major limitation for the code at high
+densities and with many simultanous runs in the cluster. This needs
+to be fixed before beta.
