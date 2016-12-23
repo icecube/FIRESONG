@@ -15,7 +15,6 @@ import scipy.integrate
 # Firesong code
 from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance
 from Luminosity import LuminosityFunction
-import hawc
 
 #
 # Check that the Firesong environmental variable is set
@@ -53,21 +52,12 @@ parser.add_argument("--LF",action="store", dest="LF",default="SC",
 parser.add_argument("--sigma", action="store",
                     dest="sigma", type=float, default=1.0,
                     help="Width of a log normal Luminosity function in dex, default: 1.0")
-parser.add_argument("--hawc", action="store_true",
-                    dest="HAWC", default=False,
-                    help="Calculate detectable point sources for HAWC")
 
 options = parser.parse_args()
 if re.search('.gz$', options.filename):
     output = gzip.open(outputdir+str(options.filename), 'wb')
 else:
     output = open(outputdir+str(options.filename),"w")
-# Open axiliary files
-if (options.HAWC==True):
-    if re.search('.gz$', options.filename):
-        hawc_output = gzip.open(outputdir + "/HAWC/hawc_" + options.filename,"w")
-    else:    
-        hawc_output = open(outputdir + "/HAWC/hawc_" + options.filename,"w")
 
 N_sample, candleflux = StandardCandleSources(options)
 flux_z1 = LuminosityFunction(options,N_sample,candleflux)
@@ -128,13 +118,7 @@ for i in range(0,N_sample):
     if i%100000==0 and i>0:
         print "Generated ", i, " neutrino sources"
     ############# This is the place to plug in Detector output modules #############
-    if (options.HAWC==True):
-        hawc.write(z,declin,flux,hawc_output)    
                  
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]" 
 output.close()
-
-# Close up auxiliary files
-if (options.HAWC==True):
-    hawc_output.close()
