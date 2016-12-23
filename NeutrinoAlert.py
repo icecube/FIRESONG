@@ -15,6 +15,7 @@ import scipy.integrate
 # Firesong code
 from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance
 from Luminosity import LuminosityFunction
+import hawc
 
 #
 # Check that the Firesong environmental variable is set
@@ -30,6 +31,8 @@ outputdir = firesongdir + "/Results/"
 # Process command line options
 #
 parser = argparse.ArgumentParser()
+parser.add_argument('-N', action='store', dest='AlertNumber',type=int,default= 1,
+                    help='Number of neutrinos to generate')
 parser.add_argument('-o', action='store', dest='filename',default= 'Firesong.out',
                     help='Output filename')
 parser.add_argument('-d', action='store', dest='density', type=float, default = 1e-9,
@@ -63,7 +66,7 @@ N_sample, candleflux = StandardCandleSources(options)
 flux_z1 = LuminosityFunction(options,N_sample,candleflux)
 
 print ("##############################################################################")
-print ("##### FIRESONG initializing #####")
+print ("##### FIRESONG initializing - Calculating Neutrino CDFs #####")
 if options.LF == "SC":
     print ("Standard candle sources")
 if options.LF == "LG":
@@ -90,35 +93,24 @@ output.write("# Note that using 4 years, IceCube sensitivity in the northern hem
 output.write("# is approximately 10^-9 in the units used for A\n")
 output.write("# Dec(deg) Redshift A\n")
 
-
 # Luminosity distace for z=1. Internally, fluxes are scaled to this distance.
 dL1 = LuminosityDistance(1.)
+
 # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
 redshift_bins = np.arange(0.0005,options.zmax, 0.001)
 
-# RedshiftCDF is used for inverse transform sampling
-RedshiftPDF = [RedshiftDistribution(redshift_bins[i], options) for i in range(0,len(redshift_bins))]
-RedshiftCDF = np.cumsum(RedshiftPDF)
-RedshiftCDF = RedshiftCDF / RedshiftCDF[-1]
+NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*flux_z1*(dL1*dL1)/(LuminosityDistance(redshift_bins[i])*LuminosityDistance(redshift_bins[i])) for i in range(0,len(redshift_bins))]
+NeutrinoCDF = np.cumsum(NeutrinoPDF)
+NeutrinoCDF = NeutrinoCDF / NeutrinoCDF[-1]
 
-TotalFlux = 0
-
-for i in range(0,N_sample):
-    # Generate a random redshift using inverse transform sampling
+for i in range(0,options.AlertNumber):
     test = np.random.rand()
-    bin_index = np.searchsorted(RedshiftCDF, test)
+    bin_index = np.searchsorted(NeutrinoCDF, test)
     z = redshift_bins[bin_index]
     # Random declination over the entire sky
     sinDec = 2*np.random.rand() -1
     declin = 180*np.arcsin(sinDec)/np.pi
     dL = LuminosityDistance(z)
     flux = flux_z1 * (dL1*dL1)/(dL*dL)
-    TotalFlux = TotalFlux + flux
-    output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
-    if i%100000==0 and i>0:
-        print "Generated ", i, " neutrino sources"
-    ############# This is the place to plug in Detector output modules #############
-                 
-output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
-print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]" 
+    output.write('{:.3f} {:.4f} {:.6e}\n'.format(declin, z, flux))
 output.close()
