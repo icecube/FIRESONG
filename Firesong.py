@@ -1,8 +1,13 @@
 #!/usr/bin/python
+# Authors: Chris Tung
+#          Igncio Taboada
+# Date: December 5, 2016
+      
 
 from __future__ import division
 import os
-import sys
+import gzip
+import re
 import numpy as np
 import random
 import math
@@ -92,7 +97,10 @@ parser.add_argument("--nohistogram", action="store_false",
                     help="Output the statistic of events, default is True, recommended False for notruncate")
 
 options = parser.parse_args()
-output = open(outputdir+str(options.filename),"w")
+if re.search('.gz$', options.filename):
+    output = gzip.open(outputdir+str(options.filename), 'wb')
+else:
+    output = open(outputdir+str(options.filename),"w")
 
 if (options.NoEvolution==False):
     Evolution=NoEvolution
@@ -188,6 +196,7 @@ EA = [IceCubeResponse(sinDec[i]) for i in range(0, len(sinDec))]
 
 #Get mean no. of event due to each source
 events = EA*flux/(options.fluxnorm*2*np.pi*0.05)
+
 #Get the number of event from poisson distribution
 obs = np.random.poisson(events, (1, len(events)))
 
@@ -205,10 +214,12 @@ output.write("# flux: E^2 dN/dE assuming " + str(options.fluxnorm) + " (E/100 Te
 output.write("#     Note that as of 2016, IceCube can detect point sources of ~10^-9 in the\n")
 output.write("#     qunits used here.\n")
 output.write("# Observed: Number of >200 TeV neutrino events detected, using 6 year Diffuse effective area by Sebastian+Leif\n")
-output.write("# declination     z      flux       observed" + "\n")
+output.write("# Dec(deg) Redshift Flux Observed\n")
 
+# This format is chosen for compactness
+# I find that many jobs on the cluster are limited by data I/O
 for i in range(0, len(redshift_list)):
-    output.write(str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
+    output.write('{:.3f} {:.4f} {:.4e} {:d} \n'.format(declin[i], z[i], flux[i], obs[0][i]))
 
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 
@@ -238,18 +249,23 @@ if (options.NoPSComparison==False):
     output.write("# Fluxes exceeding Point Source limits " + str(detectable) + "\n")
 
 if (options.NoHAWC==False):
-    hawc_output = open(outputdir + "/HAWC/hawc_" + options.filename,"w")
+    if re.search('.gz$', options.filename):
+        hawc_output = gzip.open(outputdir + "/HAWC/hawc_" + options.filename,"w")
+    else:    
+        hawc_output = open(outputdir + "/HAWC/hawc_" + options.filename,"w")
     detectable = ([[i, j, k] for i, j, k in zip(flux, declin, redshift_list) if j>-26. and j < 64. and k<0.1])
     for i in range(0,len(detectable)):
         hawc_output.write('%.3e %.3f %.3f\n' % (detectable[i][0], detectable[i][1], detectable[i][2]))
     hawc_output.close()
 
 if (options.NoCTA==False):
-    cta_output = open(outputdir + "/CTA/cta_" + options.filename,"w")
+    if re.search('.gz$', options.filename):
+        cta_output = gzip.open(outputdir + "/CTA/cta_" + options.filename,"w")
+    else:
+        cta_output = open(outputdir + "/CTA/cta_" + options.filename,"w")
     for i in range(0, len(redshift_list)):
         if obs[0][i]>0:
             cta_output.write( str(declin[i]) + " " + str(z[i]) + " " + str(flux[i]) + " " + str(obs[0][i]) + "\n")
     cta_output.close()
-    
 output.close()
 
