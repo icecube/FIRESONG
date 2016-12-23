@@ -114,16 +114,3 @@ for i in range(0,options.AlertNumber):
     flux = flux_z1 * (dL1*dL1)/(dL*dL)
     output.write('{:.3f} {:.4f} {:.6e}\n'.format(declin, z, flux))
 output.close()
-    
-#options = parser.parse_args()
-#if re.search('.gz$', options.filename):
-#    output = gzip.open(outputdir+str(options.filename), 'wb')
-#else:
-#    output = open(outputdir+str(options.filename),"w")
-#
-#for i in range(0,len(NeutrinoCDF)):
-#    z = redshift_bins[i] 
-#    dL = LuminosityDistance(z)
-#    flux = flux_z1 * (dL1*dL1)/(dL*dL)
-#    output.write('{:.4f} {:.6e} {:.6e}\n'.format(z,flux,NeutrinoCDF[i]))
-#output.close()
