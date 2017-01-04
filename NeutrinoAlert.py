@@ -15,7 +15,7 @@ import scipy.integrate
 # Firesong code
 from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance
 from Luminosity import LuminosityFunction
-import hawc
+
 
 #
 # Check that the Firesong environmental variable is set

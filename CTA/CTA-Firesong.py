@@ -7,6 +7,10 @@ import glob
 import subprocess
 import re
 import argparse
+import CTAsensitivity
+
+#### HARDCODE ALERT
+index = -2.13
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input', metavar='input', type=str, 
@@ -42,18 +46,15 @@ for neutrino in alerts:
 # These should be undetectable anyway
 # It'd be better to make CTA-Sensisitivity in to a library
     if (z<9): 
-        out = subprocess.check_output("./CTA-Sensitivity.py --ObsTime 0.5 --index -2.13 --fluxnorm " + str(f) + " --redshift " + str(z), shell=True)
-        significance = float(out[2:-2])
+        significance = CTAsensitivity.Significance(f,-2.13,z,"0.5")
         if float(significance)>5:
             Observed05 = Observed05+1
             output.write('{:.3f} {:.4f} {:.6e}\n'.format(dec, z, f))
-        out = subprocess.check_output("./CTA-Sensitivity.py --ObsTime 5 --index -2.13 --fluxnorm " + str(f) + " --redshift " + str(z), shell=True)
-        significance = float(out[2:-2])
+        significance = CTAsensitivity.Significance(f,-2.13,z,"5")    
         if significance>5:
             Observed5 = Observed5+1
             output.write('{:.3f} {:.4f} {:.6e}\n'.format(dec, z, f))
-        out = subprocess.check_output("./CTA-Sensitivity.py --ObsTime 50 --index -2.13 --fluxnorm " + str(f) + " --redshift " + str(z), shell=True)
-        significance = float(out[2:-2])
+        significance = CTAsensitivity.Significance(f,-2.13,z,"50")    
         if significance>5:
             Observed50 = Observed50+1
             output.write('{:.3f} {:.4f} {:.6e}\n'.format(dec, z, f))
