@@ -112,7 +112,8 @@ for i in range(0,N_sample):
     sinDec = 2*np.random.rand() -1
     declin = 180*np.arcsin(sinDec)/np.pi
     dL = LuminosityDistance(z)
-    flux = flux_z1 * (dL1*dL1)/(dL*dL)
+    if options.LF != 'SC':
+        flux = flux_z1[i] * (dL1*dL1)/(dL*dL)
     TotalFlux = TotalFlux + flux
     output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
     if i%100000==0 and i>0:
