@@ -19,7 +19,6 @@ def PowerLawFlux(meanflux, index, nsource, width):
 ## index = -2, f_mean ~= 2ln(10)*F_min
 ## index < -2, f_mean ~= (index+1)/(index+2)*F_min
         if index == -2:
-                width = 10**width
                 F_min = meanflux / (width*np.log(10))
                 F_max = F_min*10**width
                 
@@ -30,6 +29,8 @@ def PowerLawFlux(meanflux, index, nsource, width):
                 test = np.random.rand(nsource)
                 F_id = np.searchsorted(cdf, test)
                 flux = np.array([F_bin[i] for i in F_id])
+                return flux
+
         if index < -2:
                 width = 10**width
                 F_min = (index+2.)/(index+1.)*meanflux
@@ -42,7 +43,7 @@ def PowerLawFlux(meanflux, index, nsource, width):
                 test = np.random.rand(nsource)
                 F_id = np.searchsorted(cdf, test)
                 flux = np.array([F_bin[i] for i in F_id])
-        return flux
+                return flux
 
 def LognormalFlux(meanflux, nsource, width):
         logmean = np.log(meanflux)
