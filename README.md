@@ -36,6 +36,19 @@ We acknowledge help and ideas by Markus Ahlers and Georga Japaridze
 
 # Tagged Versions
 
+v0.2 - beta - January 9, 2016
+Major functionality is in place. 
+
+First version ready for public realease.
+
+There are two modes of operation:
+
+Firesong.py : It creates a random instance of all the neutrino sources in the Universe. Steady sources have been the most tested. Transient source functionality is present, but not verified. All luminosity functions and evolution options have been tested
+NeutrinoAlert.py : The desired number of IceCube detected neutrinos can be simulated. Steady sources have been the most tested. Transient source functionality is present, but not verified. Currently it only works with standard candle sources.
+The CTA/ folder provides an example use case of the output of NeutrinoAlert.py
+
+
+
 v0.1 - alpha - December 16, 2016
 Major functionality is in place.
 Problems to be solved:
