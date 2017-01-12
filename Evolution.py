@@ -20,8 +20,10 @@ def Evolution(x,evol):
         return HopkinsBeacom2006StarFormationRate(x)
     elif (evol=="NoEvolution"):
         return NoEvolution(x)
+    elif (evol=="CC2015SNR"):
+        return CandelsClash2015SNRate(x)
     else:
-        print "Source evolution " +  option +  " not recognized"
+        print "Source evolution " +  evol +  " not recognized"
         quit()
 
 #StarFormationHistory (SFR), from Hopkins and Beacom 2006, unit = M_sun/yr/Mpc^3 
@@ -36,6 +38,14 @@ def HopkinsBeacom2006StarFormationRate(x):
 def NoEvolution(x):
     return 1.
 
+def CandelsClash2015SNRate(x):
+    a = 0.015
+    b = 1.5
+    c = 5.0
+    d = 6.1
+    density = a*(10.**x)**c / ((10.**x / b)**d+1.)
+    return density
+
 def StandardCandleSources(options):
   norm = scipy.integrate.quad(lambda z: RedshiftDistribution(z, options), 0, options.zmax)[0]
   area = scipy.integrate.quad(lambda z: RedshiftDistribution(z, options), 0, 0.01)[0]
@@ -43,7 +53,7 @@ def StandardCandleSources(options):
   vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
   Ntotal = options.density * vlocal / (area/norm)
   dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
-  Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm, 0, options.zmax)[0]
+  Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+1), 0, options.zmax)[0]
   return [int(Ntotal), Fluxnorm] 
 
 # Wrapper fucntion - so that cosmolopy is only imported here.
