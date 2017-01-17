@@ -40,6 +40,8 @@ parser.add_argument("--evolution", action="store",
 parser.add_argument("--transient", action='store_true',
                     dest='Transient', default=False,
                     help='Simulate transient sources, NOT TESTED YET!')
+parser.add_argument("--timescale", action='store', dest='timescale', type=float,
+                    default=1000., help='time scale of transient sources, default is 1000sec.')
 parser.add_argument("--zmax", action="store", type=float,
                     dest="zmax", default=10.,
                     help="Highest redshift to be simulated")
@@ -126,12 +128,19 @@ for i in range(0,N_sample):
     else:
         flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1+z)/2)**(-options.index+1)
     TotalFlux = TotalFlux + flux
+    # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
+    if options.Transient == True:
+        flux = flux / ((1+z)*options.timescale)
     output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
     if i%100000==0 and i>0:
         print "Generated ", i, " neutrino sources"
 ############# This is the place to plug in Detector output modules ############
     if (z<options.zNEAR):
         near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(flux,declin, z))
+
+#For transient source, we calculate the total fluence from all sources, then obtain the diffuse flux by doing a time average over a year
+if options.Transient == True:
+    TotalFlux = TotalFlux / (86400*365)
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]" 
 output.close()
