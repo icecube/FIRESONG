@@ -52,6 +52,8 @@ parser.add_argument("--LF",action="store", dest="LF",default="SC",
 parser.add_argument("--sigma", action="store",
                     dest="sigma", type=float, default=1.0,
                     help="Width of a log normal Luminosity function in dex, default: 1.0")
+parser.add_argument("--zNEAR", action="store",dest="zNEAR", type=float,
+                    default=-1, help="Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
 
 options = parser.parse_args()
 if re.search('.gz$', options.filename):
@@ -59,6 +61,13 @@ if re.search('.gz$', options.filename):
 else:
     output = open(outputdir+str(options.filename),"w")
 
+if (options.zNEAR>0):
+    if re.search('.gz$', options.filename):
+        near_output = gzip.open(outputdir + "Near_" + options.filename,"w")
+    else:
+        near_output = open(outputdir + "Near_" + options.filename,"w")
+
+    
 N_sample, candleflux = StandardCandleSources(options)
 flux_z1 = LuminosityFunction(options,N_sample,candleflux)
 
@@ -120,8 +129,12 @@ for i in range(0,N_sample):
     output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
     if i%100000==0 and i>0:
         print "Generated ", i, " neutrino sources"
-    ############# This is the place to plug in Detector output modules #############
-                 
+############# This is the place to plug in Detector output modules ############
+    if (z<options.zNEAR):
+        near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(flux,declin, z))
 output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
 print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]" 
 output.close()
+if (options.zNEAR>0):
+    near_output.close()
+
