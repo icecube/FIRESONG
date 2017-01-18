@@ -43,6 +43,8 @@ parser.add_argument("--evolution", action="store",
 parser.add_argument("--transient", action='store_true',
                     dest='Transient', default=False,
                     help='Simulate transient sources, NOT TESTED YET!')
+parser.add_argument("--timescale", action='store', dest='timescale', type=float,
+                    default=1000., help='time scale of transient sources, default is 1000sec.')
 parser.add_argument("--zmax", action="store", type=float,
                     dest="zmax", default=10.,
                     help="Highest redshift to be simulated")
@@ -99,7 +101,7 @@ dL1 = LuminosityDistance(1.)
 # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
 redshift_bins = np.arange(0.0005,options.zmax, 0.001)
 
-NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*((1+redshift_bins[i])/2)**(-options.index+1)*flux_z1*(dL1*dL1)/(LuminosityDistance(redshift_bins[i])*LuminosityDistance(redshift_bins[i])) for i in range(0,len(redshift_bins))]
+NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*((1+redshift_bins[i])/2.)**(-options.index+1)*flux_z1*(dL1*dL1)/(LuminosityDistance(redshift_bins[i])*LuminosityDistance(redshift_bins[i])) for i in range(0,len(redshift_bins))]
 NeutrinoCDF = np.cumsum(NeutrinoPDF)
 NeutrinoCDF = NeutrinoCDF / NeutrinoCDF[-1]
 
@@ -111,6 +113,8 @@ for i in range(0,options.AlertNumber):
     sinDec = 2*np.random.rand() -1
     declin = 180*np.arcsin(sinDec)/np.pi
     dL = LuminosityDistance(z)
-    flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1+z)/2)**(-options.index+1)
+    flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1+z)/2.)**(-options.index+1)
+    if options.Transient == True:
+        flux = flux/((1+z)*options.timescale)
     output.write('{:.3f} {:.4f} {:.6e}\n'.format(declin, z, flux))
 output.close()
