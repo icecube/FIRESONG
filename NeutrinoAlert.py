@@ -115,6 +115,6 @@ for i in range(0,options.AlertNumber):
     dL = LuminosityDistance(z)
     flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1+z)/2.)**(-options.index+1)
     if options.Transient == True:
-        flux = flux/((1+z)*options.timescale)
+        flux = flux/(options.timescale)
     output.write('{:.3f} {:.4f} {:.6e}\n'.format(declin, z, flux))
 output.close()

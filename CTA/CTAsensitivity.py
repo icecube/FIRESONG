@@ -7,7 +7,7 @@ import math
 import EBL
 import argparse
 
-def Significance(fluxnorm,index,redshift,obsTime):
+def Significance(fluxnorm,index,redshift,obsTime, options):
 # units: fluxnor = GeV/(cm^2.s), obsTime = h
     bckname = "Performance/CTA-Performance-North-" + obsTime + "h-Background.txt"
     areaname = "Performance/CTA-Performance-North-" + obsTime + "h-EffArea.txt"
@@ -45,7 +45,10 @@ def Significance(fluxnorm,index,redshift,obsTime):
         # 10,000 to convert to cm^2
         # Delta is binwidth
         # 3600 * 5 seconds of signal
-        signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * 3600 * float(obsTime)
+        if options.Transient == True and options.timescale*(1+redshift) <= 3600 * float(obsTime):
+            signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * options.timescale*(1+redshift)
+        else:
+            signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * 3600 * float(obsTime)
         # N_sig = N_sig + 1/(TeV.cm^2.s) * m^2 * cm^2/m^2 * TeV * s
     return (signal/math.sqrt(background))[0]
 

@@ -130,7 +130,7 @@ for i in range(0,N_sample):
     TotalFlux = TotalFlux + flux
     # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
     if options.Transient == True:
-        flux = flux / ((1+z)*options.timescale)
+        flux = flux / (options.timescale)
     output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
     if i%100000==0 and i>0:
         print "Generated ", i, " neutrino sources"

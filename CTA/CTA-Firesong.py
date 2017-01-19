@@ -17,6 +17,11 @@ parser.add_argument('input', metavar='input', type=str,
                     help='Input file')
 parser.add_argument('-o', action='store', dest='output',default= 'CTA-Firesong.out',
                     help='Output filename')
+parser.add_argument("--transient", action='store_true',
+                    dest='Transient', default=False,
+                    help='Simulate transient sources, NOT TESTED YET!')
+parser.add_argument("--timescale", action='store', dest='timescale', type=float,
+                    default=1000., help='time scale of transient sources, default is 1000sec.')
 options = parser.parse_args()
 
 try:
@@ -46,15 +51,15 @@ for neutrino in alerts:
 # These should be undetectable anyway
 # It'd be better to make CTA-Sensisitivity in to a library
     if (z<9): 
-        significance = CTAsensitivity.Significance(f,-2.13,z,"0.5")
+        significance = CTAsensitivity.Significance(f,-2.13,z,"0.5", options)
         if float(significance)>5:
             Observed05 = Observed05+1
             output.write('{:.3f} {:.4f} {:.6e}\n'.format(dec, z, f))
-        significance = CTAsensitivity.Significance(f,-2.13,z,"5")    
+        significance = CTAsensitivity.Significance(f,-2.13,z,"5", options)    
         if significance>5:
             Observed5 = Observed5+1
             output.write('{:.3f} {:.4f} {:.6e}\n'.format(dec, z, f))
-        significance = CTAsensitivity.Significance(f,-2.13,z,"50")    
+        significance = CTAsensitivity.Significance(f,-2.13,z,"50", options)    
         if significance>5:
             Observed50 = Observed50+1
             output.write('{:.3f} {:.4f} {:.6e}\n'.format(dec, z, f))
