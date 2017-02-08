@@ -45,8 +45,8 @@ def Significance(fluxnorm,index,redshift,obsTime, options):
         # 10,000 to convert to cm^2
         # Delta is binwidth
         # 3600 * 5 seconds of signal
-        if options.Transient == True and options.timescale*(1+redshift) <= 3600 * float(obsTime):
-            signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * options.timescale*(1+redshift)
+        if options.Transient == True and np.random.rand()*options.timescale*(1+redshift) <= 3600 * float(obsTime):
+            signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * np.random.rand()*options.timescale*(1+redshift)
         else:
             signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * 3600 * float(obsTime)
         # N_sig = N_sig + 1/(TeV.cm^2.s) * m^2 * cm^2/m^2 * TeV * s
