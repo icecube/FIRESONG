@@ -72,6 +72,9 @@ if (options.zNEAR>0):
     
 N_sample, candleflux = StandardCandleSources(options)
 flux_z1 = LuminosityFunction(options,N_sample,candleflux)
+## Integrate[EdN/dE, {E, 10TeV, 10PeV}] * 4*Pi * dL1^2 * unit conversion
+luminosity = flux_z1 * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options.index+2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
+
 
 print ("##############################################################################")
 print ("##### FIRESONG initializing #####")
@@ -86,6 +89,7 @@ print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("Total number of neutrinos sources in the Universe: " + str(N_sample))
 print ("Desired neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
 print ("Redshift range: 0 - " + str(options.zmax)) 
+print ("Standard Candle Luminosity: {:.4e} erg/yr".format(luminosity))
 print ("##### FIRESONG initialization done #####")
 
 ##################################################
@@ -97,6 +101,7 @@ output.write("# Desired neutrino diffuse flux:\n")
 output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
 output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
 output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
+output.write("Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
 output.write("# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n")
 output.write("# is approximately 10^-9 in the units used for A\n")
 output.write("# Dec(deg) Redshift A\n")
@@ -124,9 +129,9 @@ for i in range(0,N_sample):
     declin = 180*np.arcsin(sinDec)/np.pi
     dL = LuminosityDistance(z)
     if options.LF != 'SC':
-        flux = flux_z1[i] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+1)
+        flux = flux_z1[i] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
     else:
-        flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+1)
+        flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
     TotalFlux = TotalFlux + flux
     # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
     if options.Transient == True:

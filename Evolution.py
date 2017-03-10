@@ -52,12 +52,12 @@ def StandardCandleSources(options):
 
   vlocal = cosmolopy.distance.comoving_volume(0.01, **cosmology)
   Ntotal = options.density * vlocal / (area/norm)
-  dL1 = dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
+  dL1 = cosmolopy.distance.luminosity_distance(1.0, **cosmology)
   if options.Transient != True:
-      Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+1), 0, options.zmax)[0]
+      Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+2), 0, options.zmax)[0]
   else:
   #For transient source, Fluxnorm will be the fluence of a standard candle at z=1, with unit GeV/cm^2 given that the burst rate density is measured in per year.
-      Fluxnorm = 4*np.pi*options.fluxnorm*86400*365 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+2), 0, options.zmax)[0]
+      Fluxnorm = 4*np.pi*options.fluxnorm*86400*365 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+3), 0, options.zmax)[0]
   return [int(Ntotal), Fluxnorm] 
 
 # Wrapper fucntion - so that cosmolopy is only imported here.

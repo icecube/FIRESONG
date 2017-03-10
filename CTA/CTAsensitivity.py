@@ -7,7 +7,7 @@ import math
 import EBL
 import argparse
 
-def Significance(fluxnorm,index,redshift,obsTime, options):
+def Significance(fluxnorm, redshift, obsTime, options):
 # units: fluxnor = GeV/(cm^2.s), obsTime = h
     bckname = "Performance/CTA-Performance-North-" + obsTime + "h-Background.txt"
     areaname = "Performance/CTA-Performance-North-" + obsTime + "h-EffArea.txt"
@@ -37,16 +37,24 @@ def Significance(fluxnorm,index,redshift,obsTime, options):
     #   Units: 1/(TeV.cm^2.s)
         energy[i] = EffArea[i][0]
         area[i] = EffArea[i][1] # m^2
-        spectrum[i] = fluxnorm/1000. * math.pow(energy[i],index) * math.pow(100., -index-2.0) * math.exp(-ebl.TAU(energy[i],redshift))
+        spectrum[i] = fluxnorm/1000. * math.pow(energy[i], -options.index) * math.pow(100., options.index-2.0) * math.exp(-ebl.TAU(energy[i],redshift))
         # 1/(TeV.cm^2.s) = TeV/cm^2.s * TeV^-2.13 * TeV^0.13 *ebl
         lowlog = math.log10(energy[i])-0.025
         hilog = math.log10(energy[i])+0.025
+        # Delta is binwidth
         delta[i] = math.pow(10,hilog)-math.pow(10,lowlog)  # TeV  
         # 10,000 to convert to cm^2
-        # Delta is binwidth
+        if options.Transient == True:
+            # neutrino may be emitted randomly during the transient event
+            eventduration = np.random.rand()*options.timescale*(1+redshift)
+            # delay due to alert generation and reposition of telescopes
+            delay = (20.+np.random.rand()*60.)+(20+np.random.rand()*30)
+            eventduration = eventduration - delay
+            if eventduration < 0:
+                eventduration = 0.
         # 3600 * 5 seconds of signal
-        if options.Transient == True and np.random.rand()*options.timescale*(1+redshift) <= 3600 * float(obsTime):
-            signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * np.random.rand()*options.timescale*(1+redshift)
+        if options.Transient == True and eventduration <= 3600 * float(obsTime):
+            signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * eventduration
         else:
             signal = signal + spectrum[i] * area[i] * 10000 * delta[i] * 3600 * float(obsTime)
         # N_sig = N_sig + 1/(TeV.cm^2.s) * m^2 * cm^2/m^2 * TeV * s
