@@ -73,7 +73,7 @@ if (options.zNEAR>0):
 N_sample, candleflux = StandardCandleSources(options)
 flux_z1 = LuminosityFunction(options,N_sample,candleflux)
 ## Integrate[EdN/dE, {E, 10TeV, 10PeV}] * 4*Pi * dL1^2 * unit conversion
-luminosity = flux_z1 * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options.index+2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
+luminosity = candleflux * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options.index+2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
 
 
 print ("##############################################################################")
@@ -101,7 +101,7 @@ output.write("# Desired neutrino diffuse flux:\n")
 output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
 output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
 output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
-output.write("Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
+output.write("# Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
 output.write("# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n")
 output.write("# is approximately 10^-9 in the units used for A\n")
 output.write("# Dec(deg) Redshift A\n")
