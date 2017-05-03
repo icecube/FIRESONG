@@ -28,15 +28,19 @@ Several scripts are provided:
 * CTA/CTA-Sensitivity.py - Command line version of CTA/CTA-Firesong.py
   but for a single source and a single observation time. 
 
-# Authors as of December 5, 2016
+# Authors as of May 3, 2017
 Chris Tung
 Ignacio Taboada
 
-We acknowledge help and ideas by Markus Ahlers and Georga Japaridze
+We acknowledge help and ideas by Markus Ahlers, Georga Japaridze and Konstancja Satalecka
 
 # Tagged Versions
+v1.0 - May 3, 2017
+Public Release
 
-v0.2 - beta - January 9, 2016
+
+
+v0.2 - beta - January 9, 2017
 Major functionality is in place. 
 
 First version ready for public realease.
