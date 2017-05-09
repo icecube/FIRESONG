@@ -35,6 +35,10 @@ Ignacio Taboada
 We acknowledge help and ideas by Markus Ahlers, Georga Japaridze and Konstancja Satalecka
 
 # Tagged Versions
+v1.1 - May 9, 2017
+
+Added the option [--L] to specify luminosity for source. Please input the luminosity in unit of erg/yr.
+
 v1.0 - May 3, 2017
 Public Release
 
