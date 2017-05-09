@@ -13,7 +13,7 @@ import argparse
 import numpy as np
 import scipy.integrate
 # Firesong code
-from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance
+from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance, LtoFlux
 from Luminosity import LuminosityFunction
 
 #
@@ -56,6 +56,10 @@ parser.add_argument("--sigma", action="store",
                     help="Width of a log normal Luminosity function in dex, default: 1.0")
 parser.add_argument("--zNEAR", action="store",dest="zNEAR", type=float,
                     default=-1, help="Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
+parser.add_argument("--L", action="store",
+                    dest="luminosity", type=float, default=0.0,
+                    help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
+
 
 options = parser.parse_args()
 if re.search('.gz$', options.filename):
@@ -69,11 +73,14 @@ if (options.zNEAR>0):
     else:
         near_output = open(outputdir + "Near_" + options.filename,"w")
 
-    
+#Calculate total number of sources in the universe, and the flux from each source
 N_sample, candleflux = StandardCandleSources(options)
-flux_z1 = LuminosityFunction(options,N_sample,candleflux)
 ## Integrate[EdN/dE, {E, 10TeV, 10PeV}] * 4*Pi * dL1^2 * unit conversion
 luminosity = candleflux * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options.index+2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
+if options.luminosity != 0.0:
+    candleflux = LtoFlux(options)
+    luminosity = options.luminosity
+flux_z1 = LuminosityFunction(options,N_sample,candleflux)
 
 
 print ("##############################################################################")

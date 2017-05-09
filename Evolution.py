@@ -63,3 +63,19 @@ def StandardCandleSources(options):
 # Wrapper fucntion - so that cosmolopy is only imported here.
 def LuminosityDistance(z):
     return cosmolopy.distance.luminosity_distance(z, **cosmology)
+
+# Convert luminosity of standard candle to diffuse neutrino flux and standard candle flux
+def LtoFlux(options):
+  #change unit of luminosity from erg/yr to GeV/s
+  l = 1.97917e-5*options.luminosity
+  #change energy luminosity to particle luminosity, integrating the particle luminosity from 10TeV to 10 PeV
+  m0 = l / scipy.integrate.quad(lambda E: E*(E/1.e5)**(-options.index), 1e4, 1e7)[0]
+  #calculate the normalization for particle spectrum of source at z = 1 
+  candleflux = 2.**(2.+options.index)*m0/4./np.pi/(cosmolopy.distance.luminosity_distance(1, **cosmology)*3.086e24)**2. * (1.e5)**2
+  return candleflux
+
+
+
+
+
+
