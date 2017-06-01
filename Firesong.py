@@ -77,6 +77,7 @@ if (options.zNEAR>0):
 N_sample, candleflux = StandardCandleSources(options)
 ## Integrate[EdN/dE, {E, 10TeV, 10PeV}] * 4*Pi * dL1^2 * unit conversion
 luminosity = candleflux * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options.index+2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
+## If luminosity of the sources is specified, re-calculate candleflux
 if options.luminosity != 0.0:
     candleflux = LtoFlux(options)
     luminosity = options.luminosity
