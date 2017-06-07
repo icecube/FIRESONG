@@ -14,7 +14,7 @@ import numpy as np
 import scipy.integrate
 # Firesong code
 from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance, LtoFlux
-from Luminosity import LuminosityFunction
+from Luminosity import LuminosityFunction, LuminosityPDF
 
 
 #
@@ -74,7 +74,7 @@ luminosity = candleflux * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options
 if options.luminosity != 0.0:
     candleflux = LtoFlux(options)
     luminosity = options.luminosity
-flux_z1 = LuminosityFunction(options,N_sample,candleflux)
+flux_z1 = LuminosityFunction(options, N_sample, candleflux)
 
 print ("##############################################################################")
 print ("##### FIRESONG initializing - Calculating Neutrino CDFs #####")
@@ -112,22 +112,33 @@ dL1 = LuminosityDistance(1.)
 # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
 redshift_bins = np.arange(0.0005,options.zmax, 0.001)
 
+
+# Calculate the redshift z PDF for neutrino events
 if options.Transient == False:
-    NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*((1+redshift_bins[i])/2.)**(-options.index+2)*flux_z1*(dL1*dL1)/(LuminosityDistance(redshift_bins[i])*LuminosityDistance(redshift_bins[i])) for i in range(0,len(redshift_bins))]
+    NeutrinoPDF_z = [RedshiftDistribution(z, options)*((1+z)/2.)**(-options.index+2)/(LuminosityDistance(z)**2.) for z in redshift_bins]
 else:
-    NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*((1+redshift_bins[i])/2.)**(-options.index+3)*flux_z1*(dL1*dL1)/(LuminosityDistance(redshift_bins[i])*LuminosityDistance(redshift_bins[i])) for i in range(0,len(redshift_bins))]
-NeutrinoCDF = np.cumsum(NeutrinoPDF)
-NeutrinoCDF = NeutrinoCDF / NeutrinoCDF[-1]
+    NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*((1+redshift_bins[i])/2.)**(-options.index+3)*flux_z1*(dL1**2.)/(LuminosityDistance(redshift_bins[i])**2.) for i in range(0,len(redshift_bins))]
+NeutrinoCDF_z = np.cumsum(NeutrinoPDF_z)
+NeutrinoCDF_z = NeutrinoCDF_z / NeutrinoCDF_z[-1]
+
+# Obtain the flux_z1 PDF for neutrino event
+if options.LF != "SC":
+    f1_list, NeutrinoCDF_f = LuminosityPDF(options, candleflux)
 
 for i in range(0,options.AlertNumber):
+    # Random variates from the above constructed PDFs
     test = np.random.rand()
-    bin_index = np.searchsorted(NeutrinoCDF, test)
-    z = redshift_bins[bin_index]
+    bin_index_z = np.searchsorted(NeutrinoCDF_z, test)
+    z = redshift_bins[bin_index_z]
+    if options.LF != 'SC':
+        test = np.random.rand()
+        bin_index_f = np.searchsorted(NeutrinoCDF_f, test)
+        flux_z1 = f1_list[bin_index_f]
     # Random declination over the entire sky
     sinDec = 2*np.random.rand() -1
     declin = 180*np.arcsin(sinDec)/np.pi
     dL = LuminosityDistance(z)
-    flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1+z)/2.)**(-options.index+2)
+    flux = flux_z1 * (dL1 / dL)**2 * ((1+z)/2.)**(-options.index+2)
     if options.Transient == True:
         flux = flux/(options.timescale)
     output.write('{:.3f} {:.4f} {:.6e}\n'.format(declin, z, flux))
