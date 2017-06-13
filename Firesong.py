@@ -118,7 +118,7 @@ output.write("# Dec(deg) Redshift A\n")
 # Luminosity distace for z=1. Internally, fluxes are scaled to this distance.
 dL1 = LuminosityDistance(1.)
 # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
-redshift_bins = np.arange(0.0005,options.zmax, 0.001)
+redshift_bins = np.arange(0.0005,options.zmax, options.zmax/10000.)
 
 # RedshiftCDF is used for inverse transform sampling
 RedshiftPDF = [RedshiftDistribution(redshift_bins[i], options) for i in range(0,len(redshift_bins))]
