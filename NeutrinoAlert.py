@@ -110,14 +110,14 @@ output.write("# Dec(deg) Redshift A\n")
 dL1 = LuminosityDistance(1.)
 
 # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
-redshift_bins = np.arange(0.0005,options.zmax, 0.001)
+redshift_bins = np.arange(0.0005,options.zmax, options.zmax/10000.)
 
 
 # Calculate the redshift z PDF for neutrino events
 if options.Transient == False:
     NeutrinoPDF_z = [RedshiftDistribution(z, options)*((1+z)/2.)**(-options.index+2)/(LuminosityDistance(z)**2.) for z in redshift_bins]
 else:
-    NeutrinoPDF = [RedshiftDistribution(redshift_bins[i], options)*((1+redshift_bins[i])/2.)**(-options.index+3)*flux_z1*(dL1**2.)/(LuminosityDistance(redshift_bins[i])**2.) for i in range(0,len(redshift_bins))]
+    NeutrinoPDF_z = [RedshiftDistribution(z, options)*((1+z)/2.)**(-options.index+3)/(LuminosityDistance(z)**2.) for z in redshift_bins]
 NeutrinoCDF_z = np.cumsum(NeutrinoPDF_z)
 NeutrinoCDF_z = NeutrinoCDF_z / NeutrinoCDF_z[-1]
 
