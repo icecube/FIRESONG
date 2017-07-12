@@ -11,9 +11,9 @@ cosmology = cosmolopy.distance.set_omega_k_0(cosmology) #Flat universe
 # This is the redshift distribution for arbitrary evolution for either transient or steady sources 
 def RedshiftDistribution(z,options):
     if options.Transient == False:
-        return 4*np.pi* Evolution(np.log10(1+z),options.Evolution) * cosmolopy.distance.diff_comoving_volume(z,**cosmology)
+        return 4*np.pi* Evolution(np.log10(1.+z),options.Evolution) * cosmolopy.distance.diff_comoving_volume(z,**cosmology)
     else:
-        return 4*np.pi* Evolution(np.log10(1+z),options.Evolution) * 1/(1+z) * cosmolopy.distance.diff_comoving_volume(z,**cosmology)
+        return 4*np.pi* Evolution(np.log10(1.+z),options.Evolution) * 1./(1.+z) * cosmolopy.distance.diff_comoving_volume(z,**cosmology)
       
 def Evolution(x,evol):
     if (evol=="HB2006SFR"):
@@ -56,11 +56,11 @@ def StandardCandleSources(options):
   if options.Transient != True:
     # Here the integral on redshift is done from 0 to 10.
     # This insures proper normalization even if options.zmax is not 10.
-    Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+2), 0,10.)[0]
+    Fluxnorm = 4*np.pi*options.fluxnorm / scipy.integrate.quad(lambda z: Ntotal*dL1**2./(LuminosityDistance(z)**2.)*RedshiftDistribution(z, options)/norm*((1.+z)/2.)**(-options.index+2), 0,10.)[0]
   else:
     #For transient source, Fluxnorm will be the fluence of a standard candle at z=1, with unit GeV/cm^2 given that the burst rate density is measured in per year.
     # As above, the integral is done from redshift 0 to 10.
-    Fluxnorm = 4*np.pi*options.fluxnorm*86400*365 / scipy.integrate.quad(lambda z: Ntotal*dL1*dL1/np.power(cosmolopy.distance.luminosity_distance(z, **cosmology), 2)*RedshiftDistribution(z, options)/norm*((1+z)/2.)**(-options.index+3), 0,10.)[0]
+    Fluxnorm = 4*np.pi*options.fluxnorm*86400*365 / scipy.integrate.quad(lambda z: Ntotal*dL1**2./(LuminosityDistance(z)**2.)*RedshiftDistribution(z, options)/norm*((1.+z)/2.)**(-options.index+3), 0,10.)[0]
   return [int(Ntotal), Fluxnorm] 
 
 # Wrapper fucntion - so that cosmolopy is only imported here.
@@ -74,7 +74,7 @@ def LtoFlux(options):
   #change energy luminosity to particle luminosity, integrating the particle luminosity from 10TeV to 10 PeV
   m0 = l / scipy.integrate.quad(lambda E: E*(E/1.e5)**(-options.index), 1e4, 1e7)[0]
   #calculate the normalization for particle spectrum of source at z = 1 
-  candleflux = 2.**(2.+options.index)*m0/4./np.pi/(cosmolopy.distance.luminosity_distance(1, **cosmology)*3.086e24)**2. * (1.e5)**2
+  candleflux = 2.**(2.+options.index)*m0/4./np.pi/(LuminosityDistance(1)*3.086e24)**2. * (1.e5)**2
   return candleflux
 
 

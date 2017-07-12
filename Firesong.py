@@ -77,9 +77,15 @@ if (options.zNEAR>0):
 N_sample, candleflux = StandardCandleSources(options)
 ## Integrate[EdN/dE, {E, 10TeV, 10PeV}] * 4*Pi * dL1^2 * unit conversion
 luminosity = candleflux * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(-options.index+2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
+## the candle flux of Transient mode is the candle fluence, so we need to convert it to flux first to obtain the luminosity
+if options.Transient == True:
+    luminosity = luminosity / options.timescale
 ## If luminosity of the sources is specified, re-calculate candleflux
 if options.luminosity != 0.0:
     candleflux = LtoFlux(options)
+    ## Need to change from flux to fluence for transient mode
+    if options.Transient == True:
+        candleflux = candleflux*options.timescale
     luminosity = options.luminosity
 flux_z1 = LuminosityFunction(options,N_sample,candleflux)
 
@@ -92,10 +98,13 @@ if options.LF == "LG":
     print ("Lognormal distributed sources")
 if options.LF == "PL":
     print ("PowerLaw distributed sources")
+if options.Transient == True:
+    print ("Transient Sources, time scale = " + str(options.timescale) + "s")
 print ("Source evolution assumed: " + str(options.Evolution))
 print ("Local density of neutrino sources: " + str(options.density) + "/Mpc^3")
 print ("Total number of neutrinos sources in the Universe: " + str(N_sample))
-print ("Desired neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
+if options.luminosity == 0.0:
+    print ("Desired neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
 print ("Redshift range: 0 - " + str(options.zmax)) 
 print ("Standard Candle Luminosity: {:.4e} erg/yr".format(luminosity))
 print ("##### FIRESONG initialization done #####")
@@ -105,6 +114,14 @@ print ("##### FIRESONG initialization done #####")
 ##################################################
 
 output.write("# FIRESONG Output description\n")
+if options.LF == "SC":
+    output.write("# Standard candle sources\n")
+if options.LF == "LG":
+    output.write("# Lognormal distributed sources\n")
+if options.LF == "PL":
+    output.write("# PowerLaw distributed sources\n")
+if options.Transient == True:
+    output.write("# Transient Sources, time scale = " + str(options.timescale) + "s \n")
 output.write("# Desired neutrino diffuse flux:\n")
 output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
 output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
@@ -136,14 +153,18 @@ for i in range(0,N_sample):
     sinDec = 2*np.random.rand() -1
     declin = 180*np.arcsin(sinDec)/np.pi
     dL = LuminosityDistance(z)
+    ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
+    ## is calculated
     if options.LF != 'SC':
         flux = flux_z1[i] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
     else:
         flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
+    if options.Transient == True:
+        flux = flux*(1.+z)/2.
     TotalFlux = TotalFlux + flux
     # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
     if options.Transient == True:
-        flux = flux / (options.timescale)
+        flux = flux / ((1.+z)*options.timescale)
     output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
     if i%100000==0 and i>0:
         print "Generated ", i, " neutrino sources"
