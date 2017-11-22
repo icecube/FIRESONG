@@ -45,9 +45,9 @@ parser.add_argument("--timescale", action='store', dest='timescale', type=float,
 parser.add_argument("--zmax", action="store", type=float,
                     dest="zmax", default=10.,
                     help="Highest redshift to be simulated")
-parser.add_argument("--fluxnorm", action="store", dest='fluxnorm', type=float, default=0.9e-8,
+parser.add_argument("--fluxnorm", action="store", dest='fluxnorm', type=float, default=1.01e-8,
                     help="Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
-parser.add_argument("--index", action="store", dest='index', type=float, default=2.13,
+parser.add_argument("--index", action="store", dest='index', type=float, default=2.19,
                     help="Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
 parser.add_argument("--LF",action="store", dest="LF",default="SC",                    
                     help="Luminosity function, SC for standard candles, LG for lognormal, PL for powerlaw")
@@ -61,6 +61,7 @@ parser.add_argument("--L", action="store",
                     help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
 
 
+
 options = parser.parse_args()
 if re.search('.gz$', options.filename):
     output = gzip.open(outputdir+str(options.filename), 'wb')
@@ -72,6 +73,7 @@ if (options.zNEAR>0):
         near_output = gzip.open(outputdir + "Near_" + options.filename,"w")
     else:
         near_output = open(outputdir + "Near_" + options.filename,"w")
+
 
 #Calculate total number of sources in the universe, and the flux from each source
 N_sample, candleflux = StandardCandleSources(options)
@@ -125,7 +127,7 @@ if options.Transient == True:
 output.write("# Desired neutrino diffuse flux:\n")
 output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
 output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
-output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
+output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s]\n") 
 output.write("# Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
 output.write("# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n")
 output.write("# is approximately 10^-9 in the units used for A\n")
