@@ -80,7 +80,7 @@ def firesong_simulation(options, outputdir):
     output.write("# Desired neutrino diffuse flux:\n")
     output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
     output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
-    output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
+    output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s]\n") 
     output.write("# Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
     output.write("# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n")
     output.write("# is approximately 10^-9 in the units used for A\n")
