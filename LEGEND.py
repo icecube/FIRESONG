@@ -52,27 +52,30 @@ def legend_simulation(options, output):
     TotalFlux = 0
     ## Generate declin, L and z
     for index in range(len(nz)):
-        #generate nz[index] declination
-        sinDec = 2*np.random.rand(nz[index]) -1
-        declin = 180*np.arcsin(sinDec)/np.pi
-        #generate nz[index] luminosity(according to CDF) and z
-        test = np.random.rand(nz[index])
-        bin_index_l = np.searchsorted(L_cdf[index], test)
-        L = np.array(luminosity_bins[bin_index_l])+4.21  ## Factor of 4.21 to change L_x to L_rad
-        z = np.array([redshift_bins[index]]*nz[index])
-
-        for i in range(nz[index]):
+        if nz[index] > 0:
+            #generate nz[index] declination
+            sinDec = 2*np.random.rand(nz[index])-1
+            declin = 180*np.arcsin(sinDec)/np.pi
+            #generate nz[index] luminosity(according to CDF) and z
+            test = np.random.rand(nz[index])
+            bin_index_l = np.searchsorted(L_cdf[index], test)
+            L = np.array(luminosity_bins[bin_index_l])+4.21  ## Factor of 4.21 to change L_x to L_rad
+            z = np.array([redshift_bins[index]]*nz[index])
             #photon flux from radiation luminosity, pivoted at 1GeV, doppler shifted
-            pflux = (1+z[i])**(2-options.index)*(10**L[i] * 624.151)*(2-options.index)/((100)**(2-options.index)-(0.1)**(2-options.index))/4./np.pi/(LuminosityDistance(z[i])*3.086e24)**2.
+            pflux = (1+z)**(2-options.index)*(10**L * 624.151)*(2-options.index)/((100)**(2-options.index)-(0.1)**(2-options.index))/4./np.pi/(LuminosityDistance(z)*3.086e24)**2.
             #neutrino flux from radiation photon flux, and change the pivot energy to 100GeV as IceCube convention, assuming 1 to 1 flux ratio
             flux = pflux*(1e5)**(2-options.index)
-            output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin[i], z[i], flux))
-            if (z[i]<options.zNEAR):
-                near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(declin[i], flux[i], z[i]))
-            TotalFlux += flux
+
+            for i in range(nz[index]):
+                output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin[i], z[i], flux[i]))
+                if (z[i]<options.zNEAR):
+                    near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(declin[i], flux[i], z[i]))
+                TotalFlux += flux[i]
 
     print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]"
-    output.write("# Source flux E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
+    print "IC Diffuse flux conversion Factor =", options.fluxnorm/(TotalFlux/(4*np.pi))
+    output.write("# Diffuse flux E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
+    output.write('# IC Diffuse flux conversion Factor = '+str(options.fluxnorm/(TotalFlux/(4*np.pi))))
     output.close()
     if (options.zNEAR>0):
         near_output.close()
@@ -99,14 +102,14 @@ if __name__ == '__main__':
                         dest="le_model", default='blazar',
                         help="evolution model, default is blazar")
     parser.add_argument("--Lmin", action="store", dest="lmin", type=float, default=40,
-                        help="Minimum luminosity of source")
+                        help="Minimum log(luminosity) of source, default is 40")
     parser.add_argument("--Lmax", action="store", dest="lmax", type=float, default=48,
-                        help="Maximum luminosity of source")
-    parser.add_argument("--transient", action='store_true',
-                        dest='Transient', default=False,
-                        help='Simulate transient sources, NOT TESTED YET!')
-    parser.add_argument("--timescale", action='store', dest='timescale', type=float,
-                        default=1000., help='time scale of transient sources, default is 1000sec.')
+                        help="Maximum log(luminosity) of source, default is 48")
+    #parser.add_argument("--transient", action='store_true',
+    #                    dest='Transient', default=False,
+    #                    help='Simulate transient sources, NOT TESTED YET!')
+    #parser.add_argument("--timescale", action='store', dest='timescale', type=float,
+    #                    default=1000., help='time scale of transient sources, default is 1000sec.')
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
                         help="Highest redshift to be simulated")
@@ -115,7 +118,7 @@ if __name__ == '__main__':
     parser.add_argument("--index", action="store", dest='index', type=float, default=2.19,
                         help="Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
     parser.add_argument("--zNEAR", action="store",dest="zNEAR", type=float,
-                        default=-1, help="Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
+                        default=-1, help="Write down a separate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
     options = parser.parse_args()
 
     legend_simulation(options, outputdir)
