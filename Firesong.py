@@ -106,7 +106,7 @@ def firesong_simulation(options):
 
     return TotalFlux, luminosity, sources
 
-def firesong_simulation_by_hand(outputdir,
+def firesong_simulation_by_hand(outputdir = None,
                                 filename   ='Firesong.out',
                                 density    = 1e-9,
                                 Evolution  = "HB2006SFR", 
@@ -133,7 +133,10 @@ def firesong_simulation_by_hand(outputdir,
                                   zNEAR      = zNEAR, 
                                   luminosity = luminosity)
     TotalFlux, luminosity, sources = firesong_simulation(options)
-    firesong_save_simulation(outputdir, options, TotalFlux, luminosity, sources)
+    if outputdir is None:
+        return TotalFlux, luminosity, sources
+    else:
+        firesong_save_simulation(outputdir, options, TotalFlux, luminosity, sources)
     
 def firesong_save_simulation(outputdir, options, TotalFlux, luminosity, sources):
     if re.search('.gz$', options.filename):
