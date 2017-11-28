@@ -72,33 +72,31 @@ def firesong_simulation(options):
 
     sources = np.zeros((N_sample,), dtype=[("dec", "f4"), ("z", "f4"), ("flux", "f4")])
 
-    for i in range(0,N_sample):
-        # Generate a random redshift using inverse transform sampling
-        test = np.random.rand()
-        bin_index = np.searchsorted(RedshiftCDF, test)
-        z = redshift_bins[bin_index]
-        # Random declination over the entire sky
-        sinDec = 2*np.random.rand() -1
-        declin = 180*np.arcsin(sinDec)/np.pi
-        dL = LuminosityDistance(z)
-        ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
-        ## is calculated
-        if options.LF != 'SC':
-            flux = flux_z1[i] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
-        else:
-            flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
-        if options.Transient == True:
-            flux = flux*(1.+z)/2.
-        TotalFlux = TotalFlux + flux
-        # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
-        if options.Transient == True:
-            flux = flux / ((1.+z)*options.timescale)
-        sources["dec"][i] = declin
-        sources["z"][i] = z
-        sources["flux"][i] = flux
+    # Generate a random redshift using inverse transform sampling
+    test = np.random.rand(N_sample)
+    bin_index = np.searchsorted(RedshiftCDF, test)
+    z = redshift_bins[bin_index]
+    # Random declination over the entire sky
+    sinDec = 2*np.random.rand(N_sample) -1
+    declin = 180*np.arcsin(sinDec)/np.pi
+    dL = LuminosityDistance(z)
+    ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
+    ## is calculated
+    if options.LF != 'SC':
+        flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
+    else:
+        flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
+    if options.Transient == True:
+        flux = flux*(1.+z)/2.
         
-        if i%100000==0 and i>0:
-            print "Generated ", i, " neutrino sources"
+    TotalFlux = np.sum(flux)
+    # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
+    if options.Transient == True:
+        flux = flux / ((1.+z)*options.timescale)
+            
+    sources["dec"] = declin
+    sources["z"] = z
+    sources["flux"] = flux
     ############# This is the place to plug in Detector output modules ############
 
     #For transient source, we calculate the total fluence from all sources, then obtain the diffuse flux by doing a time average over a year
