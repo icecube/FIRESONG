@@ -141,6 +141,8 @@ def firesong_simulation(options, outputdir):
     if (options.zNEAR>0):
         near_output.close()
 
+    return TotalFlux, luminosity, sources
+
 def firesong_simulation_by_hand(outputdir,
                                 filename   ='Firesong.out',
                                 density    = 1e-9,
