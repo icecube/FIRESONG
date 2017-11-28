@@ -99,6 +99,8 @@ def firesong_simulation(options, outputdir):
 
     TotalFlux = 0
 
+    sources = np.zeros((N_sample,), dtype=[("dec", "f4"), ("z", "f4"), ("flux", "f4")])
+
     for i in range(0,N_sample):
         # Generate a random redshift using inverse transform sampling
         test = np.random.rand()
@@ -120,6 +122,9 @@ def firesong_simulation(options, outputdir):
         # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
         if options.Transient == True:
             flux = flux / ((1.+z)*options.timescale)
+        sources["dec"][i] = declin
+        sources["z"][i] = z
+        sources["flux"][i] = flux
         output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
         if i%100000==0 and i>0:
             print "Generated ", i, " neutrino sources"
