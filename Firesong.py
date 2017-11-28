@@ -16,17 +16,7 @@ import scipy.integrate
 from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance, LtoFlux
 from Luminosity import LuminosityFunction
 
-def firesong_simulation(options, outputdir):
-    if re.search('.gz$', options.filename):
-        output = gzip.open(outputdir+str(options.filename), 'wb')
-    else:
-        output = open(outputdir+str(options.filename),"w")
-
-    if (options.zNEAR>0):
-        if re.search('.gz$', options.filename):
-            near_output = gzip.open(outputdir + "Near_" + options.filename,"w")
-        else:
-            near_output = open(outputdir + "Near_" + options.filename,"w")
+def firesong_simulation(options):
 
     #Calculate total number of sources in the universe, and the flux from each source
     N_sample, candleflux = StandardCandleSources(options)
@@ -68,25 +58,6 @@ def firesong_simulation(options, outputdir):
     #        Simulation starts here
     ##################################################
 
-    output.write("# FIRESONG Output description\n")
-    if options.LF == "SC":
-        output.write("# Standard candle sources\n")
-    if options.LF == "LG":
-        output.write("# Lognormal distributed sources\n")
-    if options.LF == "PL":
-        output.write("# PowerLaw distributed sources\n")
-    if options.Transient == True:
-        output.write("# Transient Sources, time scale = " + str(options.timescale) + "s \n")
-    output.write("# Desired neutrino diffuse flux:\n")
-    output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
-    output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
-    output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
-    output.write("# Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
-    output.write("# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n")
-    output.write("# is approximately 10^-9 in the units used for A\n")
-    output.write("# Dec(deg) Redshift A\n")
-
-
     # Luminosity distace for z=1. Internally, fluxes are scaled to this distance.
     dL1 = LuminosityDistance(1.)
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
@@ -125,21 +96,15 @@ def firesong_simulation(options, outputdir):
         sources["dec"][i] = declin
         sources["z"][i] = z
         sources["flux"][i] = flux
-        output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
+        
         if i%100000==0 and i>0:
             print "Generated ", i, " neutrino sources"
     ############# This is the place to plug in Detector output modules ############
-        if (z<options.zNEAR):
-            near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(flux,declin, z))
 
     #For transient source, we calculate the total fluence from all sources, then obtain the diffuse flux by doing a time average over a year
     if options.Transient == True:
         TotalFlux = TotalFlux / (86400*365)
-    output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
     print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]" 
-    output.close()
-    if (options.zNEAR>0):
-        near_output.close()
 
     return TotalFlux, luminosity, sources
 
@@ -169,7 +134,52 @@ def firesong_simulation_by_hand(outputdir,
                                   sigma      = sigma, 
                                   zNEAR      = zNEAR, 
                                   luminosity = luminosity)
-    firesong_simulation(options, outputdir)
+    TotalFlux, luminosity, sources = firesong_simulation(options)
+    firesong_save_simulation(outputdir, options, TotalFlux, luminosity, sources)
+    
+def firesong_save_simulation(outputdir, options, TotalFlux, luminosity, sources):
+    if re.search('.gz$', options.filename):
+        output = gzip.open(outputdir+str(options.filename), 'wb')
+    else:
+        output = open(outputdir+str(options.filename),"w")
+
+    if (options.zNEAR>0):
+        if re.search('.gz$', options.filename):
+            near_output = gzip.open(outputdir + "Near_" + options.filename,"w")
+        else:
+            near_output = open(outputdir + "Near_" + options.filename,"w")
+
+    output.write("# FIRESONG Output description\n")
+    if options.LF == "SC":
+        output.write("# Standard candle sources\n")
+    if options.LF == "LG":
+        output.write("# Lognormal distributed sources\n")
+    if options.LF == "PL":
+        output.write("# PowerLaw distributed sources\n")
+    if options.Transient == True:
+        output.write("# Transient Sources, time scale = " + str(options.timescale) + "s \n")
+    output.write("# Desired neutrino diffuse flux:\n")
+    output.write("#      E^2 dN_{diffuse}/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
+    output.write("# Neutrino point source fluxes listed below are of \'A\' where the flux is:\n")
+    output.write("#      E^2 dN_{PS}/dE = A * (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]\n") 
+    output.write("# Standard Candle Luminosity: {:.4e} erg/yr \n".format(luminosity))
+    output.write("# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n")
+    output.write("# is approximately 10^-9 in the units used for A\n")
+    output.write("# Dec(deg) Redshift A\n")
+    
+    for i, source in enumerate(sources):
+        output.write('{:.4f} {:.4f} {:.4e}\n'.format(source["dec"], source["z"], source["flux"]))
+        if i%100000==0 and i>0:
+            print "Saved ", i, " neutrino sources"
+
+        if (source["z"]<options.zNEAR):
+            near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(source["flux"],source["declin"], source["z"]))
+    
+    output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
+
+    output.close()
+    if (options.zNEAR>0):
+        near_output.close()
 
 if __name__ == "__main__":
 
@@ -219,4 +229,5 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
     
-    firesong_simulation(options, outputdir)
+    TotalFlux, luminosity, sources = firesong_simulation(options)
+    firesong_save_simulation(outputdir, options, TotalFlux, luminosity, sources)
