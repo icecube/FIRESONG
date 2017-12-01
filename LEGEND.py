@@ -59,7 +59,7 @@ def legend_simulation(options, output):
             #generate nz[index] luminosity(according to CDF) and z
             test = np.random.rand(nz[index])
             bin_index_l = np.searchsorted(L_cdf[index], test)
-            L = np.array(luminosity_bins[bin_index_l])+4.21  ## Factor of 4.21 to change L_x to L_rad
+            L = np.array(luminosity_bins[bin_index_l])
             z = np.array([redshift_bins[index]]*nz[index])
             #photon flux from radiation luminosity, pivoted at 1GeV, doppler shifted
             pflux = (1+z)**(2-options.index)*(10**L * 624.151)*(2-options.index)/((100)**(2-options.index)-(0.1)**(2-options.index))/4./np.pi/(LuminosityDistance(z)*3.086e24)**2.

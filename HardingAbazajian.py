@@ -1,3 +1,12 @@
+## This is module for using blazar's luminosity evolution by Harding and Abazajian
+## Any other model can follow this as a template
+## variables that will be read in LEGEND.py are LF(L,z) and kappa
+## LF is the distribution of source as a function of L and z
+## kappa is the fraction of source we are interested in the LF
+
+## !!Important!! ##
+## L is X-ray luminosity in this model
+
 A = 5.04e-6
 gamma1 = 0.43
 L0 = 10**43.94
@@ -10,6 +19,7 @@ La = 10**44.6
 beta1 = 0.
 beta2 = 0.
 kappa = 9.54e-6
+L_x_to_rad = 4.19
 
 def LF_ueda_L(L):
 	return A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
