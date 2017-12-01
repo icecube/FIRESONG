@@ -95,27 +95,6 @@ def LuminosityEvolution(options):
   luminosity_bins = luminosity_bins + L_x_to_rad
 
   return redshift_bins, luminosity_bins, nz, L_cdf
-  
-  # #generate z and L for each redshift bin
-  # #generate L according to GLF at z 
-  # #generate z by evenly sample within z to z+dz
-  # L = []
-  # z = []
-  # for index in range(len(nz)):
-  #   test = np.random.rand(nz[index])
-  #   bin_index_l = np.searchsorted(L_cdf[index], test)
-  #   L = np.append(L, luminosity_bins[bin_index_l])
-  #   z = np.append(z, [redshift_bins[index]]*nz[index])
-
-  # #flatten the arrays of L and z
-  # L = L.flatten()
-  # z = z.flatten()
-  # #gamma photon flux from Xray luminosity, pivoted at 1GeV, doppler shifted
-  # gflux1 = (1+z)**(2-options.index)*(10**L * 624.151)*(2-options.index)/((100)**(2-options.index)-(0.1)**(2-options.index))/4./np.pi/(LuminosityDistance(z)*3.086e24)**2.
-  # #neutrino flux from Xray photon flux, and change the pivot energy to 100GeV as IceCube convention, assuming 1 to 1 flux ratio
-  # flux = gflux1*(1e5)**(2-options.index)
-
-  # return flux, z
 
 
 
