@@ -72,7 +72,7 @@ def legend_simulation(options, output):
                     near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(declin[i], flux[i], z[i]))
                 TotalFlux += flux[i]
 
-    print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]"
+    print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2/s/sr]"
     print "IC Diffuse flux conversion Factor =", options.fluxnorm/(TotalFlux/(4*np.pi))
     output.write("# Diffuse flux E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
     output.write('# IC Diffuse flux conversion Factor = '+str(options.fluxnorm/(TotalFlux/(4*np.pi))))

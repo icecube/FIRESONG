@@ -19,7 +19,7 @@ La = 10**44.6
 beta1 = 0.
 beta2 = 0.
 kappa = 9.54e-6
-L_x_to_rad = 4.19
+L_x_to_rad = 4.21
 
 def LF_ueda_L(L):
 	return A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
