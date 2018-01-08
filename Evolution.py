@@ -74,7 +74,7 @@ def LtoFlux(options):
   #change energy luminosity to particle luminosity, integrating the particle luminosity from 10TeV to 10 PeV
   m0 = l / scipy.integrate.quad(lambda E: E*(E/1.e5)**(-options.index), 1e4, 1e7)[0]
   #calculate the normalization for particle spectrum of source at z = 1 
-  candleflux = 2.**(2.+options.index)*m0/4./np.pi/(LuminosityDistance(1)*3.086e24)**2. * (1.e5)**2
+  candleflux = 2.**(2.-options.index)*m0/4./np.pi/(LuminosityDistance(1)*3.086e24)**2. * (1.e5)**2
   return candleflux
 
 
