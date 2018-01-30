@@ -1,6 +1,18 @@
 # Firesong
 FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays
 
+# Citation
+There's no dedicated publication to FIRESONG, though we are
+considering writing one. Presently the best reference for FIRESONG is:
+
+https://arxiv.org/abs/1801.09545
+
+Constrains on the extragalactic origin of IceCube's neutrinos using
+HAWC
+Ignacio Taboada, Chun Fai Tung, Joshua Wood for the HAWC collaboration
+Proc. of the 35th International Cosmic Ray Conference (ICRC2017),
+Bexco, Busan, Korea.
+
 # Instructions
 Set up the enviromental error FIRESONG so
 export FIRESONG=/location/of/firesong/
