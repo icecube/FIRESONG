@@ -39,6 +39,8 @@ Several scripts are provided:
   adding CTA-South is straight forward.
 * CTA/CTA-Sensitivity.py - Command line version of CTA/CTA-Firesong.py
   but for a single source and a single observation time. 
+* LEGEND.py - Generate neutrino sources with parametrized luminosity
+  function. Only blazars' LF is implmented at the moment.
 
 # Authors as of May 3, 2017
 Chris Tung

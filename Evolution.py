@@ -78,6 +78,23 @@ def LtoFlux(options):
   return candleflux
 
 
+def LuminosityEvolution(options):
+  if options.le_model=='blazar':
+    from HardingAbazajian import LF, kappa, L_x_to_rad
+  #10000 bins in redshift range
+  dz = options.zmax/10000.
+  #create bins for redshift and luminosity
+  redshift_bins = np.arange(0.0005,options.zmax, dz)
+  luminosity_bins = np.arange(options.lmin, options.lmax, 0.01)
+  #number of sources in each redshift bin 
+  nz = np.random.poisson([kappa*scipy.integrate.quad(lambda L: LF(L, z), options.lmin, options.lmax)[0]*cosmolopy.distance.diff_comoving_volume(z, **cosmology)*4*np.pi*dz for z in redshift_bins])
+  #create luminosity CDF for each redshift
+  L_pdf = [[LF(L, z) for L in luminosity_bins] for z in redshift_bins]
+  L_cdf = [np.cumsum(pdf) / np.cumsum(pdf)[-1] for pdf in L_pdf]
+  #Change luminosity bin from L_x to L_rad
+  luminosity_bins = luminosity_bins + L_x_to_rad
+
+  return redshift_bins, luminosity_bins, nz, L_cdf
 
 
 
