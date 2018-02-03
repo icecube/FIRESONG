@@ -63,7 +63,7 @@ def legend_simulation(options, output):
             z = np.array([redshift_bins[index]]*nz[index])
             #photon flux from radiation luminosity, pivoted at 1GeV, doppler shifted
             pflux = (1+z)**(2-options.index)*(10**L * 624.151)*(2-options.index)/((100)**(2-options.index)-(0.1)**(2-options.index))/4./np.pi/(LuminosityDistance(z)*3.086e24)**2.
-            #neutrino flux from radiation photon flux, and change the pivot energy to 100GeV as IceCube convention, assuming 1 to 1 flux ratio
+            #neutrino flux from radiation photon flux, and change the pivot energy to 100TeV as IceCube convention, assuming 1 to 1 flux ratio
             flux = pflux*(1e5)**(2-options.index)
 
             for i in range(nz[index]):
