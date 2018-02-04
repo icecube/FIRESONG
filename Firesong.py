@@ -99,35 +99,61 @@ def firesong_simulation(options, outputdir):
 
     TotalFlux = 0
 
-    for i in range(0,N_sample):
+    sources = np.zeros((N_sample,), dtype=[("dec", "f4"), ("z", "f4"), ("flux", "f4")])
+    _step = 500000     # for divinding up numpy workload, reduce memory usage
+
+    loop = int(N_sample/_step)
+    residue = N_sample%_step
+
+    for i in range(0,loop+1):
+        if i == loop:
+            n_size = residue
+        else:
+            n_size = _step
         # Generate a random redshift using inverse transform sampling
-        test = np.random.rand()
+        test = np.random.rand(n_size)
         bin_index = np.searchsorted(RedshiftCDF, test)
         z = redshift_bins[bin_index]
         # Random declination over the entire sky
-        sinDec = 2*np.random.rand() -1
+        sinDec = 2*np.random.rand(n_size) -1
         declin = 180*np.arcsin(sinDec)/np.pi
         dL = LuminosityDistance(z)
         ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
         ## is calculated
         if options.LF != 'SC':
-            flux = flux_z1[i] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
+            if i == loop:
+                flux = flux_z1[-n_size:] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
+            else:
+                flux = flux_z1[i*n_size:(i+1)*n_size] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
         else:
             flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
         if options.Transient == True:
             flux = flux*(1.+z)/2.
-        TotalFlux = TotalFlux + flux
+        TotalFlux = TotalFlux + sum(flux)
         # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
         if options.Transient == True:
             flux = flux / ((1.+z)*options.timescale)
-        output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
-        if i%100000==0 and i>0:
-            print "Generated ", i, " neutrino sources"
+        if i == loop:
+            sources['dec'][-n_size:] = declin
+            sources['z'][-n_size:] = z
+            sources['flux'][-n_size:] = flux
+            print "Generated ", i*_step+n_size, " neutrino sources"
+        else:
+            sources['dec'][i*n_size:(i+1)*n_size] = declin
+            sources['z'][i*n_size:(i+1)*n_size] = z
+            sources['flux'][i*n_size:(i+1)*n_size] = flux
+            print "Generated ", (i+1)*n_size, " neutrino sources"
+        #output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
+        
     ############# This is the place to plug in Detector output modules ############
-        if (z<options.zNEAR):
-            near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(flux,declin, z))
+        #if (z<options.zNEAR):
+        #    near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(flux,declin, z))
 
     #For transient source, we calculate the total fluence from all sources, then obtain the diffuse flux by doing a time average over a year
+    if options.zNEAR>0:
+        np.save(outputdir+str(options.filename)+'.npy', sources[sources['z'] < options.zNEAR])
+    else:
+        np.save(outputdir+str(options.filename)+'.npy', sources)
     if options.Transient == True:
         TotalFlux = TotalFlux / (86400*365)
     output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
