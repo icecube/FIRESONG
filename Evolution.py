@@ -22,9 +22,27 @@ def Evolution(x,evol):
         return NoEvolution(x)
     elif (evol=="CC2015SNR"):
         return CandelsClash2015SNRate(x)
+    elif (evol=="YMKBH2008SFR"):
+        return YukselMatthewKistlerBeacomHopkins2008StarFormationRate(x)
     else:
         print "Source evolution " +  evol +  " not recognized"
         quit()
+
+def YukselMatthewKistlerBeacomHopkins2008StarFormationRate(x):
+    """ Star Formation Rate in units of M_sun/yr/Mpc^3
+	arXiv:0804.4008  Eq.5
+    """
+    z_plus_1 = 10**x
+    a = 3.4
+    b = -0.3
+    c = -3.5
+    # z1 = 1
+    # z2 =4 
+    B = 5160.63662037 # precomputed B = (1+z1)**(1-a/b)
+    C = 9.06337604231 # precomputed C = (1+z1)**((b-a)/c) * (1 + z2)**(1-b/c)
+    eta = -10
+    r0 = 0.02
+    return r0 * ( z_plus_1**(a*eta) + (z_plus_1/B)**(b*eta) + (z_plus_1/C)**(c*eta) )**(1./eta)
 
 #StarFormationHistory (SFR), from Hopkins and Beacom 2006, unit = M_sun/yr/Mpc^3 
 def HopkinsBeacom2006StarFormationRate(x):
