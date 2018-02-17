@@ -22,6 +22,8 @@ def Evolution(x,evol):
         return NoEvolution(x)
     elif (evol=="CC2015SNR"):
         return CandelsClash2015SNRate(x)
+    elif (evol=="MD2014SFR"):
+        return MadauDickinson2014(x)
     else:
         print "Source evolution " +  evol +  " not recognized"
         quit()
@@ -43,8 +45,14 @@ def CandelsClash2015SNRate(x):
     b = 1.5
     c = 5.0
     d = 6.1
-    density = a*(10.**x)**c / ((10.**x / b)**d+1.)
-    return density
+    return a*(10.**x)**c / ((10.**x / b)**d+1.)
+
+def MadauDickinson2014(x):
+    a = 0.015
+    b = 2.7
+    c = 2.9
+    d = 5.6
+    return a*((1+x)**b) / ( 1 + ((1+x)/c)**d ) 
 
 def StandardCandleSources(options):
   norm = scipy.integrate.quad(lambda z: RedshiftDistribution(z, options), 0, options.zmax)[0]
