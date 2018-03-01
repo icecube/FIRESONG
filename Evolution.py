@@ -269,6 +269,8 @@ class Simulation(object):
         self.setup()
 
     def setup(self):
+        # CHECK use a spline to generate inverse-CDF
+        # should perform better than np.searchsorted
         redshift_bins = np.arange(self.zmin, self.zmax,
                                   self.zmax/float(self.bins))
 
