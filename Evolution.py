@@ -184,6 +184,11 @@ class SourcePopulation():
 
         return Fluxnorm
 
+    def fluxFromRelative(self, flux_z1, z, index):
+        dL = self.LuminosityDistance(z)
+        flux = flux_z1 * (self.dL1**2)/(dL**2) * (1.+z)**(-self.index+2)
+        return flux
+
 
 class TransientSourcePopulation(SourcePopulation):
     def __init__(self, cosmology, evolution, timescale):
@@ -228,6 +233,18 @@ class TransientSourcePopulation(SourcePopulation):
                                                                 E0=E0)
         return flux * self.timescale
 
+    def fluxFromRelative(self, flux_z1, z, index):
+        flux = super(TransientSourcePopulation, self).fluxFromRelative(flux_z1,
+                                                                       z,
+                                                                       index)
+        return flux / ((1.+z)*self.timescale)
+
+    def fluence2flux(self, fluence, z):
+        # For transient sources, the flux measured on Earth will be
+        # red-shifted-fluence/{(1+z)*burst duration}
+        flux = fluence / ((1.+z)*self.timescale)
+        return flux
+
 
 class Simulation():
     def __init__(self, population, luminosity_function, index):
@@ -256,17 +273,13 @@ class Simulation():
         return z
 
     def sample_flux(self, N=None):
-        flux_z1 = self.luminosity_function.sample_distribution(N)
-
         z = self.sample_redshift(N)
-        dL = self.population.LuminosityDistance(z)
+
+        flux_z1 = self.luminosity_function.sample_distribution(N)
+        flux = self.population.fluxFromRelative(flux_z1, z, self.index)
 
         # Random declination over the entire sky
         sinDec = np.random.uniform(-1, 1, N)
         declin = np.degrees(np.arcsin(sinDec))
-
-        ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
-        ## is calculated
-        flux = flux_z1 * (self.population.dL1**2)/(dL**2) * (1.+z)**(-self.index+2)
 
         return flux, z, declin
