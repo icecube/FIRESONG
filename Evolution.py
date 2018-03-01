@@ -206,6 +206,9 @@ class SourcePopulation():
 
 
 class TransientSourcePopulation(SourcePopulation):
+    def __init__(self, cosmology, evolution, timescale):
+        super(TransientSourcePopulation, self).__init__(cosmology, evolution)
+        self.timescale = timescale
 
     def RedshiftDistribution(self, z):
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) * 1./(1.+z)
@@ -228,3 +231,19 @@ class TransientSourcePopulation(SourcePopulation):
                                  0, 10.)[0]
 
         return fluence
+
+    def Flux2Lumi(self, fluxnorm, index, emin, emax, E0=1e5):
+        flux = super(TransientSourcePopulation, self).Flux2Lumi(fluxnorm,
+                                                                index,
+                                                                emin,
+                                                                emax,
+                                                                E0=E0)
+        return flux / self.timescale
+
+    def Lumi2Flux(self, luminosity, index, emin, emax, E0=1e5):
+        flux = super(TransientSourcePopulation, self).Lumi2Flux(luminosity,
+                                                                index,
+                                                                emin,
+                                                                emax,
+                                                                E0=E0)
+        return flux * self.timescale
