@@ -191,7 +191,7 @@ class SourcePopulation():
 
     def fluxFromRelative(self, flux_z1, z, index):
         dL = self.LuminosityDistance(z)
-        flux = flux_z1 * (self.dL1**2)/(dL**2) * (1.+z)**(-self.index+2)
+        flux = flux_z1 * (self.dL1**2)/(dL**2) * (1.+z)**(-index+2)
         return flux
 
 
@@ -279,7 +279,7 @@ class Simulation():
         # Generate a histogram to store redshifts.
         # Starts at z = 0.0005 and increases in steps of 0.001
         rand_cdf = np.random.uniform(0, 1, N)
-        bin_index = np.searchsorted(self.redshif_cdf, rand_cdf)
+        bin_index = np.searchsorted(self.redshift_cdf, rand_cdf)
         z = self.redshift_bins[bin_index]
         return z
 
