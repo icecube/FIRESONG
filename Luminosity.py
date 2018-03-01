@@ -177,7 +177,7 @@ class PL_LuminosityFunction(LuminosityFunction):
 
 # Is this a real luminosty ?
 # It'd be nice to have something with the correct units here
-def get_LuminosityFunction(options, nsource, candleflux):
+def get_LuminosityFunction(options, candleflux):
     if options.LF == "SC":
         return SC_LuminosityFunction(candleflux)
     if options.LF == "LG":
