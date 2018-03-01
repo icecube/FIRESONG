@@ -6,7 +6,6 @@ import numpy as np
 import scipy
 import cosmolopy
 cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
-cosmology = cosmolopy.distance.set_omega_k_0(cosmology)  # Flat universe
 
 
 def get_evolution(evol):
@@ -29,8 +28,8 @@ class Evolution():
     def parametrization(self, x):
         raise NotImplementedError("Abstract")
 
-    def __call__(self, x):
-        return self.parametrization(x)
+    def __call__(self, z):
+        return self.parametrization(np.log10(1.+z))
 
 
 class NoEvolution(Evolution):
@@ -56,8 +55,10 @@ class YukselEtAl2008StarFormationRate(Evolution):
     arXiv:0804.4008  Eq.5
     """
 
+    def __call__(self, z):
+        return self.parametrization(1.+z)
+
     def parametrization(self, x):
-        z_plus_1 = 10**x
         a = 3.4
         b = -0.3
         c = -3.5
@@ -69,9 +70,8 @@ class YukselEtAl2008StarFormationRate(Evolution):
         C = 9.06337604231
         eta = -10
         r0 = 0.02
-        return r0 * (z_plus_1**(a*eta) +
-                     (z_plus_1/B)**(b*eta) +
-                     (z_plus_1/C)**(c*eta))**(1./eta)
+        return r0 * (x**(a*eta) + (x/B)**(b*eta) +
+                     (x/C)**(c*eta))**(1./eta)
 
 
 class CandelsClash2015SNRate(Evolution):
@@ -87,6 +87,7 @@ class CandelsClash2015SNRate(Evolution):
 class SourcePopulation():
     def __init__(self, cosmology, evolution):
         self.evolution = evolution
+        # Flat universe
         self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                    # Mpc / cm
@@ -95,7 +96,7 @@ class SourcePopulation():
 
     def RedshiftDistribution(self, z):
         """ can remove 4*pi becaue we just use this in a normalized way """
-        return 4 * np.pi * self.evolution(np.log10(1.+z)) * \
+        return 4 * np.pi * self.evolution(z) * \
             cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
 
     def RedshiftIntegral(self, zmax):
