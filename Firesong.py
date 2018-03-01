@@ -13,7 +13,7 @@ import argparse
 import numpy as np
 import scipy.integrate
 # Firesong code
-from Evolution import get_evolution, SourcePopulation, TransientSourcePopulation, cosmology
+from Evolution import get_evolution, SourcePopulation, TransientSourcePopulation, cosmology, Simulation
 from Luminosity import get_LuminosityFunction
 
 def firesong_simulation(options, outputdir):
@@ -37,7 +37,7 @@ def firesong_simulation(options, outputdir):
                                       get_evolution(options.Evolution))
 
 
-    N_sample = population.Nsources(options.density, options.zmax)
+    N_sample = int(population.Nsources(options.density, options.zmax))
 
     if options.luminosity == 0.0:
         ## If luminosity not specified calculate candleflux from diffuse flux
@@ -102,7 +102,7 @@ def firesong_simulation(options, outputdir):
 
     
     simulation = Simulation(population, 
-                            get_LuminosityFunction(options, candleflux)
+                            get_LuminosityFunction(options, candleflux),
                             index=options.index,
                             zmax=options.zmax)
 
