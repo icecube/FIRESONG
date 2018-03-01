@@ -13,8 +13,8 @@ import argparse
 import numpy as np
 import scipy.integrate
 # Firesong code
-from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance, LtoFlux
-from Luminosity import LuminosityFunction
+from Evolution import get_evolution, SourcePopulation, TransientSourcePopulation, cosmology
+from Luminosity import get_LuminosityFunction
 
 def firesong_simulation(options, outputdir):
     if re.search('.gz$', options.filename):
@@ -28,22 +28,36 @@ def firesong_simulation(options, outputdir):
         else:
             near_output = open(outputdir + "Near_" + options.filename,"w")
 
-    #Calculate total number of sources in the universe, and the flux from each source
-    N_sample, candleflux = StandardCandleSources(options)
-    ## Integrate[EdN/dE, {E, 10TeV, 10PeV}] * 4*Pi * dL1^2 * unit conversion
-    luminosity = candleflux * (1.e-5) * scipy.integrate.quad(lambda E: 2.**(options.index-2)*(E/1.e5)**(-options.index+1), 1.e4, 1.e7)[0] * 4*np.pi * (LuminosityDistance(1.)*3.086e24)**2. *50526
-    ## the candle flux of Transient mode is the candle fluence, so we need to convert it to flux first to obtain the luminosity
     if options.Transient == True:
-        luminosity = luminosity / options.timescale
-    ## If luminosity of the sources is specified, re-calculate candleflux
-    if options.luminosity != 0.0:
-        candleflux = LtoFlux(options)
-        ## Need to change from flux to fluence for transient mode
-        if options.Transient == True:
-            candleflux = candleflux*options.timescale
-        luminosity = options.luminosity
-    flux_z1 = LuminosityFunction(options,N_sample,candleflux)
+        population = TransientSourcePopulation(cosmology, 
+                                               get_evolution(options.Evolution),
+                                               timescale=options.timescale)
+    else:
+        population = SourcePopulation(cosmology, 
+                                      get_evolution(options.Evolution))
 
+
+    N_sample = population.Nsources(options.density, options.zmax)
+
+    if options.luminosity == 0.0:
+        ## If luminosity not specified calculate candleflux from diffuse flux
+        candleflux = population.StandardCandleSources(options.fluxnorm, 
+                                                      options.density, 
+                                                      options.zmax, 
+                                                      options.index)
+        luminosity = population.Flux2Lumi(candleflux, 
+                                          options.index, 
+                                          emin=1.e4, 
+                                          emax=1.e7, 
+                                          E0=1e5)
+    else:
+        ## If luminosity of the sources is specified, calculate candleflux
+        candleflux = population.Lumi2Flux(options.luminosity, 
+                                          options.index, 
+                                          emin=1.e4, 
+                                          emax=1.e7, 
+                                          E0=1.e5)
+        luminosity = options.luminosity
 
     print ("##############################################################################")
     print ("##### FIRESONG initializing #####")
@@ -86,40 +100,23 @@ def firesong_simulation(options, outputdir):
     output.write("# is approximately 10^-9 in the units used for A\n")
     output.write("# Dec(deg) Redshift A\n")
 
-
-    # Luminosity distace for z=1. Internally, fluxes are scaled to this distance.
-    dL1 = LuminosityDistance(1.)
-    # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
-    redshift_bins = np.arange(0.0005,options.zmax, options.zmax/10000.)
-
-    # RedshiftCDF is used for inverse transform sampling
-    RedshiftPDF = [RedshiftDistribution(redshift_bins[i], options) for i in range(0,len(redshift_bins))]
-    RedshiftCDF = np.cumsum(RedshiftPDF)
-    RedshiftCDF = RedshiftCDF / RedshiftCDF[-1]
+    
+    simulation = Simulation(population, 
+                            get_LuminosityFunction(options, candleflux)
+                            index=options.index,
+                            zmax=options.zmax)
 
     TotalFlux = 0
-
     for i in range(0,N_sample):
-        # Generate a random redshift using inverse transform sampling
-        test = np.random.rand()
-        bin_index = np.searchsorted(RedshiftCDF, test)
-        z = redshift_bins[bin_index]
-        # Random declination over the entire sky
-        sinDec = 2*np.random.rand() -1
-        declin = 180*np.arcsin(sinDec)/np.pi
-        dL = LuminosityDistance(z)
         ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
         ## is calculated
-        if options.LF != 'SC':
-            flux = flux_z1[i] * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
-        else:
-            flux = flux_z1 * (dL1*dL1)/(dL*dL) * ((1.+z)/2.)**(-options.index+2)
-        if options.Transient == True:
-            flux = flux*(1.+z)/2.
+        flux, z, declin = simulation.sample_flux()
         TotalFlux = TotalFlux + flux
+        
         # For transient sources, the flux measured on Earth will be red-shifted-fluence/{(1+z)*burst duration} 
         if options.Transient == True:
-            flux = flux / ((1.+z)*options.timescale)
+            flux = population.fluence2flux(flux, z)
+        
         output.write('{:.4f} {:.4f} {:.4e}\n'.format(declin, z, flux))
         if i%100000==0 and i>0:
             print "Generated ", i, " neutrino sources"
@@ -129,7 +126,7 @@ def firesong_simulation(options, outputdir):
 
     #For transient source, we calculate the total fluence from all sources, then obtain the diffuse flux by doing a time average over a year
     if options.Transient == True:
-        TotalFlux = TotalFlux / (86400*365)
+        TotalFlux = TotalFlux / population.yr2sec
     output.write("# E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + "\n")
     print "Actual diffuse flux simulated :  E^2 dNdE = " + str(TotalFlux/(4*np.pi)) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") [GeV/cm^2.s.sr]" 
     output.close()
