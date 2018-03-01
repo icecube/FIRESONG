@@ -247,13 +247,19 @@ class TransientSourcePopulation(SourcePopulation):
 
 
 class Simulation():
-    def __init__(self, population, luminosity_function, index):
+    def __init__(self, population, luminosity_function, index, zmax,
+                 zmin=0.0005, bins=10000):
         self.population = population
         self.luminosity_function = luminosity_function
         self.index = abs(index)
+        self.zmax = zmax
+        self.zmin = zmin
+        self.bins = bins
+        self.setup()
 
-    def setup(self, zmax, zmin=0.0005, bins=10000):
-        redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
+    def setup(self):
+        redshift_bins = np.arange(self.zmin, self.zmax,
+                                  self.zmax/float(self.bins))
 
         # RedshiftCDF is used for inverse transform sampling
         RedshiftPDF = [self.population.RedshiftDistribution(redshift_bins[i])
