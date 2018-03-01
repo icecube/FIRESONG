@@ -1,6 +1,4 @@
 #!/usr/bin/python
-#
-# x = log10(1+z)
 
 import numpy as np
 import scipy
