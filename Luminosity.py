@@ -2,7 +2,7 @@
 #
 
 import numpy as np
-from scipy.special import erf
+from scipy.stats import lognorm
 
 
 class LuminosityFunction():
@@ -68,9 +68,7 @@ class LG_LuminosityFunction(LuminosityFunction):
             -------------------- * exp | -  ----------------  |
              x sigma sqrt(2 pi)        \       2 sigma^2      /
         """
-        return np.exp(-(np.log(lumi) - self.mu)**2. /
-                     (2.*self.sigma**2.)) / \
-            self.sigma/np.sqrt(2*np.pi)/lumi
+        return lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf(self, lumi):
         """ Gives the value of the CDF at lumi.
@@ -84,7 +82,7 @@ class LG_LuminosityFunction(LuminosityFunction):
             --- + --- erf |  ----------------   |
              2     2       \   sqrt(2) sigma   /
         """
-        return 0.5*(1+erf((np.log(lumi)-self.mu)/(self.sigma*np.sqrt(2))))
+        return lognorm.cdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf_eval(self):
         """ Evaluates CDF at within a `central` range.
@@ -179,14 +177,15 @@ class PL_LuminosityFunction(LuminosityFunction):
 
 # Is this a real luminosty ?
 # It'd be nice to have something with the correct units here
-def LuminosityFunction(options, nsource, candleflux):
+def get_LuminosityFunction(options, nsource, candleflux):
     if options.LF == "SC":
-        LF = SC_LuminosityFunction(candleflux)
+        return SC_LuminosityFunction(candleflux)
     if options.LF == "LG":
-        LF = LG_LuminosityFunction(candleflux,
-                                   options.sigma)
+        return LG_LuminosityFunction(candleflux,
+                                     options.sigma)
     if options.LF == "PL":
-        LF = PL_LuminosityFunction(candleflux,
-                                   options.index,
-                                   options.sigma)
-    return LF.sample_distribution(nsource)
+        return PL_LuminosityFunction(candleflux,
+                                     options.index,
+                                     options.sigma)
+    raise NotImplementedError("The luminosity function " +
+                              options.LF + " is not implemented.")
