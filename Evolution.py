@@ -223,12 +223,12 @@ class TransientSourcePopulation(SourcePopulation):
         return fluence
 
     def Flux2Lumi(self, fluxnorm, index, emin, emax, E0=1e5):
-        flux = super(TransientSourcePopulation, self).Flux2Lumi(fluxnorm,
-                                                                index,
-                                                                emin,
-                                                                emax,
-                                                                E0=E0)
-        return flux / self.timescale
+        luminosity = super(TransientSourcePopulation, self).Flux2Lumi(fluxnorm,
+                                                                      index,
+                                                                      emin,
+                                                                      emax,
+                                                                      E0=E0)
+        return luminosity / self.timescale
 
     def Lumi2Flux(self, luminosity, index, emin, emax, E0=1e5):
         flux = super(TransientSourcePopulation, self).Lumi2Flux(luminosity,
