@@ -22,7 +22,7 @@ def get_evolution(evol):
 
 
 class Evolution():
-    def __init__():
+    def __init__(self):
         pass
 
     def parametrization(self, x):
@@ -42,12 +42,17 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
     unit = M_sun/yr/Mpc^3 """
 
     def parametrization(self, x):
-        if x < 0.30963:
-            return np.power(10, 3.28*x-1.82)
-        if (x >= 0.30963) and (x < 0.73878):
-            return np.power(10, -0.26*x-0.724)
-        if x >= 0.73878:
-            return np.power(10, -8.0*x+4.99)
+        x = np.atleast_1d(x)
+        result = np.zeros_like(x)
+        m0 = x < 0.30963
+        m1 = np.logical_and(x >= 0.30963, x < 0.73878)
+        m2 = x >= 0.73878
+        result[m0] = np.power(10, 3.28*x[m0]-1.82)
+        result[m1] = np.power(10, -0.26*x[m1]-0.724)
+        result[m2] = np.power(10, -8.0*x[m2]+4.99)
+        if len(result) == 1:
+            return np.asscalar(result)
+        return result
 
 
 class YukselEtAl2008StarFormationRate(Evolution):
