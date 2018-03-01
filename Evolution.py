@@ -141,6 +141,7 @@ class SourcePopulation(object):
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are []
         """
+        # CHECK Integral can be expressed analytic
         integrand = lambda E: E*(E/E0)**(-abs(index))
         flux_integral = scipy.integrate.quad(integrand, emin, emax)[0]
         luminosity = fluxnorm / E0**2. * flux_integral *  \
@@ -160,6 +161,7 @@ class SourcePopulation(object):
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are []
         """
+        # CHECK Integral can be expressed analytic
         integrand = lambda E: E*(E/E0)**(-abs(index))
         flux_integral = scipy.integrate.quad(integrand, emin, emax)[0]
         fluxnorm = luminosity / 4. / np.pi / \
