@@ -9,7 +9,7 @@ class LuminosityFunction():
     def __init__(self, candleflux):
         self.meanflux = candleflux              # mean flux
 
-    def sample_distribution(self, nsources):
+    def sample_distribution(self, nsources, rng=None):
         raise NotImplementedError("Abstract Class")
 
     def pdf(self):
@@ -24,7 +24,7 @@ class LuminosityFunction():
 
 class SC_LuminosityFunction(LuminosityFunction):
 
-    def sample_distribution(self, nsources=None):
+    def sample_distribution(self, nsources=None, rng=None):
         return self.meanflux
 
     def pdf(self, lumi):
@@ -48,13 +48,15 @@ class LG_LuminosityFunction(LuminosityFunction):
         self.sigma = np.log(10**self.width)    # sigma is given in ln
         self.mu = self.logmean-self.sigma**2./2.  # log median flux
 
-    def sample_distribution(self, nsource=None):
+    def sample_distribution(self, nsource=None, rng=None):
         """ Samples from the Luminosity Function nsource times
 
         Parameters:
             number of sources
         """
-        return np.random.lognormal(self.mu, self.sigma, nsource)
+        if rng is None:
+            rng = np.random.RandomState()
+        return rng.lognormal(self.mu, self.sigma, nsource)
 
     def pdf(self, lumi):
         """ Gives the value of the PDF at lumi.
@@ -135,13 +137,15 @@ class PL_LuminosityFunction(LuminosityFunction):
 
         self.Fmax = self.Fmin*10**self.width
 
-    def sample_distribution(self, nsource=None):
+    def sample_distribution(self, nsource=None, rng=None):
         """
         inv.CDF:
         a = 1-index
         P^{-1}(x)=(x_min^a+(x_max^a-x_min^a)*x)^(1/a)
         """
-        x = np.random.uniform(0, 1, nsource)
+        if rng is None:
+            rng = np.random.RandomState()
+        x = rng.uniform(0, 1, nsource)
         beta = (1.+self.index)
         return (self.Fmin**beta + (self.Fmax**beta -
                                    self.Fmin**beta)*x)**(1./beta)

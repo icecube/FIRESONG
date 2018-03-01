@@ -253,13 +253,14 @@ class TransientSourcePopulation(SourcePopulation):
 
 class Simulation():
     def __init__(self, population, luminosity_function, index, zmax,
-                 zmin=0.0005, bins=10000):
+                 seed=None, zmin=0.0005, bins=10000):
         self.population = population
         self.luminosity_function = luminosity_function
         self.index = abs(index)
         self.zmax = zmax
         self.zmin = zmin
         self.bins = bins
+        self.rng = np.random.RandomState(seed)
         self.setup()
 
     def setup(self):
@@ -278,7 +279,7 @@ class Simulation():
     def sample_redshift(self, N=None):
         # Generate a histogram to store redshifts.
         # Starts at z = 0.0005 and increases in steps of 0.001
-        rand_cdf = np.random.uniform(0, 1, N)
+        rand_cdf = self.rng.uniform(0, 1, N)
         bin_index = np.searchsorted(self.redshift_cdf, rand_cdf)
         z = self.redshift_bins[bin_index]
         return z
@@ -286,11 +287,11 @@ class Simulation():
     def sample_flux(self, N=None):
         z = self.sample_redshift(N)
 
-        flux_z1 = self.luminosity_function.sample_distribution(N)
+        flux_z1 = self.luminosity_function.sample_distribution(N, rng=self.rng)
         flux = self.population.fluxFromRelative(flux_z1, z, self.index)
 
         # Random declination over the entire sky
-        sinDec = np.random.uniform(-1, 1, N)
+        sinDec = self.rng.uniform(-1, 1, N)
         declin = np.degrees(np.arcsin(sinDec))
 
         return flux, z, declin
