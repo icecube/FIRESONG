@@ -75,6 +75,7 @@ def firesong_simulation(options, outputdir):
     if options.luminosity == 0.0:
         print ("Desired neutrino diffuse flux: E^2 dN/dE = " + str(options.fluxnorm) + " (E/100 TeV)^(" + str(-(options.index-2.)) + ") GeV/cm^2.s.sr")
     print ("Redshift range: 0 - " + str(options.zmax)) 
+    print ("CandleFlux at z=1: {:.4e} GeV/cm^2.s".format(candleflux))
     print ("Standard Candle Luminosity: {:.4e} erg/yr".format(luminosity))
     print ("##### FIRESONG initialization done #####")
 
