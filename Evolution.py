@@ -86,12 +86,13 @@ class CandelsClash2015SNRate(Evolution):
 
 class SourcePopulation():
     def __init__(self, cosmology, evolution):
-        self.evolution = evolution
-        # Flat universe
-        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                    # Mpc / cm
         self.GeV_per_sec_2_ergs_per_year = 50526  # (GeV/sec) / (ergs/yr)
+        self.evolution = evolution
+
+        # Flat universe
+        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
         self.dL1 = self.LuminosityDistance(1.)
 
     def RedshiftDistribution(self, z):
@@ -105,6 +106,26 @@ class SourcePopulation():
 
         integrand = lambda z: self.RedshiftDistribution(z)
         return scipy.integrate.quad(integrand, 0, zmax)[0]
+
+    def setup_redshift_cdf(self, zmax, zmin=0.0005, bins=10000):
+        redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
+
+        # RedshiftCDF is used for inverse transform sampling
+        RedshiftPDF = [self.RedshiftDistribution(redshift_bins[i])
+                       for i in range(0, len(redshift_bins))]
+        RedshiftCDF = np.cumsum(RedshiftPDF)
+        RedshiftCDF = RedshiftCDF / RedshiftCDF[-1]
+
+        self.redshift_bins = redshift_bins
+        self.redshift_cdf = RedshiftCDF
+
+    def sample_redshift(self, N=1):
+        # Generate a histogram to store redshifts.
+        # Starts at z = 0.0005 and increases in steps of 0.001
+        rand_cdf = np.random.rand() if N == 1 else np.random.rand(N)
+        bin_index = np.searchsorted(self.redshif_cdf, rand_cdf)
+        z = self.redshift_bins[bin_index]
+        return z
 
     def LuminosityDistance(self, z):
         # Wrapper function - so that cosmolopy is only imported here.
