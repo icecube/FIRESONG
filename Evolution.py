@@ -146,8 +146,8 @@ class SourcePopulation(object):
         luminosity = fluxnorm / E0**2. * flux_integral *  \
             self.GeV_per_sec_2_ergs_per_year * \
             4. * np.pi * (self.dL1*self.Mpc2cm)**2.
-
-        return luminosity
+        # CHECK why (1+z)/2
+        return luminosity * 2.**(index-2)
 
     def Lumi2Flux(self, luminosity, index, emin, emax, E0=1.e5):
         """
@@ -165,7 +165,8 @@ class SourcePopulation(object):
         fluxnorm = luminosity / 4. / np.pi / \
             (self.dL1*self.Mpc2cm)**2. / \
             self.GeV_per_sec_2_ergs_per_year / flux_integral * E0**2.
-        return fluxnorm
+        # CHECK why (1+z)/2
+        return fluxnorm * 2.**(2.-index)
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index):
         """ $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
@@ -181,8 +182,9 @@ class SourcePopulation(object):
 
         # Here the integral on redshift is done from 0 to 10.
         # This insures proper normalization even if zmax is not 10.
+        # CHECK why (1+z)/2.
         Fluxnorm = all_sky_flux / Ntotal / self.dL1**2. / \
-            scipy.integrate.quad(lambda z: (1.+z)**(-abs(index)+2) /
+            scipy.integrate.quad(lambda z: ((1.+z)/2.)**(-abs(index)+2) /
                                  self.LuminosityDistance(z)**2. *
                                  self.RedshiftDistribution(z) / norm,
                                  0, 10.)[0]
@@ -191,7 +193,8 @@ class SourcePopulation(object):
 
     def fluxFromRelative(self, flux_z1, z, index):
         dL = self.LuminosityDistance(z)
-        flux = flux_z1 * (self.dL1**2)/(dL**2) * (1.+z)**(-index+2)
+        # CHECK why (1+z)/2.
+        flux = flux_z1 * (self.dL1**2)/(dL**2) * ((1.+z)/2.)**(-index+2)
         return flux
 
 
@@ -200,6 +203,9 @@ class TransientSourcePopulation(SourcePopulation):
         super(TransientSourcePopulation, self).__init__(cosmology, evolution)
         self.timescale = timescale
         self.yr2sec = 86400*365
+
+    def RedshiftDistribution(self, z):
+        return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index):
         # For transient source, Fluxnorm will be the fluence of a
@@ -211,8 +217,9 @@ class TransientSourcePopulation(SourcePopulation):
         all_sky_flux = 4 * np.pi * fluxnorm * self.yr2sec
 
         # As above, the integral is done from redshift 0 to 10.
+        # CHECK why (1+z)/2.
         fluence = all_sky_flux / Ntotal / self.dL1**2. / \
-            scipy.integrate.quad(lambda z: (1.+z)**(-abs(index)+3) /
+            scipy.integrate.quad(lambda z: ((1.+z)/2.)**(-abs(index)+3) /
                                  (self.LuminosityDistance(z)**2.) *
                                  self.RedshiftDistribution(z) / norm,
                                  0, 10.)[0]
@@ -239,7 +246,8 @@ class TransientSourcePopulation(SourcePopulation):
         flux = super(TransientSourcePopulation, self).fluxFromRelative(flux_z1,
                                                                        z,
                                                                        index)
-        return flux / ((1.+z)*self.timescale)
+        # CHECK why (1+z)/2.
+        return flux * (1.+z) / 2.
 
     def fluence2flux(self, fluence, z):
         # For transient sources, the flux measured on Earth will be
