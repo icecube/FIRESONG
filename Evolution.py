@@ -107,26 +107,6 @@ class SourcePopulation():
         integrand = lambda z: self.RedshiftDistribution(z)
         return scipy.integrate.quad(integrand, 0, zmax)[0]
 
-    def setup_redshift_cdf(self, zmax, zmin=0.0005, bins=10000):
-        redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
-
-        # RedshiftCDF is used for inverse transform sampling
-        RedshiftPDF = [self.RedshiftDistribution(redshift_bins[i])
-                       for i in range(0, len(redshift_bins))]
-        RedshiftCDF = np.cumsum(RedshiftPDF)
-        RedshiftCDF = RedshiftCDF / RedshiftCDF[-1]
-
-        self.redshift_bins = redshift_bins
-        self.redshift_cdf = RedshiftCDF
-
-    def sample_redshift(self, N=1):
-        # Generate a histogram to store redshifts.
-        # Starts at z = 0.0005 and increases in steps of 0.001
-        rand_cdf = np.random.rand() if N == 1 else np.random.rand(N)
-        bin_index = np.searchsorted(self.redshif_cdf, rand_cdf)
-        z = self.redshift_bins[bin_index]
-        return z
-
     def LuminosityDistance(self, z):
         # Wrapper function - so that cosmolopy is only imported here.
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
@@ -247,3 +227,46 @@ class TransientSourcePopulation(SourcePopulation):
                                                                 emax,
                                                                 E0=E0)
         return flux * self.timescale
+
+
+class Simulation():
+    def __init__(self, population, luminosity_function, index):
+        self.population = population
+        self.luminosity_function = luminosity_function
+        self.index = abs(index)
+
+    def setup(self, zmax, zmin=0.0005, bins=10000):
+        redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
+
+        # RedshiftCDF is used for inverse transform sampling
+        RedshiftPDF = [self.population.RedshiftDistribution(redshift_bins[i])
+                       for i in range(0, len(redshift_bins))]
+        RedshiftCDF = np.cumsum(RedshiftPDF)
+        RedshiftCDF = RedshiftCDF / RedshiftCDF[-1]
+
+        self.redshift_bins = redshift_bins
+        self.redshift_cdf = RedshiftCDF
+
+    def sample_redshift(self, N=None):
+        # Generate a histogram to store redshifts.
+        # Starts at z = 0.0005 and increases in steps of 0.001
+        rand_cdf = np.random.uniform(0, 1, N)
+        bin_index = np.searchsorted(self.redshif_cdf, rand_cdf)
+        z = self.redshift_bins[bin_index]
+        return z
+
+    def sample_flux(self, N=None):
+        flux_z1 = self.luminosity_function.sample_distribution(N)
+
+        z = self.sample_redshift(N)
+        dL = self.population.LuminosityDistance(z)
+
+        # Random declination over the entire sky
+        sinDec = np.random.uniform(-1, 1, N)
+        declin = np.degrees(np.arcsin(sinDec))
+
+        ## IMPORTANT notice, in the following "flux" means fluence in Transient mode, but flux in steady source mode, until TotalFlux(TotalFluence)
+        ## is calculated
+        flux = flux_z1 * (self.population.dL1**2)/(dL**2) * (1.+z)**(-self.index+2)
+
+        return flux, z, declin
