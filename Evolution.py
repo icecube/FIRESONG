@@ -201,9 +201,6 @@ class TransientSourcePopulation(SourcePopulation):
         self.timescale = timescale
         self.yr2sec = 86400*365
 
-    def RedshiftDistribution(self, z):
-        return super(TransientSourcePopulation, self).RedshiftDistribution(z) * 1./(1.+z)
-
     def StandardCandleSources(self, fluxnorm, density, zmax, index):
         # For transient source, Fluxnorm will be the fluence of a
         # standard candle at z=1, with unit GeV/cm^2 given that the
