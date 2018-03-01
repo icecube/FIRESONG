@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import lognorm
 
 
-class LuminosityFunction():
+class LuminosityFunction(object):
     def __init__(self, candleflux):
         self.meanflux = candleflux              # mean flux
 

@@ -21,7 +21,7 @@ def get_evolution(evol):
     return evolutions[evol]()
 
 
-class Evolution():
+class Evolution(object):
     def __init__(self):
         pass
 
@@ -89,7 +89,7 @@ class CandelsClash2015SNRate(Evolution):
         return density
 
 
-class SourcePopulation():
+class SourcePopulation(object):
     def __init__(self, cosmology, evolution):
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                    # Mpc / cm
@@ -251,7 +251,7 @@ class TransientSourcePopulation(SourcePopulation):
         return flux
 
 
-class Simulation():
+class Simulation(object):
     def __init__(self, population, luminosity_function, index, zmax,
                  seed=None, zmin=0.0005, bins=10000):
         self.population = population
