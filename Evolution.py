@@ -194,6 +194,7 @@ class TransientSourcePopulation(SourcePopulation):
     def __init__(self, cosmology, evolution, timescale):
         super(TransientSourcePopulation, self).__init__(cosmology, evolution)
         self.timescale = timescale
+        self.yr2sec = 86400*365
 
     def RedshiftDistribution(self, z):
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) * 1./(1.+z)
@@ -205,8 +206,7 @@ class TransientSourcePopulation(SourcePopulation):
 
         norm = self.RedshiftIntegral(zmax)
         Ntotal = self.Nsources(density, zmax)
-        yr2sec = 86400*365
-        all_sky_flux = 4 * np.pi * fluxnorm * yr2sec
+        all_sky_flux = 4 * np.pi * fluxnorm * self.yr2sec
 
         # As above, the integral is done from redshift 0 to 10.
         fluence = all_sky_flux / Ntotal / self.dL1**2. / \
