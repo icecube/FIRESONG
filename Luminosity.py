@@ -24,8 +24,8 @@ class LuminosityFunction():
 
 class SC_LuminosityFunction(LuminosityFunction):
 
-    def sample_distribution(self, nsources):
-        return self.meanflux*np.ones(nsources)
+    def sample_distribution(self, nsources=None):
+        return self.meanflux
 
     def pdf(self, lumi):
         raise NotImplementedError("""This is a delta function.
@@ -48,7 +48,7 @@ class LG_LuminosityFunction(LuminosityFunction):
         self.sigma = np.log(10**self.width)    # sigma is given in ln
         self.mu = self.logmean-self.sigma**2./2.  # log median flux
 
-    def sample_distribution(self, nsource):
+    def sample_distribution(self, nsource=None):
         """ Samples from the Luminosity Function nsource times
 
         Parameters:
@@ -135,13 +135,13 @@ class PL_LuminosityFunction(LuminosityFunction):
 
         self.Fmax = self.Fmin*10**self.width
 
-    def sample_distribution(self, nsource):
+    def sample_distribution(self, nsource=None):
         """
         inv.CDF:
         a = 1-index
         P^{-1}(x)=(x_min^a+(x_max^a-x_min^a)*x)^(1/a)
         """
-        x = np.random.rand(nsource)
+        x = np.random.uniform(0, 1, nsource)
         beta = (1.+self.index)
         return (self.Fmin**beta + (self.Fmax**beta -
                                    self.Fmin**beta)*x)**(1./beta)
