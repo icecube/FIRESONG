@@ -9,11 +9,11 @@ from Luminosity import get_LuminosityFunction
 from cosmolopy.distance import diff_comoving_volume
 
 # Physics Settings
-def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
+def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, index=2.19,
              logMu_range=[-10, 6], N_Mu_bins=200,
              z_limits=[0.04, 10.], nzbins=120,
              Lum_limits=[1e45, 1e54], nLbins=120,
-             flux_to_mu=10763342917.859608, upper_E=1e7, lower_E=1e4):
+             upper_E=1e7, lower_E=1e4):
     """
     Parameter:
         - density in 1/Mpc^3
@@ -32,61 +32,54 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
     """
     
     pop = SourcePopulation(cosmology, get_evolution("HB2006SFR"))
-
-    # Define the Redshift and Luminosity Evolution
     LF = get_LuminosityFunction(argparse.Namespace(LF="LG", sigma=sigma), L_nu)
 
     int_norm = pop.RedshiftIntegral(z_limits[-1])
     N_tot = pop.Nsources(density, z_limits[-1])
     
-
-    # Setup Arrays
-    logMu_array = np.linspace(logMu_range[0], logMu_range[1], N_Mu_bins)
-    Flux_from_fixed_z = []
-
     zs = np.linspace(z_limits[0], z_limits[1], nzbins)
     deltaz = (float(z_limits[1])-float(z_limits[0]))/nzbins
-
     Ls = np.linspace(np.log10(Lum_limits[0]), np.log10(Lum_limits[1]), nLbins)
     deltaL = (np.log10(Lum_limits[1])-np.log10(Lum_limits[0]))/nLbins
+    logMu_array = np.linspace(logMu_range[0], logMu_range[1], N_Mu_bins)
+    deltaLogMu = float(logMu_range[1]-logMu_range[0]) / N_Mu_bins 
 
-    # Integration
+    # Setup Arrays
+    
     Count_array = np.zeros(N_Mu_bins)
     muError = []
-    tot_bins = nLbins * nzbins
-    Flux_from_fixed_z.append([])
+    Flux_from_fixed_z = []
+    
+    # Integration
     # Loop over redshift bins
-    for z_count, z in enumerate(zs):
+    for z in zs:
         
         # Conversion Factor for given z
         u_lim = upper_E/(1+z)   # upper IceCube range
         l_lim = lower_E/(1+z)   # lower IceCube range
-        if gamma != 2.0:
-            exponent = (2-gamma)
-            nenner = 1/exponent*(u_lim**exponent-l_lim**exponent)
+        if index != 2.0:
+            nenner = (u_lim**(2-index)-l_lim**(2-index)) /(2-index)
         else:
             nenner = (np.log(u_lim)-np.log(l_lim))
-        bz = (1/(1e5)**(gamma-2))*1/(nenner)
-        
-        dlz = pop.LuminosityDistance(z)
-        tot_flux_from_z = 0.
+        energy_integral = (1/(1e5)**(index-2))*1/(nenner)
 
         # Loop over Luminosity bins
-        for l_count, lum in enumerate(Ls):
-                    
+        tot_flux_from_z = 0.
+        for lum in Ls:
                 # Number of Sources in
-                LF_val = pop.evolution(z)*LF.pdf(10**lum)
-                dN = (4*np.pi*LF_val*diff_comoving_volume(z, **pop.cosmology)/int_norm) * deltaL*deltaz*N_tot
+                dN = N_tot * LF.pdf(10**lum) * deltaL * (pop.RedshiftDistribution(z)/int_norm) * deltaz
 
                 # Flux to Source Strength
-                logmu = np.log10(flux_to_mu * 10**lum/pop.GeV_per_sec_2_ergs_per_year /
-                                 (4*np.pi*(pop.Mpc2cm*dlz)**2)*bz)
+                #logmu = np.log10(10**lum * energy_integral / 
+                #                 pop.GeV_per_sec_2_ergs_per_year /
+                #                 (4.*np.pi*(pop.LuminosityDistance(z)*pop.Mpc2cm)**2) )
+                                 
+                logmu = np.log10(pop.Lumi2Flux(10**lum, index, emin=lower_E, emax=upper_E)*pop.dL1**2/pop.LuminosityDistance(z)**2)
 
                 # Add dN to Histogram
                 if logmu < logMu_range[1] and logmu > logMu_range[0]:
                     tot_flux_from_z += dN*10**logmu
-                    idx = int((logmu-logMu_range[0])*N_Mu_bins /
-                              (logMu_range[1]-logMu_range[0]))
+                    idx = int((logmu-logMu_range[0]) / deltaLogMu)
                     Count_array[idx] += dN
                 else:
                     muError.append(logmu)
@@ -101,7 +94,7 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
 #        density=args.density,
 #        L_nu=args.luminosity,
 #        sigma=args.sigma,
-#        gamma=args.index,
+#        index=args.index,
 #        flux_to_mu=1,
 #        logMu_range=[-20, -6],
 #        N_Mu_bins=2000,

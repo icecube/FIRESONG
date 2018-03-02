@@ -90,8 +90,8 @@ class CandelsClash2015SNRate(Evolution):
 class SourcePopulation(object):
     def __init__(self, cosmology, evolution):
         self._zlocal = 0.01
-        self.Mpc2cm = 3.086e24                    # Mpc / cm
-        self.GeV_per_sec_2_ergs_per_year = 50526  # (GeV/sec) / (ergs/yr)
+        self.Mpc2cm = 3.086e24                     # Mpc / cm
+        self.GeV_per_sec_2_ergs_per_year = 50526.  # (GeV/sec) / (ergs/yr)
         self.evolution = evolution
 
         # Flat universe
