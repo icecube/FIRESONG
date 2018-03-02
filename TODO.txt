@@ -10,8 +10,6 @@ performance test
 
 PDF / CDF for SC LumiFunction
 
-index sign independent
-
 options handling
 
 Function documentation

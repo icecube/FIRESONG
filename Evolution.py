@@ -186,7 +186,7 @@ class SourcePopulation(object):
         # Here the integral on redshift is done from 0 to 10.
         # This insures proper normalization even if zmax is not 10.
         Fluxnorm = all_sky_flux / Ntotal / self.LuminosityDistance(z0)**2. / \
-            scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(-abs(index)+2) /
+            scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(2-index) /
                                  self.LuminosityDistance(z)**2. *
                                  self.RedshiftDistribution(z) / norm,
                                  0, 10.)[0]
@@ -222,7 +222,7 @@ class TransientSourcePopulation(SourcePopulation):
 
         # As above, the integral is done from redshift 0 to 10.
         fluence = all_sky_flux / Ntotal / self.LuminosityDistance(z0)**2. / \
-            scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(-abs(index)+3) /
+            scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(3-index) /
                                  (self.LuminosityDistance(z)**2.) *
                                  self.RedshiftDistribution(z) / norm,
                                  0, 10.)[0]
@@ -259,7 +259,7 @@ class Simulation(object):
                  emin, emax, seed=None, zmin=0.0005, bins=10000):
         self.population = population
         self.luminosity_function = luminosity_function
-        self.index = abs(index)
+        self.index = index
         self.zmax = zmax
         self.zmin = zmin
         self.bins = bins
