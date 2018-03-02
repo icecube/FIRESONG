@@ -94,6 +94,8 @@ def print_str(LF, Transient, timescale, Evolution, density,
 
 
 def firesong_simulation(options, outputdir):
+    emin = 1e4
+    emax = 1e7
 
     if options.Transient is True:
         population = TransientSourcePopulation(cosmology,
@@ -105,15 +107,14 @@ def firesong_simulation(options, outputdir):
 
     N_sample = int(population.Nsources(options.density, options.zmax))
 
-    z0 = 2.
     if options.luminosity == 0.0:
-        ## If luminosity not specified calculate candleflux from diffuse flux
+        ## If luminosity not specified calculate luminosity from diffuse flux
         luminosity = population.StandardCandleLuminosity(options.fluxnorm,
                                                          options.density,
                                                          options.zmax,
                                                          options.index,
-                                                         emin=1e4,
-                                                         emax=1e7)
+                                                         emin=emin,
+                                                         emax=emax)
     else:
         luminosity = options.luminosity
 
@@ -131,8 +132,8 @@ def firesong_simulation(options, outputdir):
                             get_LuminosityFunction(options, luminosity),
                             index=options.index,
                             zmax=options.zmax,
-                            emin=1e4,
-                            emax=1e7)
+                            emin=emin,
+                            emax=emax)
 
     out = output_writer(outputdir, options.filename)
     out.write_header(options.LF, options.Transient, options.timescale,

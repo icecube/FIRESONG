@@ -193,12 +193,14 @@ class SourcePopulation(object):
 
         return Fluxnorm
 
-    def StandardCandleLuminosity(self, fluxnorm, density, zmax, index, emin, emax, E0=1e5):
+    def StandardCandleLuminosity(self, fluxnorm, density, zmax, index,
+                                 emin, emax, E0=1e5):
         """ """
 
         flux = self.StandardCandleSources(fluxnorm, density, zmax, index, z0=1)
         luminosity = self.Flux2Lumi(flux, index, emin, emax, z=1, E0=E0)
         return luminosity
+
 
 class TransientSourcePopulation(SourcePopulation):
     def __init__(self, cosmology, evolution, timescale):
@@ -218,7 +220,7 @@ class TransientSourcePopulation(SourcePopulation):
         Ntotal = self.Nsources(density, zmax)
         all_sky_flux = 4 * np.pi * fluxnorm * self.yr2sec
 
-        # As above, the integral is done from redshift 0 to 10. 
+        # As above, the integral is done from redshift 0 to 10.
         fluence = all_sky_flux / Ntotal / self.LuminosityDistance(z0)**2. / \
             scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(-abs(index)+3) /
                                  (self.LuminosityDistance(z)**2.) *
@@ -292,7 +294,8 @@ class Simulation(object):
     def sample_flux(self, N=None):
         z = self.sample_redshift(N)
         lumi = self.luminosity_function.sample_distribution(N, rng=self.rng)
-        flux = self.population.Lumi2Flux(lumi, self.index, self.emin, self.emax, z)
+        flux = self.population.Lumi2Flux(lumi, self.index,
+                                         self.emin, self.emax, z)
 
         # Random declination over the entire sky
         sinDec = self.rng.uniform(-1, 1, N)
