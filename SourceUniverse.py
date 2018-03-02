@@ -55,13 +55,7 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, index=2.19,
     for z in zs:
         
         # Conversion Factor for given z
-        u_lim = upper_E/(1+z)   # upper IceCube range
-        l_lim = lower_E/(1+z)   # lower IceCube range
-        if index != 2.0:
-            nenner = (u_lim**(2-index)-l_lim**(2-index)) /(2-index)
-        else:
-            nenner = (np.log(u_lim)-np.log(l_lim))
-        energy_integral = (1/(1e5)**(index-2))*1/(nenner)
+        energy_integral = 1e5**2 / pop.EnergyIntegral(index, emin=lower_E, emax=upper_E, E0=1.e5, z)
 
         # Loop over Luminosity bins
         tot_flux_from_z = 0.
@@ -70,10 +64,6 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, index=2.19,
                 dN = N_tot * LF.pdf(10**lum) * deltaL * (pop.RedshiftDistribution(z)/int_norm) * deltaz
 
                 # Flux to Source Strength
-                #logmu = np.log10(10**lum * energy_integral / 
-                #                 pop.GeV_per_sec_2_ergs_per_year /
-                #                 (4.*np.pi*(pop.LuminosityDistance(z)*pop.Mpc2cm)**2) )
-                                 
                 logmu = np.log10(pop.Lumi2Flux(10**lum, index, emin=lower_E, emax=upper_E)*pop.dL1**2/pop.LuminosityDistance(z)**2)
 
                 # Add dN to Histogram

@@ -163,10 +163,14 @@ class SourcePopulation(object):
         return fluxnorm 
 
     def EnergyIntegral(self, index, emin, emax, E0, z=1):
-        # CHECK Integral can be expressed analytic
-        integrand = lambda E: E*(E/E0)**(-abs(index))
-        flux_integral = scipy.integrate.quad(integrand, emin, emax)[0]
-        return flux_integral / (1+z)**(2.-index)
+        """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
+        l_lim = emin/(1.+z)
+        u_lim = emax/(1.+z)
+        if index != 2.0:
+            integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
+        else:
+            integral = np.log(u_lim) - np.log(l_lim)
+        return E0**index*integral 
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index):
         """ $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
