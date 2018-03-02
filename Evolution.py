@@ -160,7 +160,7 @@ class SourcePopulation(object):
         fluxnorm = luminosity / 4. / np.pi / \
             (self.dL1*self.Mpc2cm)**2. / \
             self.GeV_per_sec_2_ergs_per_year / flux_integral * E0**2.
-        return fluxnorm 
+        return fluxnorm
 
     def EnergyIntegral(self, index, emin, emax, E0, z=1):
         """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
@@ -170,7 +170,7 @@ class SourcePopulation(object):
             integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
         else:
             integral = np.log(u_lim) - np.log(l_lim)
-        return E0**index*integral 
+        return E0**index * integral
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index):
         """ $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}

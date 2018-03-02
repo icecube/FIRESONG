@@ -70,7 +70,8 @@ class LG_LuminosityFunction(LuminosityFunction):
             -------------------- * exp | -  ----------------  |
              x sigma sqrt(2 pi)        \       2 sigma^2      /
         """
-        return np.exp(self.mu)*lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
+        return np.exp(self.mu) * \
+            lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf(self, lumi):
         """ Gives the value of the CDF at lumi.
