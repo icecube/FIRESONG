@@ -71,7 +71,7 @@ class output_writer(object):
 
 def print_str(LF, Transient, timescale, Evolution, density,
               N_sample, luminosity_default, fluxnorm, delta_gamma,
-              zmax, candleflux, luminosity):
+              zmax, luminosity):
     str = "##############################################################################\n"
     str += "##### FIRESONG initializing #####\n"
     if LF == "SC":
@@ -88,7 +88,6 @@ def print_str(LF, Transient, timescale, Evolution, density,
     if luminosity_default == 0.0:
         str += "Desired neutrino diffuse flux: E^2 dN/dE = {fluxnorm} (E/100 TeV)^({delta_gamma}) GeV/cm^2.s.sr\n"
     str += "Redshift range: 0 - {zmax}\n"
-    str += "CandleFlux at z=1: {candleflux:.4e} GeV/cm^2.s\n"
     str += "Standard Candle Luminosity: {luminosity:.4e} erg/yr\n"
     str += "##### FIRESONG initialization done #####\n"
     print(str.format(**locals()))
@@ -109,32 +108,20 @@ def firesong_simulation(options, outputdir):
     z0 = 2.
     if options.luminosity == 0.0:
         ## If luminosity not specified calculate candleflux from diffuse flux
-        candleflux = population.StandardCandleSources(options.fluxnorm,
-                                                      options.density,
-                                                      options.zmax,
-                                                      options.index,
-                                                      z0=z0)
-        luminosity = population.Flux2Lumi(candleflux,
-                                          options.index,
-                                          emin=1.e4,
-                                          emax=1.e7,
-                                          z=z0,
-                                          E0=1e5)
+        luminosity = population.StandardCandleLuminosity(options.fluxnorm,
+                                                         options.density,
+                                                         options.zmax,
+                                                         options.index,
+                                                         emin=1e4,
+                                                         emax=1e7)
     else:
-        ## If luminosity of the sources is specified, calculate candleflux
-        candleflux = population.Lumi2Flux(options.luminosity,
-                                          options.index,
-                                          emin=1.e4,
-                                          emax=1.e7,
-                                          z=z0,
-                                          E0=1.e5)
         luminosity = options.luminosity
 
     delta_gamma = 2-options.index
     print_str(options.LF, options.Transient, options.timescale,
               options.Evolution, options.density, N_sample,
               options.luminosity, options.fluxnorm, delta_gamma,
-              options.zmax, candleflux, luminosity)
+              options.zmax, luminosity)
 
     ##################################################
     #        Simulation starts here

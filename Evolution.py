@@ -193,6 +193,13 @@ class SourcePopulation(object):
 
         return Fluxnorm
 
+    def StandardCandleLuminosity(self, fluxnorm, density, zmax, index, emin, emax, E0=1e5):
+        """ """
+
+        flux = self.StandardCandleSources(fluxnorm, density, zmax, index, z0=1)
+        luminosity = self.Flux2Lumi(flux, index, emin, emax, z=1, E0=E0)
+        return luminosity
+
 class TransientSourcePopulation(SourcePopulation):
     def __init__(self, cosmology, evolution, timescale):
         super(TransientSourcePopulation, self).__init__(cosmology, evolution)
