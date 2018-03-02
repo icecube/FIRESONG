@@ -7,7 +7,10 @@ import numpy as np
 import scipy
 from scipy.stats import lognorm
 from scipy.interpolate import UnivariateSpline
-from ps_analysis.scripts.stager import FileStager
+try:
+    from ps_analysis.scripts.stager import FileStager
+except:
+    pass
 try:
     from cosmolopy.distance import diff_comoving_volume, luminosity_distance
     from cosmolopy.distance import comoving_volume, set_omega_k_0
@@ -25,22 +28,6 @@ def HopkinsBeacom2006StarFormationRate(z):
     if x >= 0.73878:
         return np.power(10, -8.0*x+4.99)
 
-
-# Conversion factor b calculates the energy integral
-def calc_conversion_factor(z, Gamma, upper_E=1e7, lower_E=1e4):
-    u_lim = upper_E/(1+z)   # upper IceCube range
-    l_lim = lower_E/(1+z)   # lower IceCube range
-
-    if Gamma != 2.0:
-        exponent = (2-Gamma)
-        nenner = 1/exponent*(u_lim**exponent-l_lim**exponent)
-
-    else:
-        nenner = (np.log(u_lim)-np.log(l_lim))
-
-    return (1/(1e5)**(Gamma-2))*1/(nenner)
-
-
 # Use local source Density to deduce total number of sources in the universe
 def tot_num_src(redshift_evolution, cosmology, zmax, density):
     integrand = lambda z: redshift_evolution(z) * \
@@ -49,16 +36,7 @@ def tot_num_src(redshift_evolution, cosmology, zmax, density):
     area = 4 * np.pi * scipy.integrate.quad(integrand, 0, 0.01)[0]
     vlocal = comoving_volume(0.01, **cosmology)
     Ntotal = density * vlocal / (area/norm)
-    return Ntotal, norm
-
-
-# Calculate the number of sources in volume and luminosity interval
-def calc_dN(LF, logL0, z0, logLbinwidth, zbinwidth,
-            N_tot, int_norm, cosmology):
-    LF_val = LF(z0, logL0)
-    return (4*np.pi*LF_val*diff_comoving_volume(z0, **cosmology)/int_norm) * \
-        logLbinwidth*zbinwidth*N_tot
-
+    return Ntotal
 
 # Physics Settings
 def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
@@ -92,12 +70,13 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
 
     # Define the Redshift and Luminosity Evolution
     redshift_evolution = lambda z: HopkinsBeacom2006StarFormationRate(z)
-    LF = lambda z, logL: redshift_evolution(z)*np.log(10)*10**logL * \
+    LF = lambda logL: np.log(10)*10**logL * \
         lognorm.pdf(10**logL, np.log(10)*sigma,
                     scale=L_nu*np.exp(-0.5*(np.log(10)*sigma)**2))
 
-    N_tot, int_norm = tot_num_src(redshift_evolution, cosmology,
-                                  z_limits[-1], density)
+    N_tot = tot_num_src(redshift_evolution, cosmology, z_limits[-1], density)
+    integrand = lambda z: redshift_evolution(z) * diff_comoving_volume(z, **cosmology)
+    int_norm = 4 * np.pi * scipy.integrate.quad(integrand, 0, z_limits[-1])[0]
     print "Total number of sources {:.0f} (All-Sky)".format(N_tot)
 
     # Setup Arrays
@@ -115,16 +94,24 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
     Count_array = np.zeros(N_Mu_bins)
     muError = []
     tot_bins = nLbins * nzbins
-    print('Starting Integration...Going to evaluate {} bins'.format(tot_bins))
     N_sum = 0
-
     Flux_from_fixed_z.append([])
-    print "-"*20
-
     # Loop over redshift bins
     for z_count, z in enumerate(zs):
         # Conversion Factor for given z
-        bz = calc_conversion_factor(z, gamma)
+        upper_E=1e7
+        lower_E=1e4
+        u_lim = upper_E/(1+z)   # upper IceCube range
+        l_lim = lower_E/(1+z)   # lower IceCube range
+
+        if gamma != 2.0:
+            exponent = (2-gamma)
+            nenner = 1/exponent*(u_lim**exponent-l_lim**exponent)
+
+        else:
+            nenner = (np.log(u_lim)-np.log(l_lim))
+
+        bz = (1/(1e5)**(gamma-2))*1/(nenner)
         dlz = luminosity_distance(z, **cosmology)
         tot_flux_from_z = 0.
 
@@ -134,8 +121,9 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
                 if run_id % (tot_bins/10) == 0.:
                     print "{}%".format(100*run_id/tot_bins)
                 # Number of Sources in
-                dN = calc_dN(LF, lum, z, deltaL, deltaz,
-                             N_tot, int_norm, cosmology)
+                LF_val = redshift_evolution(z)*LF(lum)
+                dN = (4*np.pi*LF_val*diff_comoving_volume(z, **cosmology)/int_norm) * deltaL*deltaz*N_tot
+
                 N_sum += dN
 
                 # Flux to Source Strength
@@ -152,15 +140,6 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
                     muError.append(logmu)
 
         Flux_from_fixed_z.append(tot_flux_from_z)
-
-    print "Number of Mu out of Range: {}".format(len(muError))
-    print "Num Sou {}".format(N_sum)
-    t1 = time.time()
-
-    print "-"*20
-    print "\n Time needed for {}x{} bins: {}s".format(nzbins,
-                                                      nLbins,
-                                                      int(t1 - t0))
 
     return logMu_array, Count_array, zs, Flux_from_fixed_z
 
