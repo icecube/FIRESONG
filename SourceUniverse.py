@@ -1,16 +1,8 @@
 #!/usr/bin/python
 
-import time
-import cPickle
-import argparse
 import numpy as np
 import scipy
 from scipy.stats import lognorm
-from scipy.interpolate import UnivariateSpline
-try:
-    from ps_analysis.scripts.stager import FileStager
-except:
-    pass
 try:
     from cosmolopy.distance import diff_comoving_volume, luminosity_distance
     from cosmolopy.distance import comoving_volume, set_omega_k_0
@@ -90,7 +82,6 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
     deltaL = (np.log10(Lum_limits[1])-np.log10(Lum_limits[0]))/nLbins
 
     # Integration
-    t0 = time.time()
     Count_array = np.zeros(N_Mu_bins)
     muError = []
     tot_bins = nLbins * nzbins
@@ -144,116 +135,15 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, gamma=2.19,
     return logMu_array, Count_array, zs, Flux_from_fixed_z
 
 
-class SourceCountDistribution(object):
-    def __init__(self, **kwargs):
-        seed = kwargs.pop("seed", None)
-        self.rng = np.random.RandomState(seed)
-        if "file" in kwargs.keys():
-            self.load_from_file(kwargs["file"])
-        elif "log10mu" in kwargs.keys() and \
-             "dNdlog10mu" in kwargs.keys() and \
-             "density" in kwargs.keys():
-            self.generate_from_histogram(kwargs["log10mu"],
-                                         kwargs["dNdlog10mu"],
-                                         kwargs["density"])
-        else:
-            raise NotImplementedError("""You have to provide either,
-                'log10mu', 'dNdlog10mu', 'density' or 'file'""")
-
-    def generate_from_histogram(self, log10mu, dNdlog10mu, density):
-        cdf = np.cumsum(dNdlog10mu)/np.sum(dNdlog10mu)
-        mask = np.diff(cdf) > 0
-        self.min_log10mu = np.min(log10mu[1:][mask])
-        self.max_log10mu = np.max(log10mu[1:][mask])
-        self.N_source_default_density = np.sum(dNdlog10mu)
-        self.default_density = density
-        self.sf_spline = UnivariateSpline(cdf[1:][mask],
-                                          log10mu[1:][mask], k=1, s=0)
-
-    def load_from_file(self, file_path):
-        with FileStager(file_path, "r") as open_file:
-            content = cPickle.load(open_file)
-        self.min_log10mu = content["min_log10mu"]
-        self.max_log10mu = content["max_log10mu"]
-        self.N_source_default_density = content["N_source_default_density"]
-        self.default_density = content["default_density"]
-        self.sf_spline = content["sf_spline"]
-
-    def save_to_file(self, file_path):
-        content = {}
-        content["min_log10mu"] = self.min_log10mu
-        content["max_log10mu"] = self.max_log10mu
-        content["N_source_default_density"] = self.N_source_default_density
-        content["default_density"] = self.default_density
-        content["sf_spline"] = self.sf_spline
-
-        with FileStager(file_path, "w") as open_file:
-            cPickle.dump(content, open_file, protocol=2)
-
-    def calc_truncation(self, threshold):
-        truncate = 1.0
-        for i in range(10):
-            if self.sf_spline(1.-truncate*0.1) < threshold:
-                truncate *= 0.1
-            else:
-                break
-        self.truncate = truncate
-
-    def calc_N(self, density=None):
-        if density is None:
-            density = self.default_density
-        return int(density/self.default_density * self.N_source_default_density)
-
-
-    def random(self, N_sources):
-        return self.sf_spline(self.rng.uniform(low=0.0, high=1.0,
-                              size=N_sources), ext=0)
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-o', action='store', dest='filename',
-                        default='SourceCount.pickle',
-                        help='Output filename')
-    parser.add_argument('-d', action='store', dest='density', type=float,
-                        default=1e-7,
-                        help='Local neutrino source density [1/Mpc^3]')
-    parser.add_argument("--L", action="store",
-                        dest="luminosity", type=float, default=1e50,
-                        help="Set luminosity for each source, unit erg/yr")
-    parser.add_argument("--index", action="store", dest='index',
-                        type=float, default=2.0,
-                        help="Astrophysical neutrino spectral index")
-    parser.add_argument("--sigma", action="store",
-                        dest="sigma", type=float, default=1.0,
-                        help="Width of a log normal function in dex")
-
-    # Not yet implemented
-    # parser.add_argument("--LF",action="store", dest="LF",default="SC",
-    #                     help="Luminosity function, SC for standard candles,
-    #                           LG for lognormal, PL for powerlaw")
-    # parser.add_argument("--evolution", action="store",
-    #                    dest="Evolution", default='HB2006SFR',
-    #                    help="Source evolution options:  HB2006SFR (default),
-    #                          NoEvolution")
-
-    args = parser.parse_args()
-
-    logMu_array, Count_array, zs, Flux_from_fixed_z = calc_pdf(
-        density=args.density,
-        L_nu=args.luminosity,
-        sigma=args.sigma,
-        gamma=args.index,
-        flux_to_mu=1,
-        logMu_range=[-20, -6],
-        N_Mu_bins=2000,
-        z_limits=[0.04, 10.],  # lower bound in Firesong 0.0005
-        nzbins=1200,
-        Lum_limits=[args.luminosity*1e-5, args.luminosity*1e5],
-        nLbins=1200)
-
-    dist = SourceCountDistribution(log10mu=logMu_array,
-                                   dNdlog10mu=np.array(Count_array),
-                                   density=args.density)
-    dist.save_to_file(args.filename)
+# logMu_array, Count_array, zs, Flux_from_fixed_z = calc_pdf(
+#        density=args.density,
+#        L_nu=args.luminosity,
+#        sigma=args.sigma,
+#        gamma=args.index,
+#        flux_to_mu=1,
+#        logMu_range=[-20, -6],
+#        N_Mu_bins=2000,
+#        z_limits=[0.04, 10.],  # lower bound in Firesong 0.0005
+#        nzbins=1200,
+#        Lum_limits=[args.luminosity*1e-5, args.luminosity*1e5],
+#        nLbins=1200)
