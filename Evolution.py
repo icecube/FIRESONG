@@ -139,14 +139,11 @@ class SourcePopulation(object):
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are []
         """
-        # CHECK Integral can be expressed analytic
-        integrand = lambda E: E*(E/E0)**(-abs(index))
-        flux_integral = scipy.integrate.quad(integrand, emin, emax)[0]
+        flux_integral = self.EnergyIntegral(index, emin, emax, E0, z=1)
         luminosity = fluxnorm / E0**2. * flux_integral *  \
             self.GeV_per_sec_2_ergs_per_year * \
             4. * np.pi * (self.dL1*self.Mpc2cm)**2.
-        # CHECK why (1+z)/2
-        return luminosity * 2.**(index-2)
+        return luminosity
 
     def Lumi2Flux(self, luminosity, index, emin, emax, E0=1.e5):
         """
@@ -159,14 +156,17 @@ class SourcePopulation(object):
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are []
         """
-        # CHECK Integral can be expressed analytic
-        integrand = lambda E: E*(E/E0)**(-abs(index))
-        flux_integral = scipy.integrate.quad(integrand, emin, emax)[0]
+        flux_integral = self.EnergyIntegral(index, emin, emax, E0, z=1)
         fluxnorm = luminosity / 4. / np.pi / \
             (self.dL1*self.Mpc2cm)**2. / \
             self.GeV_per_sec_2_ergs_per_year / flux_integral * E0**2.
-        # CHECK why (1+z)/2
-        return fluxnorm * 2.**(2.-index)
+        return fluxnorm 
+
+    def EnergyIntegral(self, index, emin, emax, E0, z=1):
+        # CHECK Integral can be expressed analytic
+        integrand = lambda E: E*(E/E0)**(-abs(index))
+        flux_integral = scipy.integrate.quad(integrand, emin, emax)[0]
+        return flux_integral / (1+z)**(2.-index)
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index):
         """ $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
