@@ -180,9 +180,6 @@ class PL_LuminosityFunction(LuminosityFunction):
         return f1_list, self.cdf(f1_list)
 
 
-# Is this a real luminosty ?
-# It'd be nice to have something with the correct units here
-# No this has the same units as candleflux which is a flux!
 def get_LuminosityFunction(options, candleflux):
     if options.LF == "SC":
         return SC_LuminosityFunction(candleflux)

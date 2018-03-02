@@ -1,8 +1,4 @@
-Factors of 2
-
 inverse CDF splinen
-
-remove Lumifunction from candleflux
 
 Source Universe to class
 

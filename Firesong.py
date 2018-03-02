@@ -106,7 +106,7 @@ def firesong_simulation(options, outputdir):
 
     N_sample = int(population.Nsources(options.density, options.zmax))
 
-    z0 = 1.
+    z0 = 2.
     if options.luminosity == 0.0:
         ## If luminosity not specified calculate candleflux from diffuse flux
         candleflux = population.StandardCandleSources(options.fluxnorm,
@@ -141,10 +141,11 @@ def firesong_simulation(options, outputdir):
     ##################################################
 
     simulation = Simulation(population,
-                            get_LuminosityFunction(options, candleflux),
+                            get_LuminosityFunction(options, luminosity),
                             index=options.index,
                             zmax=options.zmax,
-                            z0=z0)
+                            emin=1e4,
+                            emax=1e7)
 
     out = output_writer(outputdir, options.filename)
     out.write_header(options.LF, options.Transient, options.timescale,

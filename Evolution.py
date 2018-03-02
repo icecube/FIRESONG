@@ -185,7 +185,6 @@ class SourcePopulation(object):
 
         # Here the integral on redshift is done from 0 to 10.
         # This insures proper normalization even if zmax is not 10.
-        # CHECK why (1+z)/2., Explanation: (1+zdef) with zdef=1
         Fluxnorm = all_sky_flux / Ntotal / self.LuminosityDistance(z0)**2. / \
             scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(-abs(index)+2) /
                                  self.LuminosityDistance(z)**2. *
@@ -193,12 +192,6 @@ class SourcePopulation(object):
                                  0, 10.)[0]
 
         return Fluxnorm
-
-    def fluxFromRelative(self, flux_z1, z, index, z0=1.):
-        dL = self.LuminosityDistance(z)
-        # CHECK why (1+z)/2. , Explanation ( 1+z ) / (1+z_default)
-        flux = flux_z1 * (self.LuminosityDistance(z0)**2)/(dL**2) * ((1.+z)/(1.+z0))**(-index+2)
-        return flux
 
 class TransientSourcePopulation(SourcePopulation):
     def __init__(self, cosmology, evolution, timescale):
@@ -245,13 +238,6 @@ class TransientSourcePopulation(SourcePopulation):
                                                                 E0=E0)
         return flux * self.timescale
 
-    def fluxFromRelative(self, flux_z1, z, index, z0=1.):
-        flux = super(TransientSourcePopulation, self).fluxFromRelative(flux_z1,
-                                                                       z,
-                                                                       index,
-                                                                       z0=z0)
-        return flux * (1.+z) / (1.+z0)
-
     def fluence2flux(self, fluence, z):
         # For transient sources, the flux measured on Earth will be
         # red-shifted-fluence/{(1+z)*burst duration}
@@ -261,16 +247,17 @@ class TransientSourcePopulation(SourcePopulation):
 
 class Simulation(object):
     def __init__(self, population, luminosity_function, index, zmax,
-                 seed=None, zmin=0.0005, bins=10000, z0=1.):
+                 emin, emax, seed=None, zmin=0.0005, bins=10000):
         self.population = population
         self.luminosity_function = luminosity_function
         self.index = abs(index)
         self.zmax = zmax
         self.zmin = zmin
         self.bins = bins
+        self.emin = emin
+        self.emax = emax
         self.rng = np.random.RandomState(seed)
         self.setup()
-        self.z0 = z0
 
     def setup(self):
         # CHECK use a spline to generate inverse-CDF
@@ -297,9 +284,8 @@ class Simulation(object):
 
     def sample_flux(self, N=None):
         z = self.sample_redshift(N)
-
-        flux_z1 = self.luminosity_function.sample_distribution(N, rng=self.rng)
-        flux = self.population.fluxFromRelative(flux_z1, z, self.index, self.z0)
+        lumi = self.luminosity_function.sample_distribution(N, rng=self.rng)
+        flux = self.population.Lumi2Flux(lumi, self.index, self.emin, self.emax, z)
 
         # Random declination over the entire sky
         sinDec = self.rng.uniform(-1, 1, N)
