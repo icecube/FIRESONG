@@ -96,7 +96,6 @@ class SourcePopulation(object):
 
         # Flat universe
         self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
-        self.dL1 = self.LuminosityDistance(1.)
 
     def RedshiftDistribution(self, z):
         """ can remove 4*pi becaue we just use this in a normalized way """
@@ -129,7 +128,7 @@ class SourcePopulation(object):
              self.RedshiftIntegral(zmax))
         return Ntotal
 
-    def Flux2Lumi(self, fluxnorm, index, emin, emax, E0=1e5):
+    def Flux2Lumi(self, fluxnorm, index, emin, emax, z=1, E0=1e5):
         """
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
@@ -139,13 +138,13 @@ class SourcePopulation(object):
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are []
         """
-        flux_integral = self.EnergyIntegral(index, emin, emax, E0, z=1)
+        flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         luminosity = fluxnorm / E0**2. * flux_integral *  \
             self.GeV_per_sec_2_ergs_per_year * \
-            4. * np.pi * (self.dL1*self.Mpc2cm)**2.
+            4. * np.pi * (self.LuminosityDistance(z)*self.Mpc2cm)**2.
         return luminosity
 
-    def Lumi2Flux(self, luminosity, index, emin, emax, E0=1.e5):
+    def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
         """
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
@@ -156,13 +155,13 @@ class SourcePopulation(object):
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are []
         """
-        flux_integral = self.EnergyIntegral(index, emin, emax, E0, z=1)
+        flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         fluxnorm = luminosity / 4. / np.pi / \
-            (self.dL1*self.Mpc2cm)**2. / \
+            (self.LuminosityDistance(z)*self.Mpc2cm)**2. / \
             self.GeV_per_sec_2_ergs_per_year / flux_integral * E0**2.
         return fluxnorm
 
-    def EnergyIntegral(self, index, emin, emax, E0, z=1):
+    def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
         """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
         l_lim = emin/(1.+z)
         u_lim = emax/(1.+z)
@@ -172,7 +171,7 @@ class SourcePopulation(object):
             integral = np.log(u_lim) - np.log(l_lim)
         return E0**index * integral
 
-    def StandardCandleSources(self, fluxnorm, density, zmax, index):
+    def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
         """ $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
         {N_\mathrm{tot}\,d_L^2(z=1)\, \int_0^{10}
         \frac{ (1+z)^{-\gamma+2} }{d_L(z)^2}
@@ -186,21 +185,20 @@ class SourcePopulation(object):
 
         # Here the integral on redshift is done from 0 to 10.
         # This insures proper normalization even if zmax is not 10.
-        # CHECK why (1+z)/2.
-        Fluxnorm = all_sky_flux / Ntotal / self.dL1**2. / \
-            scipy.integrate.quad(lambda z: ((1.+z)/2.)**(-abs(index)+2) /
+        # CHECK why (1+z)/2., Explanation: (1+zdef) with zdef=1
+        Fluxnorm = all_sky_flux / Ntotal / self.LuminosityDistance(z0)**2. / \
+            scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(-abs(index)+2) /
                                  self.LuminosityDistance(z)**2. *
                                  self.RedshiftDistribution(z) / norm,
                                  0, 10.)[0]
 
         return Fluxnorm
 
-    def fluxFromRelative(self, flux_z1, z, index):
+    def fluxFromRelative(self, flux_z1, z, index, z0=1.):
         dL = self.LuminosityDistance(z)
-        # CHECK why (1+z)/2.
-        flux = flux_z1 * (self.dL1**2)/(dL**2) * ((1.+z)/2.)**(-index+2)
+        # CHECK why (1+z)/2. , Explanation ( 1+z ) / (1+z_default)
+        flux = flux_z1 * (self.LuminosityDistance(z0)**2)/(dL**2) * ((1.+z)/(1.+z0))**(-index+2)
         return flux
-
 
 class TransientSourcePopulation(SourcePopulation):
     def __init__(self, cosmology, evolution, timescale):
@@ -211,7 +209,7 @@ class TransientSourcePopulation(SourcePopulation):
     def RedshiftDistribution(self, z):
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
 
-    def StandardCandleSources(self, fluxnorm, density, zmax, index):
+    def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
         # For transient source, Fluxnorm will be the fluence of a
         # standard candle at z=1, with unit GeV/cm^2 given that the
         # burst rate density is measured in per year.
@@ -220,38 +218,39 @@ class TransientSourcePopulation(SourcePopulation):
         Ntotal = self.Nsources(density, zmax)
         all_sky_flux = 4 * np.pi * fluxnorm * self.yr2sec
 
-        # As above, the integral is done from redshift 0 to 10.
-        # CHECK why (1+z)/2.
-        fluence = all_sky_flux / Ntotal / self.dL1**2. / \
-            scipy.integrate.quad(lambda z: ((1.+z)/2.)**(-abs(index)+3) /
+        # As above, the integral is done from redshift 0 to 10. 
+        fluence = all_sky_flux / Ntotal / self.LuminosityDistance(z0)**2. / \
+            scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(-abs(index)+3) /
                                  (self.LuminosityDistance(z)**2.) *
                                  self.RedshiftDistribution(z) / norm,
                                  0, 10.)[0]
 
         return fluence
 
-    def Flux2Lumi(self, fluxnorm, index, emin, emax, E0=1e5):
+    def Flux2Lumi(self, fluxnorm, index, emin, emax, z=1, E0=1e5):
         luminosity = super(TransientSourcePopulation, self).Flux2Lumi(fluxnorm,
                                                                       index,
                                                                       emin,
                                                                       emax,
+                                                                      z=z,
                                                                       E0=E0)
         return luminosity / self.timescale
 
-    def Lumi2Flux(self, luminosity, index, emin, emax, E0=1e5):
+    def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
         flux = super(TransientSourcePopulation, self).Lumi2Flux(luminosity,
                                                                 index,
                                                                 emin,
                                                                 emax,
+                                                                z=z,
                                                                 E0=E0)
         return flux * self.timescale
 
-    def fluxFromRelative(self, flux_z1, z, index):
+    def fluxFromRelative(self, flux_z1, z, index, z0=1.):
         flux = super(TransientSourcePopulation, self).fluxFromRelative(flux_z1,
                                                                        z,
-                                                                       index)
-        # CHECK why (1+z)/2.
-        return flux * (1.+z) / 2.
+                                                                       index,
+                                                                       z0=z0)
+        return flux * (1.+z) / (1.+z0)
 
     def fluence2flux(self, fluence, z):
         # For transient sources, the flux measured on Earth will be
@@ -262,7 +261,7 @@ class TransientSourcePopulation(SourcePopulation):
 
 class Simulation(object):
     def __init__(self, population, luminosity_function, index, zmax,
-                 seed=None, zmin=0.0005, bins=10000):
+                 seed=None, zmin=0.0005, bins=10000, z0=1.):
         self.population = population
         self.luminosity_function = luminosity_function
         self.index = abs(index)
@@ -271,6 +270,7 @@ class Simulation(object):
         self.bins = bins
         self.rng = np.random.RandomState(seed)
         self.setup()
+        self.z0 = z0
 
     def setup(self):
         # CHECK use a spline to generate inverse-CDF
@@ -299,7 +299,7 @@ class Simulation(object):
         z = self.sample_redshift(N)
 
         flux_z1 = self.luminosity_function.sample_distribution(N, rng=self.rng)
-        flux = self.population.fluxFromRelative(flux_z1, z, self.index)
+        flux = self.population.fluxFromRelative(flux_z1, z, self.index, self.z0)
 
         # Random declination over the entire sky
         sinDec = self.rng.uniform(-1, 1, N)

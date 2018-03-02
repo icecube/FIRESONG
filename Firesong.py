@@ -106,16 +106,19 @@ def firesong_simulation(options, outputdir):
 
     N_sample = int(population.Nsources(options.density, options.zmax))
 
+    z0 = 1.
     if options.luminosity == 0.0:
         ## If luminosity not specified calculate candleflux from diffuse flux
         candleflux = population.StandardCandleSources(options.fluxnorm,
                                                       options.density,
                                                       options.zmax,
-                                                      options.index)
+                                                      options.index,
+                                                      z0=z0)
         luminosity = population.Flux2Lumi(candleflux,
                                           options.index,
                                           emin=1.e4,
                                           emax=1.e7,
+                                          z=z0,
                                           E0=1e5)
     else:
         ## If luminosity of the sources is specified, calculate candleflux
@@ -123,10 +126,11 @@ def firesong_simulation(options, outputdir):
                                           options.index,
                                           emin=1.e4,
                                           emax=1.e7,
+                                          z=z0,
                                           E0=1.e5)
         luminosity = options.luminosity
 
-    delta_gamma = -(options.index-2.)
+    delta_gamma = 2-options.index
     print_str(options.LF, options.Transient, options.timescale,
               options.Evolution, options.density, N_sample,
               options.luminosity, options.fluxnorm, delta_gamma,
@@ -139,7 +143,8 @@ def firesong_simulation(options, outputdir):
     simulation = Simulation(population,
                             get_LuminosityFunction(options, candleflux),
                             index=options.index,
-                            zmax=options.zmax)
+                            zmax=options.zmax,
+                            z0=z0)
 
     out = output_writer(outputdir, options.filename)
     out.write_header(options.LF, options.Transient, options.timescale,

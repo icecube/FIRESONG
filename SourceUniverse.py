@@ -62,8 +62,8 @@ def calc_pdf(density=1e-7, L_nu=1e50, sigma=1, index=2.19,
                 logmu = np.log10(pop.Lumi2Flux(10**lum,
                                                index,
                                                emin=lower_E,
-                                               emax=upper_E) *
-                                 pop.dL1**2/pop.LuminosityDistance(z)**2)
+                                               emax=upper_E,
+                                               z=z))
 
                 # Add dN to Histogram
                 if logmu < logMu_range[1] and logmu > logMu_range[0]:
