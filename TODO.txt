@@ -1,0 +1,21 @@
+Factors of 2
+
+inverse CDF splinen
+
+remove Lumifunction from candleflux
+
+Source Universe to class
+
+other scripts to classes
+
+Main loop reduzieren
+
+performance test
+
+PDF / CDF for SC LumiFunction
+
+index sign independent
+
+options handling
+
+Function documentation
