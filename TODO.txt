@@ -1,12 +1,4 @@
-inverse CDF splinen
-
-Source Universe to class
-
 other scripts to classes
-
-Main loop reduzieren
-
-performance test
 
 PDF / CDF for SC LumiFunction
 
