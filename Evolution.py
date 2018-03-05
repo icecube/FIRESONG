@@ -4,6 +4,7 @@ import numpy as np
 import scipy
 import cosmolopy
 cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
+from sampling import InverseCDF
 
 
 def get_evolution(evol):
@@ -269,26 +270,19 @@ class Simulation(object):
         self.setup()
 
     def setup(self):
-        # CHECK use a spline to generate inverse-CDF
-        # should perform better than np.searchsorted
         redshift_bins = np.arange(self.zmin, self.zmax,
                                   self.zmax/float(self.bins))
 
         # RedshiftCDF is used for inverse transform sampling
         RedshiftPDF = [self.population.RedshiftDistribution(redshift_bins[i])
                        for i in range(0, len(redshift_bins))]
-        RedshiftCDF = np.cumsum(RedshiftPDF)
-        RedshiftCDF = RedshiftCDF / RedshiftCDF[-1]
-
-        self.redshift_bins = redshift_bins
-        self.redshift_cdf = RedshiftCDF
+        self.invCDF = InverseCDF(redshift_bins, RedshiftPDF)
 
     def sample_redshift(self, N=None):
         # Generate a histogram to store redshifts.
         # Starts at z = 0.0005 and increases in steps of 0.001
         rand_cdf = self.rng.uniform(0, 1, N)
-        bin_index = np.searchsorted(self.redshift_cdf, rand_cdf)
-        z = self.redshift_bins[bin_index]
+        z = self.invCDF(rand_cdf)
         return z
 
     def sample_flux(self, N=None):
@@ -302,3 +296,70 @@ class Simulation(object):
         declin = np.degrees(np.arcsin(sinDec))
 
         return flux, z, declin
+
+
+class FluxPDF(object):
+    def __init__(self, population, luminosity_function, index,
+                 emin, emax, density):
+        self.population = population
+        self.luminosity_function = luminosity_function
+        self.index = index
+        self.emin = emin
+        self.emax = emax
+        self.density = density
+
+    def calc_PDF(self,
+                 zmin, zmax, nzbins,
+                 LumMin, LumMax, nLbins,
+                 logFMin, logFMax, nFluxBins,
+                 with_dFdz=False):
+
+        int_norm = self.population.RedshiftIntegral(zmax)
+        N_tot = self.population.Nsources(self.density, zmax)
+
+        zs = np.linspace(zmin, zmax, nzbins)
+        deltaz = float(zmax-zmin)/nzbins
+        
+        Ls = np.linspace(np.log10(LumMin), np.log10(LumMax), nLbins)
+        deltaL = (np.log10(Lum_limits[1])-np.log10(Lum_limits[0]))/nLbins
+        
+        logFlux_array = np.linspace(logFMin, logFMax, nFluxBins)
+        deltaLogFlux = float(fluxMax-fluxMin) / nFluxBins
+
+        # Setup Arrays
+        Count_array = np.zeros(nFluxBins)
+        fluxOutOfBounds = []
+        if with_dFdz:
+            Flux_from_fixed_z = np.zeros(nzbins)
+
+        # Integration
+        # Loop over redshift bins
+        for i, z in enumerate(zs):
+            tot_flux_from_z = 0.
+            # Loop over Luminosity bins
+            for lum in Ls:
+                    # Number of Sources in
+                    dN = self.N_tot * self.luminosity_function.pdf(10**lum) * deltaL * \
+                        (self.population.RedshiftDistribution(z)/self.int_norm) * deltaz
+
+                    # Flux to Source Strength
+                    logF = np.log10(self.population.Lumi2Flux(10**lum,
+                                                   index=self.index,
+                                                   emin=self.emin,
+                                                   emax=self.emax,
+                                                   z=z))
+
+                    # Add dN to Histogram
+                    if logF < logFMax and logF > logFMin:
+                        idx = int((logF-logFMin) / deltaFluxBins)
+                        Count_array[idx] += dN
+                        if with_dFdz:
+                            tot_flux_from_z += dN*10**logF
+                    else:
+                        fluxOutOfBounds.append(logF)
+            if with_dFdz:
+                Flux_from_fixed_z[i] = tot_flux_from_z
+
+        if with_dFdz:
+            return logFlux_array, Count_array, zs, Flux_from_fixed_z
+        return logFlux_array, Count_array
