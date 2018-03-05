@@ -13,7 +13,7 @@ import numpy as np
 from Evolution import get_evolution, SourcePopulation
 from Evolution import TransientSourcePopulation, cosmology, Simulation
 from Luminosity import get_LuminosityFunction
-from input_output import output_writer, print_str
+from input_output import output_writer, print_str, get_outputdir
 
 
 def firesong_simulation(outputdir,
@@ -71,7 +71,6 @@ def firesong_simulation(outputdir,
     out.write_header(LF, Transient, timescale, fluxnorm,
                      delta_gamma, luminosity)
 
-    # CHECK loop can be more efficient
     TotalFlux = 0
     for i in range(0, N_sample):
         # IMPORTANT notice, in the following "flux" means fluence in
@@ -102,14 +101,7 @@ def firesong_simulation(outputdir,
 
 if __name__ == "__main__":
 
-    # Check that the Firesong environmental variable is set
-    # This is needed for output and to read exposures, effective areas, etc
-    try:
-        firesongdir = os.environ['FIRESONG']
-    except:
-        print "Enviromental variable FIRESONG not set"
-        quit()
-    outputdir = firesongdir + "/Results/"
+    outputdir = get_outputdir()
 
     # Process command line options
     parser = argparse.ArgumentParser()

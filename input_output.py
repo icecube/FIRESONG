@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import re
+import os
+import gzip
 import numpy as np
 
 class output_writer(object):
@@ -52,6 +54,17 @@ class output_writer(object):
         self.output.close()
         if (self.z_near > 0):
             self.near_output.close()
+
+
+def get_outputdir():
+    # Check that the Firesong environmental variable is set
+    # This is needed for output and to read exposures, effective areas, etc
+    try:
+        firesongdir = os.environ['FIRESONG']
+    except:
+        print "Enviromental variable FIRESONG not set"
+        quit()
+    return firesongdir + "/Results/"
 
 
 def print_str(LF, Transient, timescale, Evolution, density,
