@@ -1,7 +1,5 @@
 other scripts to classes
 
-PDF / CDF for SC LumiFunction
-
 options handling
 
 Function documentation

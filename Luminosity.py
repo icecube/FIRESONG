@@ -231,7 +231,7 @@ class PL_LuminosityFunction(LuminosityFunction):
                ((self.Fmax**(1+self.index) - self.Fmin**(1+self.index)))
 
 
-def get_LuminosityFunction(options, mean_luminosity):
+def get_LuminosityFunction(mean_luminosity, LF, **kwargs):
     """Returns a Luminosity Function based on an abbreviation.
     Known abbreviations are:
         - SC - Standard Candle
@@ -246,14 +246,14 @@ def get_LuminosityFunction(options, mean_luminosity):
     Raises 'NotImplementedError' for unknown abbreviation.
     """
 
-    if options.LF == "SC":
+    if LF == "SC":
         return SC_LuminosityFunction(mean_luminosity)
-    if options.LF == "LG":
+    if LF == "LG":
         return LG_LuminosityFunction(mean_luminosity,
-                                     options.sigma)
-    if options.LF == "PL":
+                                     kwargs["sigma"])
+    if LF == "PL":
         return PL_LuminosityFunction(mean_luminosity,
-                                     options.index,
-                                     options.sigma)
+                                     kwargs["index"],
+                                     kwargs["sigma"])
     raise NotImplementedError("The luminosity function " +
-                              options.LF + " is not implemented.")
+                              LF + " is not implemented.")

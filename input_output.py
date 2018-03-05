@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import re
-
+import numpy as np
 
 class output_writer(object):
     def __init__(self, outputdir, filename, zNEAR=0):

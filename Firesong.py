@@ -53,7 +53,7 @@ def firesong_simulation(options, outputdir):
     ##################################################
 
     simulation = Simulation(population,
-                            get_LuminosityFunction(options, luminosity),
+                            get_LuminosityFunction(luminosity, LF=options.LF, sigma=options.sigma),
                             index=options.index,
                             zmax=options.zmax,
                             emin=emin,
