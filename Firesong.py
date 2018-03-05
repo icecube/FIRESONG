@@ -71,9 +71,9 @@ class output_writer(object):
 
 def print_str(LF, Transient, timescale, Evolution, density,
               N_sample, luminosity_default, fluxnorm, delta_gamma,
-              zmax, luminosity):
+              zmax, luminosity, mode=""):
     str = "##############################################################################\n"
-    str += "##### FIRESONG initializing #####\n"
+    str += "##### FIRESONG initializing {mode}#####\n"
     if LF == "SC":
         str += "Standard candle sources+\n"
     if LF == "LG":
