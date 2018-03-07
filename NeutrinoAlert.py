@@ -13,8 +13,12 @@ import argparse
 import numpy as np
 import scipy.integrate
 # Firesong code
-from Evolution import RedshiftDistribution, StandardCandleSources, LuminosityDistance, LtoFlux
-from Luminosity import LuminosityFunction, LuminosityPDF
+
+from Evolution import get_evolution, SourcePopulation
+from Evolution import TransientSourcePopulation, cosmology, Simulation
+from Luminosity import get_LuminosityFunction
+from input_output import output_writer_Alert, print_str, get_outputdir
+from sampling import InverseCDF
 
 def calc_NeutrinoAlert(outputdir,
                      filename='Firesong.out',
@@ -50,12 +54,13 @@ def calc_NeutrinoAlert(outputdir,
                                                          emax=emax)
 
     delta_gamma = 2-index
-    print_str(**locals())
+    print_str(LF, Transient, timescale, Evolution, density, N_sample,
+              luminosity, fluxnorm, delta_gamma, zmax, luminosity)
 
     ##################################################
     #        Simulation starts here
     ##################################################
-    out = output_writer(outputdir, filename)
+    out = output_writer_Alert(outputdir, filename)
     out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
 
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
@@ -64,9 +69,9 @@ def calc_NeutrinoAlert(outputdir,
     z0 = 1
     # Calculate the redshift z PDF for neutrino events
     if Transient:
-        NeutrinoPDF_z = [pop.RedshiftDistribution(z)*((1+z)/(1+z0))**(-index+3)/(pop.LuminosityDistance(z)**2.) for z in redshift_bins]
+        NeutrinoPDF_z = [population.RedshiftDistribution(z)*((1+z)/(1+z0))**(-index+3)/(population.LuminosityDistance(z)**2.) for z in redshift_bins]
     else:
-        NeutrinoPDF_z = [pop.RedshiftDistribution(z)*((1+z)/(1+z0))**(-index+2)/(pop.LuminosityDistance(z)**2.) for z in redshift_bins]
+        NeutrinoPDF_z = [population.RedshiftDistribution(z)*((1+z)/(1+z0))**(-index+2)/(population.LuminosityDistance(z)**2.) for z in redshift_bins]
     invCDF = InverseCDF(redshift_bins, NeutrinoPDF_z)
     lum_func = get_LuminosityFunction(luminosity, LF=LF, sigma=sigma)
 
@@ -76,12 +81,12 @@ def calc_NeutrinoAlert(outputdir,
         sinDec = 2*np.random.rand() -1
         declin = np.degrees(np.arcsin(sinDec))
         lumi = lum_func.sample_distribution()
-        flux = pop.Lumi2Flux( lumi, index, emin, emax, z)
-        output.write('{:.3f} {:.4f} {:.6e}\n'.format(declin, z, flux))
+        flux = population.Lumi2Flux( lumi, index, emin, emax, z)
+        out.write(declin, z, flux)
     out.finish()
 
 if __name__ == "__main__":
-    outputdir = get_outputdir
+    outputdir = get_outputdir()
 
     # Process command line options
     parser = argparse.ArgumentParser()
@@ -119,7 +124,7 @@ if __name__ == "__main__":
 
     calc_NeutrinoAlert(outputdir,
                        filename=options.filename,
-                       AlertNumber=options.AllertNumber,
+                       AlertNumber=options.AlertNumber,
                        density=options.density,
                        Evolution=options.Evolution,
                        Transient=options.Transient,

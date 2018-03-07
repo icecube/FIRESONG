@@ -35,4 +35,4 @@ class InverseCDF(object):
         If N is not given (or None) a single value is returned.
         """
         
-        return self.invCDF(self.rng.uniform(0.0, 1.0, size=N), ext=0)
+        return self.invCDF(self.rng.uniform(0.0, 1.0, size=N))#, ext=0)

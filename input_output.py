@@ -60,7 +60,13 @@ class output_writer(object):
 class output_writer_CDF(output_writer):
     
     def write(self, z, flux, nuCDF):
-        output.write('{:.4f} {:.6e} {:.6e}\n'.format(z, flux, nuCDF))
+        self.output.write('{:.4f} {:.6e} {:.6e}\n'.format(z, flux, nuCDF))
+
+
+class output_writer_Alert(output_writer):
+    
+    def write(self, declin, z, flux):
+        self.output.write('{:.3f} {:.4f} {:.6e}\n'.format(float(declin), float(z), float(flux)))
 
 
 def get_outputdir():
