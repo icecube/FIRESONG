@@ -60,7 +60,7 @@ class output_writer(object):
 class output_writer_CDF(output_writer):
     
     def write(self, z, flux, nuCDF):
-        self.output.write('{:.4f} {:.6e} {:.6e}\n'.format(z, flux, nuCDF))
+        self.output.write('{:.4f} {:.6e} {:.6e}\n'.format(float(z), flux, nuCDF))
 
 
 class output_writer_Alert(output_writer):

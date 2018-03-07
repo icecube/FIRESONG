@@ -12,7 +12,7 @@ import numpy as np
 from Evolution import get_evolution, SourcePopulation
 from Evolution import TransientSourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
-from input_output import output_writer, print_str, get_outputdir
+from input_output import output_writer_CDF, print_str, get_outputdir
 
 
 def calc_NeutrinoCDF(outputdir,
@@ -62,22 +62,22 @@ def calc_NeutrinoCDF(outputdir,
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
     redshift_bins = np.arange(0.0005, zmax, 0.001)
 
-    NeutrinoPDF = [pop.RedshiftDistribution(z)*pop.Lumi2Flux(luminosities,
+    NeutrinoPDF = [population.RedshiftDistribution(z)*population.Lumi2Flux(luminosities,
                                                              index,
                                                              emin, emax,
                                                              z) for z in redshift_bins]
     NeutrinoCDF = np.cumsum(NeutrinoPDF)
     NeutrinoCDF = NeutrinoCDF / NeutrinoCDF[-1]
 
-    out = output_writer(outputdir, filename)
+    out = output_writer_CDF(outputdir, filename)
     out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
     for z, nuCDF in zip(redshift_bins, NeutrinoCDF):
-        flux = pop.Lumi2Flux(luminosities, index, emin, emax, z)
+        flux = population.Lumi2Flux(luminosities, index, emin, emax, z)
         out.write(z, flux, nuCDF)
     out.finish()
     
 if __name__ == "__main__":
-    outputdir = get_outputdir
+    outputdir = get_outputdir()
 
     # Process command line options
     parser = argparse.ArgumentParser()
