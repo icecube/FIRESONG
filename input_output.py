@@ -3,7 +3,7 @@ import re
 import os
 import gzip
 import numpy as np
-
+    
 class output_writer(object):
     def __init__(self, outputdir, filename, zNEAR=0):
         self.output = self.open_file(outputdir, filename)
@@ -48,12 +48,19 @@ class output_writer(object):
             if z < self.z_near:
                 self.near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(f, d, z))
 
-    def finish(self, tot_flux):
+    def finish(self, tot_flux=None):
         """give tot_flux per sr """
-        self.output.write("# E^2 dNdE = {tot_flux}\n".format(**locals()))
+        if tot_flux is not None:
+            self.output.write("# E^2 dNdE = {tot_flux}\n".format(**locals()))
         self.output.close()
         if (self.z_near > 0):
             self.near_output.close()
+
+
+class output_writer_CDF(output_writer):
+    
+    def write(self, z, flux, nuCDF):
+        output.write('{:.4f} {:.6e} {:.6e}\n'.format(z, flux, nuCDF))
 
 
 def get_outputdir():
