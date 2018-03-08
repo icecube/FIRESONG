@@ -12,7 +12,7 @@ import numpy as np
 from Evolution import get_evolution, SourcePopulation
 from Evolution import TransientSourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
-from input_output import output_writer, print_str, get_outputdir
+from input_output import output_writer, print_config, get_outputdir
 from sampling import InverseCDF
 
 
@@ -54,8 +54,9 @@ def firesong_simulation(outputdir,
                                                          emax=emax)
 
     delta_gamma = 2-index
-    print_str(LF, Transient, timescale, Evolution, density, N_sample,
-              luminosity, fluxnorm, delta_gamma, zmax, luminosity)
+    print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                 mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here

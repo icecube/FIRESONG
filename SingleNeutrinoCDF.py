@@ -12,7 +12,7 @@ import numpy as np
 from Evolution import get_evolution, SourcePopulation
 from Evolution import TransientSourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
-from input_output import output_writer_CDF, print_str, get_outputdir
+from input_output import output_writer_CDF, print_config, get_outputdir
 
 
 def calc_NeutrinoCDF(outputdir,
@@ -49,9 +49,9 @@ def calc_NeutrinoCDF(outputdir,
                                                          emax=emax)
 
     delta_gamma = 2-index
-    print_str(LF, Transient, timescale, Evolution, density, N_sample,
-              luminosity, fluxnorm, delta_gamma, zmax, luminosity,
-              mode=" - Calculating Neutrino CDFs ")
+    print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                 mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here

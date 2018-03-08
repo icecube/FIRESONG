@@ -12,7 +12,7 @@ import numpy as np
 from Evolution import get_evolution, SourcePopulation
 from Evolution import TransientSourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
-from input_output import output_writer_Alert, print_str, get_outputdir
+from input_output import output_writer, print_config, get_outputdir
 from sampling import InverseCDF
 
 
@@ -50,13 +50,14 @@ def calc_NeutrinoAlert(outputdir,
                                                          emax=emax)
 
     delta_gamma = 2-index
-    print_str(LF, Transient, timescale, Evolution, density, N_sample,
-              luminosity, fluxnorm, delta_gamma, zmax, luminosity)
+    print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                 mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here
     ##################################################
-    out = output_writer_Alert(outputdir, filename)
+    out = output_writer(outputdir, filename)
     out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
 
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001

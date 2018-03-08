@@ -44,7 +44,7 @@ class output_writer(object):
         for d, z, f in zip(np.atleast_1d(declin),
                            np.atleast_1d(redshift),
                            np.atleast_1d(flux)):
-            self.output.write('{:.4f} {:.4f} {:.4e}\n'.format(d, z, f))
+            self.output.write('{:.4f} {:.4f} {:.6e}\n'.format(d, z, f))
             # CHECK why different order
             if z < self.z_near:
                 self.near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(f, d, z))
@@ -63,11 +63,6 @@ class output_writer_CDF(output_writer):
         self.output.write('{:.4f} {:.6e} {:.6e}\n'.format(float(z), flux, nuCDF))
 
 
-class output_writer_Alert(output_writer):
-    def write(self, declin, z, flux):
-        self.output.write('{:.3f} {:.4f} {:.6e}\n'.format(float(declin), float(z), float(flux)))
-
-
 def get_outputdir():
     """ Check that the Firesong environmental variable is set
     This is needed for output and to read exposures, effective areas, etc
@@ -82,9 +77,9 @@ def get_outputdir():
     return firesongdir + "/Results/"
 
 
-def print_str(LF, Transient, timescale, Evolution, density,
-              N_sample, luminosity_default, fluxnorm, delta_gamma,
-              zmax, luminosity, mode="", **kwargs):
+def print_config(LF, Transient, timescale, Evolution, density,
+                 N_sample, luminosity_default, fluxnorm, delta_gamma,
+                 zmax, luminosity, mode="", **kwargs):
     """
     Prints the configuration to the screen.
     """
