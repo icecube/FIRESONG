@@ -1,5 +1,0 @@
-other scripts to classes
-
-options handling
-
-Function documentation

@@ -70,8 +70,11 @@ class output_writer_Alert(output_writer):
 
 
 def get_outputdir():
-    # Check that the Firesong environmental variable is set
-    # This is needed for output and to read exposures, effective areas, etc
+    """ Check that the Firesong environmental variable is set
+    This is needed for output and to read exposures, effective areas, etc
+
+    Returns path to result folder
+    """
     try:
         firesongdir = os.environ['FIRESONG']
     except:
@@ -82,7 +85,10 @@ def get_outputdir():
 
 def print_str(LF, Transient, timescale, Evolution, density,
               N_sample, luminosity_default, fluxnorm, delta_gamma,
-              zmax, luminosity, mode=""):
+              zmax, luminosity, mode="", **kwargs):
+    """
+    Prints the configuration to the screen.
+    """
     str = "##############################################################################\n"
     str += "##### FIRESONG initializing {mode}#####\n"
     if LF == "SC":
