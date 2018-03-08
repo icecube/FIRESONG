@@ -62,10 +62,11 @@ def calc_NeutrinoCDF(outputdir,
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
     redshift_bins = np.arange(0.0005, zmax, 0.001)
 
-    NeutrinoPDF = [population.RedshiftDistribution(z)*population.Lumi2Flux(luminosities,
-                                                             index,
-                                                             emin, emax,
-                                                             z) for z in redshift_bins]
+    NeutrinoPDF = [population.RedshiftDistribution(z) *
+                   population.Lumi2Flux(luminosities,
+                                        index,
+                                        emin, emax,
+                                        z) for z in redshift_bins]
     NeutrinoCDF = np.cumsum(NeutrinoPDF)
     NeutrinoCDF = NeutrinoCDF / NeutrinoCDF[-1]
 
@@ -75,7 +76,7 @@ def calc_NeutrinoCDF(outputdir,
         flux = population.Lumi2Flux(luminosities, index, emin, emax, z)
         out.write(z, flux, nuCDF)
     out.finish()
-    
+
 if __name__ == "__main__":
     outputdir = get_outputdir()
 
@@ -111,15 +112,15 @@ if __name__ == "__main__":
                         help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
     options = parser.parse_args()
 
-calc_NeutrinoCDF(outputdir,
-                 filename=options.filename,
-                 density=options.density,
-                 Evolution=options.Evolution,
-                 Transient=options.Transient,
-                 timescale=options.timescale,
-                 zmax=options.zmax,
-                 fluxnorm=options.fluxnorm,
-                 index=options.index,
-                 LF=options.LF,
-                 sigma=options.sigma,
-                 luminosity=options.luminosity)
+    calc_NeutrinoCDF(outputdir,
+                     filename=options.filename,
+                     density=options.density,
+                     Evolution=options.Evolution,
+                     Transient=options.Transient,
+                     timescale=options.timescale,
+                     zmax=options.zmax,
+                     fluxnorm=options.fluxnorm,
+                     index=options.index,
+                     LF=options.LF,
+                     sigma=options.sigma,
+                     luminosity=options.luminosity)

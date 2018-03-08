@@ -3,7 +3,8 @@ import re
 import os
 import gzip
 import numpy as np
-    
+
+
 class output_writer(object):
     def __init__(self, outputdir, filename, zNEAR=0):
         self.output = self.open_file(outputdir, filename)
@@ -58,13 +59,11 @@ class output_writer(object):
 
 
 class output_writer_CDF(output_writer):
-    
     def write(self, z, flux, nuCDF):
         self.output.write('{:.4f} {:.6e} {:.6e}\n'.format(float(z), flux, nuCDF))
 
 
 class output_writer_Alert(output_writer):
-    
     def write(self, declin, z, flux):
         self.output.write('{:.3f} {:.4f} {:.6e}\n'.format(float(declin), float(z), float(flux)))
 

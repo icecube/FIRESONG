@@ -1,18 +1,25 @@
 #!/usr/bin/python
+# Authors: Theo Glauch
+#
 
-import numpy as np
+# General imports
+from __future__ import division
 import argparse
-from Evolution import get_evolution, SourcePopulation, cosmology 
+# Numpy / Scipy
+import numpy as np
+# Firesong code
+from Evolution import get_evolution, SourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
+from input_output import get_outputdir
 
 
-# Physics Settings
-def flux_pdf(luminosity=1e50, LF="LG", sigma=1, 
+def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
              index=2.19, emin=1e4, emax=1e7,
              density=1e-7, evol="HB2006SFR",
              zmin=0.005, zmax=10., nzbins=120,
              LumMin=1e45, LumMax=1e54, nLbins=120,
-             logFMin=-10, logFMax=6, nFluxBins=200):
+             logFMin=-10, logFMax=6, nFluxBins=200,
+             with_dFdz=False):
     """
     Parameter:
         - L_nu in erg/yr
@@ -47,10 +54,10 @@ def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
     deltaz = float(zmax-zmin)/nzbins
 
     Ls = np.linspace(np.log10(LumMin), np.log10(LumMax), nLbins)
-    deltaL = (np.log10(Lum_limits[1])-np.log10(Lum_limits[0]))/nLbins
+    deltaL = (np.log10(LumMax)-np.log10(LumMin))/nLbins
 
     logFlux_array = np.linspace(logFMin, logFMax, nFluxBins)
-    deltaLogFlux = float(fluxMax-fluxMin) / nFluxBins
+    deltaLogFlux = float(logFMax-logFMin) / nFluxBins
 
     Count_array = np.zeros(nFluxBins)
     fluxOutOfBounds = []
@@ -76,7 +83,7 @@ def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
 
             # Add dN to Histogram
             if logF < logFMax and logF > logFMin:
-                idx = int((logF-logFMin) / deltaFluxBins)
+                idx = int((logF-logFMin) / deltaLogFlux)
                 Count_array[idx] += dN
                 if with_dFdz:
                     tot_flux_from_z += dN*10**logF
@@ -92,14 +99,7 @@ def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
 
 if __name__ == "__main__":
 
-    # Check that the Firesong environmental variable is set
-    # This is needed for output and to read exposures, effective areas, etc
-    try:
-        firesongdir = os.environ['FIRESONG']
-    except:
-        print "Enviromental variable FIRESONG not set"
-        quit()
-    outputdir = firesongdir + "/Results/"
+    outputdir = get_outputdir()
 
     # Process command line options
     parser = argparse.ArgumentParser()
@@ -131,8 +131,8 @@ if __name__ == "__main__":
                         dest="luminosity", type=float, default=0.0,
                         help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
     options = parser.parse_args()
-    
-    output = flux_pdf(luminosity=1e50, LF="LG", sigma=1, 
+
+    output = flux_pdf(luminosity=1e50, LF="LG", sigma=1,
                       index=2.19, emin=1e4, emax=1e7,
                       density=1e-7, evol="HB2006SFR",
                       zmin=0.005, zmax=10., nzbins=120,

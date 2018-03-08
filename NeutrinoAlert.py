@@ -5,36 +5,32 @@
 
 # General imports
 from __future__ import division
-import os
-import gzip
-import re
 import argparse
 # Numpy / Scipy
 import numpy as np
-import scipy.integrate
 # Firesong code
-
 from Evolution import get_evolution, SourcePopulation
-from Evolution import TransientSourcePopulation, cosmology, Simulation
+from Evolution import TransientSourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
 from input_output import output_writer_Alert, print_str, get_outputdir
 from sampling import InverseCDF
 
+
 def calc_NeutrinoAlert(outputdir,
-                     filename='Firesong.out',
-                     AlertNumber=1,
-                     density=1e-9,
-                     Evolution="HB2006SFR",
-                     Transient=False,
-                     timescale=1000.,
-                     zmax=10.,
-                     fluxnorm=0.9e-8,
-                     index=2.13,
-                     LF="SC",
-                     sigma=1.0,
-                     luminosity=0.0,
-                     emin=1e4,
-                     emax=1e7):
+                       filename='Firesong.out',
+                       AlertNumber=1,
+                       density=1e-9,
+                       Evolution="HB2006SFR",
+                       Transient=False,
+                       timescale=1000.,
+                       zmax=10.,
+                       fluxnorm=0.9e-8,
+                       index=2.13,
+                       LF="SC",
+                       sigma=1.0,
+                       luminosity=0.0,
+                       emin=1e4,
+                       emax=1e7):
     if Transient:
         population = TransientSourcePopulation(cosmology,
                                                get_evolution(Evolution),
@@ -75,13 +71,13 @@ def calc_NeutrinoAlert(outputdir,
     invCDF = InverseCDF(redshift_bins, NeutrinoPDF_z)
     lum_func = get_LuminosityFunction(luminosity, LF=LF, sigma=sigma)
 
-    for i in range(0,options.AlertNumber):
+    for i in range(0, options.AlertNumber):
         z = invCDF.sample()
         # Random declination over the entire sky
-        sinDec = 2*np.random.rand() -1
+        sinDec = 2 * np.random.rand() - 1
         declin = np.degrees(np.arcsin(sinDec))
         lumi = lum_func.sample_distribution()
-        flux = population.Lumi2Flux( lumi, index, emin, emax, z)
+        flux = population.Lumi2Flux(lumi, index, emin, emax, z)
         out.write(declin, z, flux)
     out.finish()
 
