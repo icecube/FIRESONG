@@ -5,7 +5,6 @@
 
 # General imports
 from __future__ import division
-import os
 import argparse
 # Numpy / Scipy
 import numpy as np
@@ -84,13 +83,12 @@ def firesong_simulation(outputdir,
 
         # sample source
         z = invCDF(rng.uniform(0, 1))
-        lumi = luminosity_function.sample_distribution(N, rng=rng)
+        lumi = luminosity_function.sample_distribution(N=None, rng=rng)
         flux = population.Lumi2Flux(lumi, index, emin, emax, z)
         # Random declination over the entire sky
         sinDec = rng.uniform(-1, 1)
         declin = np.degrees(np.arcsin(sinDec))
 
-        flux, z, declin = simulation.sample_flux()
         TotalFlux = TotalFlux + flux
 
         # For transient sources, the flux measured on Earth will be
