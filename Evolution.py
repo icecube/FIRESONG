@@ -4,7 +4,6 @@ import numpy as np
 import scipy
 import cosmolopy
 cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
-from sampling import InverseCDF
 
 
 def get_evolution(evol):
@@ -253,40 +252,3 @@ class TransientSourcePopulation(SourcePopulation):
         # red-shifted-fluence/{(1+z)*burst duration}
         flux = fluence / ((1.+z)*self.timescale)
         return flux
-
-
-class Simulation(object):
-    def __init__(self, population, luminosity_function, index, zmax,
-                 emin, emax, seed=None, zmin=0.0005, bins=10000):
-        self.population = population
-        self.luminosity_function = luminosity_function
-        self.index = index
-        self.zmax = zmax
-        self.zmin = zmin
-        self.bins = bins
-        self.emin = emin
-        self.emax = emax
-        self.rng = np.random.RandomState(seed)
-        self.setup()
-
-    def setup(self):
-        redshift_bins = np.arange(self.zmin, self.zmax,
-                                  self.zmax/float(self.bins))
-
-        # RedshiftCDF is used for inverse transform sampling
-        RedshiftPDF = [self.population.RedshiftDistribution(redshift_bins[i])
-                       for i in range(0, len(redshift_bins))]
-        self.invCDF = InverseCDF(redshift_bins, RedshiftPDF)
-
-    def sample_flux(self, N=None):
-        rand_cdf = self.rng.uniform(0, 1, N)
-        z = self.invCDF(rand_cdf)
-        lumi = self.luminosity_function.sample_distribution(N, rng=self.rng)
-        flux = self.population.Lumi2Flux(lumi, self.index,
-                                         self.emin, self.emax, z)
-
-        # Random declination over the entire sky
-        sinDec = self.rng.uniform(-1, 1, N)
-        declin = np.degrees(np.arcsin(sinDec))
-
-        return flux, z, declin

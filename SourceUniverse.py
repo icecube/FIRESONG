@@ -2,7 +2,7 @@
 
 import numpy as np
 import argparse
-from Evolution import get_evolution, SourcePopulation, cosmology, FluxPDF 
+from Evolution import get_evolution, SourcePopulation, cosmology 
 from Luminosity import get_LuminosityFunction
 
 

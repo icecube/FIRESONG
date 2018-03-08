@@ -11,9 +11,10 @@ import argparse
 import numpy as np
 # Firesong code
 from Evolution import get_evolution, SourcePopulation
-from Evolution import TransientSourcePopulation, cosmology, Simulation
+from Evolution import TransientSourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
 from input_output import output_writer, print_str, get_outputdir
+from sampling import InverseCDF
 
 
 def firesong_simulation(outputdir,
@@ -22,7 +23,9 @@ def firesong_simulation(outputdir,
                         Evolution="HB2006SFR",
                         Transient=False,
                         timescale=1000.,
+                        zmin=0.0005,
                         zmax=10.,
+                        bins=10000,
                         fluxnorm=0.9e-8,
                         index=2.13,
                         LF="SC",
@@ -30,7 +33,8 @@ def firesong_simulation(outputdir,
                         zNEAR=-1,
                         luminosity=0.0,
                         emin=1e4,
-                        emax=1e7):
+                        emax=1e7,
+                        seed=None):
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
@@ -58,14 +62,15 @@ def firesong_simulation(outputdir,
     #        Simulation starts here
     ##################################################
 
-    simulation = Simulation(population,
-                            get_LuminosityFunction(luminosity,
-                                                   LF=LF,
-                                                   sigma=sigma),
-                            index=index,
-                            zmax=zmax,
-                            emin=emin,
-                            emax=emax)
+    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
+                                                 sigma=sigma)
+
+    rng = np.random.RandomState(seed)
+
+    redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
+    RedshiftPDF = [population.RedshiftDistribution(redshift_bins[i])
+                   for i in range(0, len(redshift_bins))]
+    invCDF = InverseCDF(redshift_bins, RedshiftPDF)
 
     out = output_writer(outputdir, filename)
     out.write_header(LF, Transient, timescale, fluxnorm,
@@ -76,6 +81,15 @@ def firesong_simulation(outputdir,
         # IMPORTANT notice, in the following "flux" means fluence in
         # Transient mode, but flux in steady source mode,
         # until TotalFlux(TotalFluence) is calculated
+
+        # sample source
+        z = invCDF(rng.uniform(0, 1))
+        lumi = luminosity_function.sample_distribution(N, rng=rng)
+        flux = population.Lumi2Flux(lumi, index, emin, emax, z)
+        # Random declination over the entire sky
+        sinDec = rng.uniform(-1, 1)
+        declin = np.degrees(np.arcsin(sinDec))
+
         flux, z, declin = simulation.sample_flux()
         TotalFlux = TotalFlux + flux
 
