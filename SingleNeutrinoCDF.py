@@ -3,7 +3,7 @@
 #          Igncio Taboada
 #
 
-# imports
+# General imports
 from __future__ import division
 import argparse
 # Numpy / Scipy
@@ -21,7 +21,9 @@ def calc_NeutrinoCDF(outputdir,
                      Evolution="HB2006SFR",
                      Transient=False,
                      timescale=1000.,
+                     zmin=0.0005,
                      zmax=10.,
+                     bins=10000,
                      fluxnorm=0.9e-8,
                      index=2.13,
                      LF="SC",
@@ -48,6 +50,9 @@ def calc_NeutrinoCDF(outputdir,
                                                          emin=emin,
                                                          emax=emax)
 
+    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
+                                                 sigma=sigma)
+
     delta_gamma = 2-index
     print_config(LF, Transient, timescale, Evolution, density, N_sample,
                  luminosity, fluxnorm, delta_gamma, zmax, luminosity,
@@ -57,10 +62,10 @@ def calc_NeutrinoCDF(outputdir,
     #        Simulation starts here
     ##################################################
 
-    luminosities = get_LuminosityFunction(luminosity, LF=LF, sigma=sigma).sample_distribution(N_sample)
+    luminosities = luminosity.sample_distribution(N_sample)
 
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
-    redshift_bins = np.arange(0.0005, zmax, 0.001)
+    redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
 
     NeutrinoPDF = [population.RedshiftDistribution(z) *
                    population.Lumi2Flux(luminosities,
@@ -82,13 +87,14 @@ if __name__ == "__main__":
 
     # Process command line options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', action='store', dest='filename', default='Firesong.out',
-                        help='Output filename')
-    parser.add_argument('-d', action='store', dest='density', type=float, default=1e-9,
+    parser.add_argument('-o', action='store', dest='filename',
+                        default='Firesong.out', help='Output filename')
+    parser.add_argument('-d', action='store', dest='density',
+                        type=float, default=1e-9,
                         help='Local neutrino source density [1/Mpc^3]')
     parser.add_argument("--evolution", action="store",
                         dest="Evolution", default='HB2006SFR',
-                        help="Source evolution options:  HB2006SFR (default),  NoEvolution")
+                        help="Source evolution options:  HB2006SFR (default), NoEvolution")
     parser.add_argument("--transient", action='store_true',
                         dest='Transient', default=False,
                         help='Simulate transient sources, NOT TESTED YET!')
@@ -98,9 +104,11 @@ if __name__ == "__main__":
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
                         help="Highest redshift to be simulated")
-    parser.add_argument("--fluxnorm", action="store", dest='fluxnorm', type=float, default=0.9e-8,
+    parser.add_argument("--fluxnorm", action="store", dest='fluxnorm',
+                        type=float, default=0.9e-8,
                         help="Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
-    parser.add_argument("--index", action="store", dest='index', type=float, default=2.13,
+    parser.add_argument("--index", action="store", dest='index',
+                        type=float, default=2.13,
                         help="Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
     parser.add_argument("--LF", action="store", dest="LF", default="SC",
                         help="Luminosity function, SC for standard candles, LG for lognormal, PL for powerlaw")

@@ -13,45 +13,57 @@ from Luminosity import get_LuminosityFunction
 from input_output import get_outputdir
 
 
-def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
-             index=2.19, emin=1e4, emax=1e7,
-             density=1e-7, evol="HB2006SFR",
-             zmin=0.005, zmax=10., nzbins=120,
+def flux_pdf(outputdir,
+             filename='Firesong.out',
+             density=1e-9,
+             Evolution="HB2006SFR",
+             Transient=False,
+             timescale=1000.,
+             zmin=0.0005,
+             zmax=10.,
+             bins=10000,
+             fluxnorm=0.9e-8,
+             index=2.13,
+             LF="SC",
+             sigma=1.0,
+             luminosity=0.0,
+             emin=1e4,
+             emax=1e7,
              LumMin=1e45, LumMax=1e54, nLbins=120,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False):
-    """
-    Parameter:
-        - L_nu in erg/yr
-        - Luminosity function "SC", "LG", "PL"
-        - sigma in dex
-        - spectral index
-        - minimal detection energy
-        - maximal detection energy
-        - density in Mpc^-3
-        - evolution
 
-    Integration Parameters
-        - minimal redshift 0.005
-        - maxiaml redshift 10.
-        - number of redshift bins 120
-        - minimal luminosity 1e45 erg/yr
-        - maximal luminosity 1e54 erg/yr
-        - number of log(luminosity) bins 120
-        - minimal log(flux) -10
-        - maximal log(flux) 6
-        - number of log(flux) bins = 200
-    """
+    if Transient:
+        population = TransientSourcePopulation(cosmology,
+                                               get_evolution(Evolution),
+                                               timescale=timescale)
+    else:
+        population = SourcePopulation(cosmology, get_evolution(Evolution))
 
-    population = SourcePopulation(cosmology, get_evolution(evol))
-    luminosity_function = get_LuminosityFunction(luminosity, LF=LF, sigma=sigma)
+    N_sample = population.Nsources(density, zmax)
+
+    if luminosity == 0.0:
+        ## If luminosity not specified calculate luminosity from diffuse flux
+        luminosity = population.StandardCandleLuminosity(fluxnorm,
+                                                         density,
+                                                         zmax,
+                                                         index,
+                                                         emin=emin,
+                                                         emax=emax)
+
+    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
+                                                 sigma=sigma)
+
+    delta_gamma = 2-index
+    print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                 mode=" - Calculating Flux PDF")
 
     # Setup Arrays
     int_norm = population.RedshiftIntegral(zmax)
-    N_tot = population.Nsources(density, zmax)
 
-    zs = np.linspace(zmin, zmax, nzbins)
-    deltaz = float(zmax-zmin)/nzbins
+    zs = np.linspace(zmin, zmax, bins)
+    deltaz = float(zmax-zmin)/bins
 
     Ls = np.linspace(np.log10(LumMin), np.log10(LumMax), nLbins)
     deltaL = (np.log10(LumMax)-np.log10(LumMin))/nLbins
@@ -62,7 +74,7 @@ def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
     Count_array = np.zeros(nFluxBins)
     fluxOutOfBounds = []
     if with_dFdz:
-        Flux_from_fixed_z = np.zeros(nzbins)
+        Flux_from_fixed_z = np.zeros(bins)
 
     # Integration
     # Loop over redshift bins
@@ -71,7 +83,7 @@ def flux_pdf(luminosity=1e50, LF="LG", sigma=1,
         # Loop over Luminosity bins
         for lum in Ls:
             # Number of Sources in
-            dN = N_tot * luminosity_function.pdf(10**lum) * deltaL * \
+            dN = N_sample * luminosity_function.pdf(10**lum) * deltaL * \
                 (population.RedshiftDistribution(z)/int_norm) * deltaz
 
             # Flux to Source Strength
@@ -134,7 +146,7 @@ if __name__ == "__main__":
 
     output = flux_pdf(luminosity=1e50, LF="LG", sigma=1,
                       index=2.19, emin=1e4, emax=1e7,
-                      density=1e-7, evol="HB2006SFR",
-                      zmin=0.005, zmax=10., nzbins=120,
+                      density=1e-7, Evolution="HB2006SFR",
+                      zmin=0.005, zmax=10., bins=120,
                       LumMin=1e45, LumMax=1e54, nLbins=120,
                       logFMin=-10, logFMax=6, nFluxBins=200)

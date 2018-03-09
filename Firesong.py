@@ -29,11 +29,11 @@ def firesong_simulation(outputdir,
                         index=2.13,
                         LF="SC",
                         sigma=1.0,
-                        zNEAR=-1,
                         luminosity=0.0,
                         emin=1e4,
                         emax=1e7,
-                        seed=None):
+                        seed=None,
+                        zNEAR=-1):
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
@@ -53,6 +53,9 @@ def firesong_simulation(outputdir,
                                                          emin=emin,
                                                          emax=emax)
 
+    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
+                                                 sigma=sigma)
+
     delta_gamma = 2-index
     print_config(LF, Transient, timescale, Evolution, density, N_sample,
                  luminosity, fluxnorm, delta_gamma, zmax, luminosity,
@@ -61,9 +64,6 @@ def firesong_simulation(outputdir,
     ##################################################
     #        Simulation starts here
     ##################################################
-
-    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
-                                                 sigma=sigma)
 
     rng = np.random.RandomState(seed)
 
@@ -113,15 +113,12 @@ def firesong_simulation(outputdir,
     print log.format(**locals())
 
 if __name__ == "__main__":
-
     outputdir = get_outputdir()
 
     # Process command line options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', action='store',
-                        dest='filename',
-                        default='Firesong.out',
-                        help='Output filename')
+    parser.add_argument('-o', action='store', dest='filename',
+                        default='Firesong.out', help='Output filename')
     parser.add_argument('-d', action='store', dest='density',
                         type=float, default=1e-9,
                         help='Local neutrino source density [1/Mpc^3]')
@@ -148,12 +145,12 @@ if __name__ == "__main__":
     parser.add_argument("--sigma", action="store",
                         dest="sigma", type=float, default=1.0,
                         help="Width of a log normal Luminosity function in dex, default: 1.0")
-    parser.add_argument("--zNEAR", action="store", dest="zNEAR",
-                        type=float, default=-1,
-                        help="Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
     parser.add_argument("--L", action="store",
                         dest="luminosity", type=float, default=0.0,
                         help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
+    parser.add_argument("--zNEAR", action="store", dest="zNEAR",
+                        type=float, default=-1,
+                        help="Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
     options = parser.parse_args()
 
     firesong_simulation(outputdir,
@@ -167,5 +164,5 @@ if __name__ == "__main__":
                         index=options.index,
                         LF=options.LF,
                         sigma=options.sigma,
-                        zNEAR=options.zNEAR,
-                        luminosity=options.luminosity)
+                        luminosity=options.luminosity,
+                        zNEAR=options.zNEAR)
