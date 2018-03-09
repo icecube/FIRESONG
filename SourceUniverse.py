@@ -10,11 +10,11 @@ import numpy as np
 # Firesong code
 from Evolution import get_evolution, SourcePopulation, cosmology
 from Luminosity import get_LuminosityFunction
-from input_output import get_outputdir
+from input_output import output_writer_PDF, get_outputdir, print_config
 
 
 def flux_pdf(outputdir,
-             filename='Firesong.out',
+             filename=None,
              density=1e-9,
              Evolution="HB2006SFR",
              Transient=False,
@@ -104,9 +104,18 @@ def flux_pdf(outputdir,
         if with_dFdz:
             Flux_from_fixed_z[i] = tot_flux_from_z
 
+    if filename is None:
+        if with_dFdz:
+            return logFlux_array, Count_array, zs, Flux_from_fixed_z
+        return logFlux_array, Count_array
+    
+    out = output_writer_PDF(outputdir, filename)
+    out.write(logFlux_array, Count_array)
+    out.finish()
     if with_dFdz:
-        return logFlux_array, Count_array, zs, Flux_from_fixed_z
-    return logFlux_array, Count_array
+        out = output_writer_PDF(outputdir, filename)+".dFdz"
+        out.write(zs, Flux_from_fixed_z)
+        out.finish()
 
 
 if __name__ == "__main__":
@@ -144,7 +153,8 @@ if __name__ == "__main__":
                         help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
     options = parser.parse_args()
 
-    output = flux_pdf(luminosity=1e50, LF="LG", sigma=1,
+    output = flux_pdf(outputdir, filename=options.filename,
+                      luminosity=1e50, LF="LG", sigma=1,
                       index=2.19, emin=1e4, emax=1e7,
                       density=1e-7, Evolution="HB2006SFR",
                       zmin=0.005, zmax=10., bins=120,

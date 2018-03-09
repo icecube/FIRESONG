@@ -62,6 +62,9 @@ class output_writer_CDF(output_writer):
     def write(self, z, flux, nuCDF):
         self.output.write('{:.4f} {:.6e} {:.6e}\n'.format(float(z), flux, nuCDF))
 
+class output_writer_PDF(output_writer):
+    def write(self, x, y):
+        np.savetxt(self.output, np.array([x, y]).T)
 
 def get_outputdir():
     """ Check that the Firesong environmental variable is set
@@ -73,8 +76,9 @@ def get_outputdir():
         firesongdir = os.environ['FIRESONG']
     except:
         print "Enviromental variable FIRESONG not set"
-        quit()
-    return firesongdir + "/Results/"
+        print "set to ./"
+        firesongdir = "./"
+    return os.path.join(firesongdir, "Results/")
 
 
 def print_config(LF, Transient, timescale, Evolution, density,
