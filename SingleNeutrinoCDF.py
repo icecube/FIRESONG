@@ -62,7 +62,7 @@ def calc_NeutrinoCDF(outputdir,
     #        Simulation starts here
     ##################################################
 
-    luminosities = luminosity.sample_distribution(N_sample)
+    luminosities = luminosity_function.sample_distribution(N_sample)
 
     # Generate a histogram to store redshifts. Starts at z = 0.0005 and increases in steps of 0.001
     redshift_bins = np.arange(zmin, zmax, zmax/float(bins))

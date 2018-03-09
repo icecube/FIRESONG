@@ -84,7 +84,7 @@ def firesong_simulation(outputdir,
 
         # sample source
         z = invCDF(rng.uniform(0, 1))
-        lumi = luminosity_function.sample_distribution(N=None, rng=rng)
+        lumi = luminosity_function.sample_distribution(nsources=None, rng=rng)
         flux = population.Lumi2Flux(lumi, index, emin, emax, z)
         # Random declination over the entire sky
         sinDec = rng.uniform(-1, 1)
