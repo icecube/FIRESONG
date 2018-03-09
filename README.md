@@ -33,6 +33,8 @@ Several scripts are provided:
   function of a neutrino alert vs. redshift. This has ONLY been tested
   for Standard Candle sources, so it is equivalent to CDF of neutrino
   alert vs. flux.
+* FluxPDF.py - Generated the flux probability density distribution of a 
+  source.
 * CTA/CTA-Firesong.py - Reads in neutrinos generated with
   NeutrinoAlert.py and calculates a significance for 0.5, 5 and 50
   hour observation. Currenly only CTA-North is implemented. Though

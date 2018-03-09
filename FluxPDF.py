@@ -113,7 +113,7 @@ def flux_pdf(outputdir,
     out.write(logFlux_array, Count_array)
     out.finish()
     if with_dFdz:
-        out = output_writer_PDF(outputdir, filename)+".dFdz"
+        out = output_writer_PDF(outputdir, filename+".dFdz")
         out.write(zs, Flux_from_fixed_z)
         out.finish()
 
@@ -124,16 +124,20 @@ if __name__ == "__main__":
 
     # Process command line options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', action='store',
-                        dest='filename',
-                        default='Firesong.out',
-                        help='Output filename')
+    parser.add_argument('-o', action='store', dest='filename',
+                        default='Firesong.out', help='Output filename')
     parser.add_argument('-d', action='store', dest='density',
                         type=float, default=1e-9,
                         help='Local neutrino source density [1/Mpc^3]')
     parser.add_argument("--evolution", action="store",
                         dest="Evolution", default='HB2006SFR',
                         help="Source evolution options:  HB2006SFR (default), NoEvolution")
+    parser.add_argument("--transient", action='store_true',
+                        dest='Transient', default=False,
+                        help='Simulate transient sources, NOT TESTED YET!')
+    parser.add_argument("--timescale", action='store',
+                        dest='timescale', type=float,
+                        default=1000., help='time scale of transient sources, default is 1000sec.')
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
                         help="Highest redshift to be simulated")
@@ -151,12 +155,51 @@ if __name__ == "__main__":
     parser.add_argument("--L", action="store",
                         dest="luminosity", type=float, default=0.0,
                         help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
+    parser.add_argument("--eRange", action="store", nargs=2,
+                        dest="eRange", type=float, default=[1e4, 1e7],
+                        help="Set the minimal and maximal energy boundary of the measured fluxnorm, unit GeV")
+    parser.add_argument("--zRange", action="store", nargs=2,
+                        dest="zRange", type=float, default=[0.0005, 10.],
+                        help="Set the minimal and maximal integration bounderis in redshift")
+    parser.add_argument("--zBins", action="store",
+                        dest="zBins", type=float, default=120,
+                        help="Set number of z bins used in integration")
+    parser.add_argument("--lRange", action="store", nargs=2,
+                        dest="lRange", type=float, default=[1e45, 1e54],
+                        help="Set the minimal and maximal integration bounderis in luminosity, unit erg/yr")
+    parser.add_argument("--lBins", action="store",
+                        dest="lBins", type=float, default=120,
+                        help="Set number of log10(luminosity) bins used in integration")
+    parser.add_argument("--fRange", action="store", nargs=2,
+                        dest="fRange", type=float, default=[-10, 6],
+                        help="Set the minimal and maximal log10(flux) range , unit log10(GeV/cm^2.s.sr)")
+    parser.add_argument("--fBins", action="store",
+                        dest="fBins", type=float, default=120,
+                        help="Set number of log10(flux) bins used in evaluation")
+    parser.add_argument("--dFdz", action="store_true", 
+                        help="If ggiven a second file is created with dF/dz.")
     options = parser.parse_args()
 
-    output = flux_pdf(outputdir, filename=options.filename,
-                      luminosity=1e50, LF="LG", sigma=1,
-                      index=2.19, emin=1e4, emax=1e7,
-                      density=1e-7, Evolution="HB2006SFR",
-                      zmin=0.005, zmax=10., bins=120,
-                      LumMin=1e45, LumMax=1e54, nLbins=120,
-                      logFMin=-10, logFMax=6, nFluxBins=200)
+    output = flux_pdf(outputdir,
+                      filename=options.filename,
+                      density=options.density,
+                      Evolution=options.Evolution,
+                      Transient=options.Transient,
+                      timescale=options.timescale,
+                      fluxnorm=options.fluxnorm,
+                      index=options.index,
+                      LF=options.LF,
+                      sigma=options.sigma,
+                      luminosity=options.luminosity,
+                      emin=options.eRange[0],
+                      emax=options.eRange[1],
+                      zmin=options.zRange[0],
+                      zmax=options.zRange[1],
+                      bins=options.zBins,
+                      LumMin=options.lRange[0],
+                      LumMax=options.lRange[1],
+                      nLbins=options.lBins,
+                      logFMin=options.fRange[0],
+                      logFMax=options.fRange[1],
+                      nFluxBins=options.fBins,
+                      with_dFdz=options.dFdz)
