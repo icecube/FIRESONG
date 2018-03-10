@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Authors: Chris Tung
-#          Igncio Taboada
+#          Ignacio Taboada
 #
 
 # General imports
@@ -124,7 +124,7 @@ if __name__ == "__main__":
                         help='Local neutrino source density [1/Mpc^3]')
     parser.add_argument("--evolution", action="store",
                         dest="Evolution", default='HB2006SFR',
-                        help="Source evolution options:  HB2006SFR (default), NoEvolution")
+                        help="Source evolution options:  HB2006SFR (default), YMKBH2008SFR, CC2015SNR , MD2014SFR, NoEvolution")
     parser.add_argument("--transient", action='store_true',
                         dest='Transient', default=False,
                         help='Simulate transient sources, NOT TESTED YET!')

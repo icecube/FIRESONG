@@ -46,7 +46,8 @@ Several scripts are provided:
 Chris Tung
 Ignacio Taboada
 
-We acknowledge help and ideas by Markus Ahlers, Georga Japaridze and Konstancja Satalecka
+We acknowledge help and ideas by Markus Ahlers, Georga Japaridze,
+Konstancja Satalecka and Rene Reimann
 
 # Tagged Versions
 v1.2 - June 7, 2017
