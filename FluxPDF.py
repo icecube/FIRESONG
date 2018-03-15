@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 # Firesong code
 from Evolution import get_evolution, SourcePopulation, cosmology
+from Evolution import TransientSourcePopulation
 from Luminosity import get_LuminosityFunction
 from input_output import output_writer_PDF, get_outputdir, print_config
 
@@ -108,7 +109,7 @@ def flux_pdf(outputdir,
         if with_dFdz:
             return logFlux_array, Count_array, zs, Flux_from_fixed_z
         return logFlux_array, Count_array
-    
+
     out = output_writer_PDF(outputdir, filename)
     out.write(logFlux_array, Count_array)
     out.finish()
@@ -176,7 +177,7 @@ if __name__ == "__main__":
     parser.add_argument("--fBins", action="store",
                         dest="fBins", type=float, default=120,
                         help="Set number of log10(flux) bins used in evaluation")
-    parser.add_argument("--dFdz", action="store_true", 
+    parser.add_argument("--dFdz", action="store_true",
                         help="If ggiven a second file is created with dF/dz.")
     options = parser.parse_args()
 
