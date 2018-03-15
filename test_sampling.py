@@ -11,6 +11,7 @@ or:
 
 import unittest
 import sampling
+import numpy as np
 
 
 class TestInverseCDF(unittest.TestCase):
@@ -30,7 +31,9 @@ class TestInverseCDF(unittest.TestCase):
 
     def setUp(self):
         "before each test"
-        pass
+        x = np.linspace(0, 100., 101)
+        pdf = np.exp(-0.5*((x-50.)/5.)**2)
+        self.invCDF = sampling.InverseCDF(x, pdf, seed=1)
 
     def tearDown(self):
         "after each test"
@@ -38,8 +41,34 @@ class TestInverseCDF(unittest.TestCase):
 
     ### tests start here ###
 
-    def test_InverseCDF(self):
-        pass
+    def test_InverseCDF_evaluation(self):
+        self.assertTrue(self.invCDF(1.0) <= 100)
+        self.assertTrue(self.invCDF(0.0) >= 0)
+        self.assertAlmostEqual(self.invCDF(0.5), 50)
+
+    def test_InverseCDF_evaluation_out_of_bound(self):
+        with self.assertRaises(ValueError):
+            self.invCDF(1.1)
+        with self.assertRaises(ValueError):
+            self.invCDF(-0.1)
+
+    def test_random_default(self):
+        self.assertEqual(self.invCDF.sample(), 52.928655301834596)
+
+    def test_random_given_N_1(self):
+        self.assertEqual(self.invCDF.sample(N=1), 52.928655301834596)
+
+    def test_random_given_N_5(self):
+        x = self.invCDF.sample(N=5)
+        self.assertEqual(len(x), 5)
+        self.assertEqual(x[0], 43.36341773412083)
+        self.assertNotEqual(x[0], x[1])
+
+    def test_random_wrong_parameter(self):
+        with self.assertRaises(TypeError):
+            x = self.invCDF.sample("Test")
+        x = self.invCDF.sample(1.5)
+        self.assertEqual(len(x), 1)
 
 if __name__ == "__main__":
     unittest.main()
