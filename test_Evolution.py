@@ -41,7 +41,7 @@ class TestEvolution(unittest.TestCase):
 
     def test_get_evolution(self):
         with self.assertRaises(NotImplementedError):
-            evol = Evolution.get_evolution("Test")
+            Evolution.get_evolution("Test")
 
     def test_EvolutionBaseClass(self):
         pass
@@ -77,7 +77,9 @@ class TestSourcePopulation(unittest.TestCase):
 
     def setUp(self):
         "before each test"
-        pass
+        evol = Evolution.get_evolution("NoEvolution")
+        self.pop = Evolution.SourcePopulation(Evolution.cosmology,
+                                              evol)
 
     def tearDown(self):
         "after each test"
@@ -85,8 +87,25 @@ class TestSourcePopulation(unittest.TestCase):
 
     ### tests start here ###
 
-    def test_0(self):
-        pass
+    def test_Nsources(self):
+        self.assertEqual(self.pop.Nsources(1e-9, zmax=10.),
+                         3769.7731306195333)
+
+    def test_Flux_Lumi(self):
+        L = self.pop.Lumi2Flux(1e50, 2.0, 1e3, 1e7, z=1)
+        self.assertAlmostEqual(1e50 / self.pop.Flux2Lumi(L,
+                                                         2.0,
+                                                         1e3,
+                                                         1e7,
+                                                         z=1),
+                               1)
+
+    def test_Diffuse2SC(self):
+        self.assertEqual(self.pop.StandardCandleSources(1e-8,
+                                                        1e-9,
+                                                        zmax=10.,
+                                                        index=2.0),
+                         9.2911752992097727e-11)
 
 
 class TestTransientSourcePopulation(unittest.TestCase):
