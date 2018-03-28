@@ -18,7 +18,6 @@ def get_evolution(evol):
 
     return evolutions[evol]()
 
-
 class Evolution(object):
     def __init__(self):
         pass
@@ -272,3 +271,135 @@ class TransientSourcePopulation(SourcePopulation):
         # red-shifted-fluence/{(1+z)*burst duration}
         flux = fluence / ((1.+z)*self.timescale)
         return flux
+
+#############
+#LEGEND AREA#
+#############
+
+def get_LEvolution(le_model, lmin, lmax):
+    evolutions = {"HA2014BL": HardingAbazajian(lmin, lmax)
+                  }
+    if not le_model in evolutions.keys():
+        raise NotImplementedError("Luminosity Evolution " +
+                                  le_model + " not implemented.")
+    return evolutions[le_model]
+
+class LuminosityEvolution(object):
+    """
+    For the Luminosity Distribution that depends on z
+    """
+
+    def __init__(self, lmin, lmax, cosmology=cosmology):
+        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+        self.lmin = lmin
+        self.lmax = lmax
+        self._zlocal = 0.01
+        self.Mpc2cm = 3.086e24                     # Mpc / cm
+        self.GeV_per_sec_2_ergs_per_sec = 1.60218e-3  # (GeV/sec) / (ergs/s)
+
+    def LF(self, L, z):
+        raise NotImplementedError("Please Specify Model")
+
+    def LuminosityDistance(self, z):
+        # Wrapper function - so that cosmolopy is only imported here.
+        return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+
+    def RedshiftDistribution(self, z):
+        """
+        $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
+        """
+        integral = scipy.integrate.quad(lambda L: self.LF(L, z), self.lmin, self.lmax)[0]
+        return integral * cosmolopy.distance.diff_comoving_volume(z, **self.cosmology) * \
+            4*np.pi
+
+    def L_CDF(self, redshift_bins, luminosity_bins):
+        # 2D phase space scan of L and z
+        l, z = np.meshgrid(luminosity_bins, redshift_bins)
+        L_PDF = self.LF(l, z)
+        L_CDF = np.cumsum(L_PDF, axis=1)
+        norm = L_CDF[:,-1].reshape((10000,1))
+        L_CDF = (1/norm) * L_CDF
+
+        self.redshift_bins = redshift_bins
+        self.luminosity_bins = luminosity_bins
+        self.Lcdf = L_CDF
+
+    def Luminosity_Sampling(self, z):
+        z = np.atleast_1d(z)
+        test = np.random.rand(z.shape[0])
+        index_1 = np.searchsorted(self.redshift_bins, z)
+        for test, index in zip(test, index_1):
+            index_2 = np.searchsorted(self.Lcdf[index], test)
+        return self.luminosity_bins[index_2]
+
+    def Nsources(self, zmax):
+        """
+        $$ N_{tot} = \int_0^z_{max} P(z) dz$$ 
+        """
+        return scipy.integrate.quad(lambda z: self.RedshiftDistribution(z), 0, zmax)[0]
+
+    def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
+        """
+        $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
+        \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
+        \left(\frac{E}{E_0}\right)^{-\gamma}\,
+        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+        Lumi given in ergs/yr
+        Note fluxnorm is E0^2*fluxnorm
+        fluxnorm units are []
+        """
+        flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
+        fluxnorm = luminosity / 4. / np.pi / \
+            (self.LuminosityDistance(z)*self.Mpc2cm)**2. / \
+            self.GeV_per_sec_2_ergs_per_sec / flux_integral * E0**2.
+        return fluxnorm
+
+    def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
+        """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
+        l_lim = emin/(1.+z)
+        u_lim = emax/(1.+z)
+        if index != 2.0:
+            integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
+        else:
+            integral = np.log(u_lim) - np.log(l_lim)
+        return E0**index * integral
+
+class HardingAbazajian(LuminosityEvolution):
+    """
+    Luminosity Evolution model for Blazars
+    """
+    def LF(self, L, z):
+        A = 5.04e-6
+        gamma1 = 0.43
+        L0 = 10**43.94
+        gamma2 = 2.23
+        zc0 = 1.9
+        p10 = 4.23
+        p20 = -1.5
+        alpha = 0.335
+        La = 44.6
+        beta1 = 0.
+        beta2 = 0.
+        
+        L = np.atleast_1d(L)
+        z = np.atleast_1d(z)
+        zc = np.zeros_like(L)
+        LF_F = np.zeros_like(L)
+        LF_L = A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
+        p1 = p10 + beta1 * (L-44.0)
+        p2 = p20 + beta2 * (L-44.0)
+        zc[L>=La] = zc0
+        zc[L<La] = zc0*10**((L[L<La]-La)*alpha)
+        LF_F[z-zc<=0] = (1+z[z-zc<=0])**p1[z-zc<=0]
+        LF_F[z-zc>0] = (1+zc[z-zc>0])**p1[z-zc>0]*((1+z[z-zc>0])/(1+zc[z-zc>0]))**p2[z-zc>0]
+        return LF_L*LF_F
+
+    def Nsources(self, zmax):
+        kappa = 9.54e-6
+        nsource = super(HardingAbazajian, self).Nsources(zmax)
+        return nsource*kappa
+
+    def Luminosity_Sampling(self, z):
+        L_x_to_rad = 4.21
+        L = super(HardingAbazajian, self).Luminosity_Sampling(z)
+        return 10**(L+L_x_to_rad)
