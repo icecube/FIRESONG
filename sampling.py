@@ -22,10 +22,12 @@ class InverseCDF(object):
         self.rng = np.random.RandomState(seed)
         cdf = np.cumsum(pdf)/np.sum(pdf)
         mask = np.diff(cdf) > 0
-        self.invCDF = UnivariateSpline(cdf[1:][mask], x[1:][mask], k=1, s=0)
+        self.invCDF = UnivariateSpline(cdf[1:][mask], x[1:][mask] + (x[1]-x[0])/2., k=1, s=0)
 
     def __call__(self, x):
         """ Returns the inverse CDF at point(s) x """
+        if any(np.atleast_1d(x) < 0) or any(np.atleast_1d(x) > 1):
+            raise ValueError("x out of bounds. x has to be in range 0..1")
         return self.invCDF(x)
 
     def sample(self, N=None):

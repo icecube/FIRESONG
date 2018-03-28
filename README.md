@@ -42,6 +42,25 @@ Several scripts are provided:
 * CTA/CTA-Sensitivity.py - Command line version of CTA/CTA-Firesong.py
   but for a single source and a single observation time. 
 
+# Tests
+All unittest could be run by
+
+```
+python -m unittest discover ./
+```
+
+If you want to run a test for a certain file seperatly user either
+
+```
+python -m unittest test_<...>
+```
+
+or 
+
+```
+python test_<...>.py
+```
+
 # Authors as of May 3, 2017
 Chris Tung
 Ignacio Taboada

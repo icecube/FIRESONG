@@ -5,6 +5,7 @@ import scipy
 import cosmolopy
 cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
 
+
 def get_evolution(evol):
     evolutions = {"NoEvolution": NoEvolution,
                   "HB2006SFR": HopkinsBeacom2006StarFormationRate,
@@ -91,6 +92,7 @@ class CandelsClash2015SNRate(Evolution):
         density = a*(x**c) / (1. + ( x / b)**d )
         return density
 
+
 class MadauDickinson2014CSFH(Evolution):
     """ StarFormationHistory (SFR), from Madau and Dickinson (2014),
     unit = M_sun/yr/Mpc^3 """
@@ -105,6 +107,7 @@ class MadauDickinson2014CSFH(Evolution):
         d = 5.6
         density = a*(x**b) / (1. + (x/c)**d ) 
         return density
+
 
 class SourcePopulation(object):
     def __init__(self, cosmology, evolution):

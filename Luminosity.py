@@ -20,10 +20,10 @@ class LuminosityFunction(object):
     def sample_distribution(self, nsources, rng=None):
         raise NotImplementedError("Abstract Class")
 
-    def pdf(self):
+    def pdf(self, lumi):
         raise NotImplementedError("Abstract Class")
 
-    def cdf(self):
+    def cdf(self, lumi):
         raise NotImplementedError("Abstract Class")
 
 
@@ -72,9 +72,12 @@ class SC_LuminosityFunction(LuminosityFunction):
             0.5  lumi = mean
             1    lumi > mean
         """
+        lumi = np.atleast_1d(lumi)
         cdf = np.zeros_like(lumi)
         cdf[lumi == self.mean] = .5
         cdf[lumi > self.mean] = 1.
+        if len(lumi) == 1:
+            return cdf[0]
         return cdf
 
 
