@@ -69,6 +69,10 @@ We acknowledge help and ideas by Markus Ahlers, Georga Japaridze,
 Konstancja Satalecka and Rene Reimann
 
 # Tagged Versions
+v1.5 - March 28, 2018
+
+Rewritten, added new model, new mode
+
 v1.2 - June 7, 2017
 
 Different luminosity functions can be used for NeutrinoAlert.py
