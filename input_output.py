@@ -108,3 +108,15 @@ def print_config(LF, Transient, timescale, Evolution, density,
     str += "Standard Candle Luminosity: {luminosity:.4e} erg/yr\n"
     str += "##### FIRESONG initialization done #####\n"
     print(str.format(**locals()))
+
+def print_config_LEGEND(L_Evolution, lmin, lmax, N_sample):
+    """
+    Prints the configuration to the screen.
+    """
+    str = "##############################################################################\n"
+    str += "##### LEGEND initializing        #####\n"
+    str += "Luminosity Evolution model = {L_Evolution}\n"
+    str += "Source Luminosity Limit = {lmin} - {lmax} erg/s \n"
+    str += "Totla number of sources in the universe: {N_sample} \n"
+    str += "##### LEGEND initialization done #####"
+    print(str.format(**locals()))
