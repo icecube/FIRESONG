@@ -77,21 +77,35 @@ class YukselEtAl2008StarFormationRate(Evolution):
 
 
 class CandelsClash2015SNRate(Evolution):
+    """This is the implied SRF from Goods/Candels/Clash (2015)
+    derive from CC SNe rate and assuming one rate is proportional to the other.
+    They use the same functional form as Madau and Dickinson (2014)
+    unit = M_sun/yr/Mpc^3 """
+    
+    def __call__(self, z):
+        return self.parametrization(1.+z)
+    
     def parametrization(self, x):
         a = 0.015
         b = 1.5
         c = 5.0
         d = 6.1
-        density = a*(10.**x)**c / ((10.**x / b)**d+1.)
+        density = a*(x**c) / (1. + ( x / b)**d )
         return density
 
 class MadauDickinson2014CSFH(Evolution):
+    """ StarFormationHistory (SFR), from Madau and Dickinson (2014),
+    unit = M_sun/yr/Mpc^3 """
+
+    def __call__(self, z):
+        return self.parametrization(1.+z)
+        
     def parametrization(self, x):
         a = 0.015
         b = 2.7
         c = 2.9
         d = 5.6
-        density = a*((1+x)**b) / ( 1 + ((1+x)/c)**d ) 
+        density = a*(x**b) / (1. + (x/c)**d ) 
         return density
 
 class SourcePopulation(object):
