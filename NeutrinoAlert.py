@@ -84,6 +84,9 @@ def calc_NeutrinoAlert(outputdir,
         declin = np.degrees(np.arcsin(sinDec))
         lumi = luminosity_function.sample_distribution()
         flux = population.Lumi2Flux(lumi, index, emin, emax, z)
+        if Transient:
+          flux = population.fluence2flux(flux, z)
+
         out.write(declin, z, flux)
     out.finish()
 
