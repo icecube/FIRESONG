@@ -133,6 +133,13 @@ class SourcePopulation(object):
 
     def LuminosityDistance(self, z):
         # Wrapper function - so that cosmolopy is only imported here.
+        if np.ndim(z) > 0:
+            if len(z) > 1000:
+                zz = np.linspace(0., 10., 500)
+                spl = scipy.interpolate.UnivariateSpline(zz, 
+                        cosmolopy.distance.luminosity_distance(zz, 
+                            **self.cosmology))
+                return spl(z)
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def Nsources(self, density, zmax):
@@ -305,6 +312,13 @@ class LuminosityEvolution(object):
 
     def LuminosityDistance(self, z):
         # Wrapper function - so that cosmolopy is only imported here.
+        if np.ndim(z) > 0:
+            if len(z) > 1000:
+                zz = np.linspace(0., 10., 500)
+                spl = scipy.interpolate.UnivariateSpline(zz,
+                        cosmolopy.distance.luminosity_distance(zz,
+                            **self.cosmology))
+                return spl(z)
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def RedshiftDistribution(self, z):

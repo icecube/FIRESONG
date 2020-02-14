@@ -15,7 +15,6 @@ from Luminosity import get_LuminosityFunction
 from input_output import output_writer, print_config, get_outputdir
 from sampling import InverseCDF
 
-
 def firesong_simulation(outputdir,
                         filename='Firesong.out',
                         density=1e-9,
@@ -76,30 +75,28 @@ def firesong_simulation(outputdir,
     out.write_header(LF, Transient, timescale, fluxnorm,
                      delta_gamma, luminosity)
 
-    TotalFlux = 0
-    for i in range(0, N_sample):
-        # IMPORTANT notice, in the following "flux" means fluence in
-        # Transient mode, but flux in steady source mode,
-        # until TotalFlux(TotalFluence) is calculated
+    # IMPORTANT notice, in the following "flux" means fluence in
+    # Transient mode, but flux in steady source mode,
+    # until TotalFlux(TotalFluence) is calculated
+    
+    # sample source
+    zs = invCDF(rng.uniform(low=0.0, high=1.0, size = N_sample))
+    lumis = luminosity_function.sample_distribution(nsources=N_sample, rng=rng)
+    if np.ndim(lumis) < 1:
+        lumis = np.array([lumis]*N_sample)
+    fluxes = population.Lumi2Flux(lumis, index, emin, emax, zs)
+    # Random declination over the entire sky
+    sinDecs = rng.uniform(-1, 1, size=N_sample)
+    declins = np.degrees(np.arcsin(sinDecs))
 
-        # sample source
-        z = invCDF(rng.uniform(0, 1))
-        lumi = luminosity_function.sample_distribution(nsources=None, rng=rng)
-        flux = population.Lumi2Flux(lumi, index, emin, emax, z)
-        # Random declination over the entire sky
-        sinDec = rng.uniform(-1, 1)
-        declin = np.degrees(np.arcsin(sinDec))
+    TotalFlux = np.sum(fluxes)
 
-        TotalFlux = TotalFlux + flux
+    # For transient sources, the flux measured on Earth will be
+    # red-shifted-fluence/{(1+z)*burst duration}
+    if Transient:
+        fluxes = population.fluence2flux(fluxes, zs)
 
-        # For transient sources, the flux measured on Earth will be
-        # red-shifted-fluence/{(1+z)*burst duration}
-        if Transient:
-            flux = population.fluence2flux(flux, z)
-
-        out.write(declin, z, flux)
-        if i % 100000 == 0 and i > 0:
-            print "Generated ", i, " neutrino sources"
+    out.write(declins, zs, fluxes)
 
     # For transient source, we calculate the total fluence from all sources,
     # then obtain the diffuse flux by doing a time average over a year
