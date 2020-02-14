@@ -79,7 +79,7 @@ class TestLuminosity(unittest.TestCase):
     def test_LG_LuminosityFunction_sample_distribution(self):
         rng = np.random.RandomState(seed=1)
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
-        self.assertEqual(lf.sample_distribution(nsource=10, rng=rng)[0],
+        self.assertEqual(lf.sample_distribution(nsources=10, rng=rng)[0],
                          2.9720274559094399e+50)
 
     def test_LG_LuminosityFunction_PDF(self):
