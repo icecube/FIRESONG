@@ -53,22 +53,23 @@ class TestInverseCDF(unittest.TestCase):
             self.invCDF(-0.1)
 
     def test_random_default(self):
-        self.assertEqual(self.invCDF.sample(), 52.928655301834596)
+        self.assertEqual(self.invCDF.sample(), 48.949116836587841)
 
     def test_random_given_N_1(self):
-        self.assertEqual(self.invCDF.sample(N=1), 52.928655301834596)
+        self.assertEqual(self.invCDF.sample(N=1), 48.949116836587841)
 
     def test_random_given_N_5(self):
         x = self.invCDF.sample(N=5)
         self.assertEqual(len(x), 5)
-        self.assertEqual(x[0], 43.36341773412083)
+        self.assertEqual(x[0], 48.949116836587841)
         self.assertNotEqual(x[0], x[1])
 
     def test_random_wrong_parameter(self):
         with self.assertRaises(TypeError):
             x = self.invCDF.sample("Test")
-        x = self.invCDF.sample(1.5)
-        self.assertEqual(len(x), 1)
+        with self.assertRaises(TypeError):
+            x = self.invCDF.sample(1.5)
+        #self.assertEqual(len(x), 1)
 
 if __name__ == "__main__":
     unittest.main()
