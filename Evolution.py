@@ -13,7 +13,7 @@ def get_evolution(evol):
                   "CC2015SNR": CandelsClash2015SNRate,
                   "MD2014SFR": MadauDickinson2014CSFH
                   }
-    if not evol in evolutions.keys():
+    if not evol in list(evolutions.keys()):
         raise NotImplementedError("Source evolution " +
                                   evol + " not implemented.")
 
@@ -289,7 +289,7 @@ class TransientSourcePopulation(SourcePopulation):
 def get_LEvolution(le_model, lmin, lmax):
     evolutions = {"HA2014BL": HardingAbazajian(lmin, lmax)
                   }
-    if not le_model in evolutions.keys():
+    if not le_model in list(evolutions.keys()):
         raise NotImplementedError("Luminosity Evolution " +
                                   le_model + " not implemented.")
     return evolutions[le_model]
