@@ -4,12 +4,12 @@
 #
 
 # General imports
-from __future__ import division
+# from __future__ import division
 import argparse
 # Numpy / Scipy
 import numpy as np
 # Firesong code
-from Evolution import get_LEvolution, cosmology
+from Evolution import get_LEvolution
 from input_output import output_writer, print_config_LEGEND, get_outputdir
 from sampling import InverseCDF
 
@@ -33,7 +33,7 @@ def legend_simulation(outputdir,
 
     N_sample = int(LE_model.Nsources(zmax))
 
-    delta_gamma = 2-index
+    delta_gamma = 2 - index
     print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
 
     ##################################################
@@ -42,37 +42,39 @@ def legend_simulation(outputdir,
 
     rng = np.random.RandomState(seed)
 
-    redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
+    # Prepare CDF for redshift generation
+    redshift_bins = np.arange(zmin, zmax, zmax / float(bins))
     RedshiftPDF = [LE_model.RedshiftDistribution(redshift_bins[i])
                    for i in range(0, len(redshift_bins))]
     invCDF = InverseCDF(redshift_bins, RedshiftPDF)
 
-    luminosity_bins = np.arange(lmin, lmax, (lmax-lmin)/1000.)
+    # Prepare a luminosity CDF as a function of redshift
+    luminosity_bins = np.arange(lmin, lmax, (lmax - lmin) / 1000.)
     LE_model.L_CDF(redshift_bins, luminosity_bins)
 
     out = output_writer(outputdir, filename)
 
-    TotalFlux = 0
-    for i in range(0, N_sample):
-        # sample source
-        z = invCDF(rng.uniform(0, 1))
-        lumi = LE_model.Luminosity_Sampling(z)
-        flux = LE_model.Lumi2Flux(lumi, index, emin, emax, z)
-        # Random declination over the entire sky
-        sinDec = rng.uniform(-1, 1)
-        declin = np.degrees(np.arcsin(sinDec))
+    # Generate redshift
+    zs = invCDF(rng.uniform(low=0.0, high=1.0, size=N_sample))
+    # Generate luminosity as function of z
+    lumis = LE_model.Luminosity_Sampling(zs)
+    if np.ndim(lumis) < 1:
+        lumis = np.array([lumis] * N_sample)
+    # Calculate the flux of each source
+    fluxes = LE_model.Lumi2Flux(lumis, index, emin, emax, zs)
+    # Random declination over the entire sky
+    sinDecs = rng.uniform(-1, 1, size=N_sample)
+    declins = np.degrees(np.arcsin(sinDecs))
+    TotalFlux = np.sum(fluxes)
 
-        TotalFlux = TotalFlux + flux
-
-        out.write(declin, z, flux)
-        if i % 100000 == 0 and i > 0:
-            print "Generated ", i, " sources"
-
-
+    # Write out
+    out.write(declins, zs, fluxes)
     out.finish(TotalFlux)
-    print "Actual diffuse flux simulated :"
+
+    print("Actual diffuse flux simulated :")
     log = "E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]"
-    print log.format(**locals())
+    print(log.format(**locals()))
+
 
 if __name__ == "__main__":
     outputdir = get_outputdir()
@@ -86,7 +88,8 @@ if __name__ == "__main__":
                         help="Source evolution options:  HA2014BL")
     parser.add_argument("--timescale", action='store',
                         dest='timescale', type=float,
-                        default=1000., help='time scale of transient sources, default is 1000sec.')
+                        default=1000.,
+                        help='time scale of transient sources, default is 1000sec.')
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
                         help="Highest redshift to be simulated")
