@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/Library/Frameworks/Python.framework/Versions/3.7/bin/python3
 # Authors: Chris Tung
 #          Ignacio Taboada
 #
 
 # General imports
-from __future__ import division
+#from __future__ import division
 import argparse
 # Numpy / Scipy
 import numpy as np
@@ -105,9 +105,9 @@ def firesong_simulation(outputdir,
     TotalFlux /= 4*np.pi  # give in per sr
 
     out.finish(TotalFlux)
-    print "Actual diffuse flux simulated :"
+    print("Actual diffuse flux simulated :")
     log = "E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]"
-    print log.format(**locals())
+    print(log.format(**locals()))
 
 if __name__ == "__main__":
     outputdir = get_outputdir()
