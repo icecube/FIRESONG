@@ -77,8 +77,8 @@ def get_outputdir():
     try:
         firesongdir = os.environ['FIRESONG']
     except:
-        print "Enviromental variable FIRESONG not set"
-        print "set to ./"
+        print("Enviromental variable FIRESONG not set")
+        print("set to ./")
         firesongdir = "./"
     return os.path.join(firesongdir, "Results/")
 
@@ -107,7 +107,7 @@ def print_config(LF, Transient, timescale, Evolution, density,
     str += "Redshift range: 0 - {zmax}\n"
     str += "Standard Candle Luminosity: {luminosity:.4e} erg/yr\n"
     str += "##### FIRESONG initialization done #####\n"
-    print(str.format(**locals()))
+    print((str.format(**locals())))
 
 def print_config_LEGEND(L_Evolution, lmin, lmax, N_sample):
     """
@@ -119,4 +119,4 @@ def print_config_LEGEND(L_Evolution, lmin, lmax, N_sample):
     str += "Source Luminosity Limit = {lmin} - {lmax} erg/s \n"
     str += "Totla number of sources in the universe: {N_sample} \n"
     str += "##### LEGEND initialization done #####"
-    print(str.format(**locals()))
+    print((str.format(**locals())))
