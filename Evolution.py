@@ -121,6 +121,13 @@ class SourcePopulation(object):
 
     def RedshiftDistribution(self, z):
         """ can remove 4*pi becaue we just use this in a normalized way """
+        if np.ndim(z) > 0:
+            if len(z) > 1000:
+                zz = np.linspace(0., 10., 1000)
+                spl = scipy.interpolate.UnivariateSpline(zz,
+                    cosmolopy.distance.diff_comoving_volume(zz,
+                        **self.cosmology))
+                return 4 * np.pi * self.evolution(z) * spl(z)
         return 4 * np.pi * self.evolution(z) * \
             cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
 
@@ -135,7 +142,7 @@ class SourcePopulation(object):
         # Wrapper function - so that cosmolopy is only imported here.
         if np.ndim(z) > 0:
             if len(z) > 1000:
-                zz = np.linspace(0., 10., 500)
+                zz = np.linspace(0., 10., 1000)
                 spl = scipy.interpolate.UnivariateSpline(zz, 
                         cosmolopy.distance.luminosity_distance(zz, 
                             **self.cosmology))
