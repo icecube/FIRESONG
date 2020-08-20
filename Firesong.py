@@ -67,8 +67,7 @@ def firesong_simulation(outputdir,
     rng = np.random.RandomState(seed)
 
     redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
-    RedshiftPDF = [population.RedshiftDistribution(redshift_bins[i])
-                   for i in range(0, len(redshift_bins))]
+    RedshiftPDF = population.RedshiftDistribution(redshift_bins)
     invCDF = InverseCDF(redshift_bins, RedshiftPDF)
 
     out = output_writer(outputdir, filename)
