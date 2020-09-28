@@ -34,6 +34,7 @@ def firesong_simulation(outputdir,
                         seed=None,
                         zNEAR=-1):
 
+    print("CHECKING GITHUB RELATED THING")
     if Transient:
         population = TransientSourcePopulation(cosmology,
                                                get_evolution(Evolution),
