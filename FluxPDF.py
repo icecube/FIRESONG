@@ -32,7 +32,8 @@ def flux_pdf(outputdir,
              emax=1e7,
              LumMin=1e45, LumMax=1e54, nLbins=120,
              logFMin=-10, logFMax=6, nFluxBins=200,
-             with_dFdz=False):
+             with_dFdz=False,
+             verbose=True):
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
@@ -56,9 +57,10 @@ def flux_pdf(outputdir,
                                                  sigma=sigma)
 
     delta_gamma = 2-index
-    print_config(LF, Transient, timescale, Evolution, density, N_sample,
-                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
-                 mode=" - Calculating Flux PDF")
+    if verbose:
+        print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                    luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                    mode=" - Calculating Flux PDF")
 
     # Setup Arrays
     int_norm = population.RedshiftIntegral(zmax)
