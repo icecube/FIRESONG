@@ -32,7 +32,8 @@ def firesong_simulation(outputdir,
                         emin=1e4,
                         emax=1e7,
                         seed=None,
-                        zNEAR=-1):
+                        zNEAR=-1,
+                        verbose=True):
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
@@ -56,9 +57,10 @@ def firesong_simulation(outputdir,
                                                  sigma=sigma)
 
     delta_gamma = 2-index
-    print_config(LF, Transient, timescale, Evolution, density, N_sample,
-                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
-                 mode=" - Calculating Neutrino CDFs ")
+    if verbose:
+        print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                    luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                    mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here
@@ -71,9 +73,17 @@ def firesong_simulation(outputdir,
                    for i in range(0, len(redshift_bins))]
     invCDF = InverseCDF(redshift_bins, RedshiftPDF)
 
-    out = output_writer(outputdir, filename)
-    out.write_header(LF, Transient, timescale, fluxnorm,
-                     delta_gamma, luminosity)
+    if filename is None:
+        results = {}
+        results['header'] = {'LF': LF, 'Transient': Transient, 
+            'timescale': timescale, 'fluxnorm': fluxnorm, 
+            'delta_gamma': delta_gamma,
+            'luminosity': luminosity}
+        sources = {}
+    else:
+        out = output_writer(outputdir, filename)
+        out.write_header(LF, Transient, timescale, fluxnorm,
+                        delta_gamma, luminosity)
 
     # IMPORTANT notice, in the following "flux" means fluence in
     # Transient mode, but flux in steady source mode,
@@ -96,7 +106,12 @@ def firesong_simulation(outputdir,
     if Transient:
         fluxes = population.fluence2flux(fluxes, zs)
 
-    out.write(declins, zs, fluxes)
+    if filename is None:
+        sources['dec'] = declins
+        sources['flux'] = fluxes
+        sources['z'] = zs
+    else:
+        out.write(declins, zs, fluxes)
 
     # For transient source, we calculate the total fluence from all sources,
     # then obtain the diffuse flux by doing a time average over a year
@@ -104,10 +119,17 @@ def firesong_simulation(outputdir,
         TotalFlux = TotalFlux / population.yr2sec
     TotalFlux /= 4*np.pi  # give in per sr
 
-    out.finish(TotalFlux)
-    print("Actual diffuse flux simulated :")
-    log = "E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]"
-    print(log.format(**locals()))
+    if filename is None:
+        results['total_flux'] = TotalFlux
+        results['sources'] = sources
+    else:
+        out.finish(TotalFlux)
+    if verbose:
+        print("Actual diffuse flux simulated :")
+        log = "E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]"
+        print(log.format(**locals()))
+    if filename is None:
+        return results
 
 if __name__ == "__main__":
     outputdir = get_outputdir()

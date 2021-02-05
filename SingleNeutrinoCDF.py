@@ -30,7 +30,8 @@ def calc_NeutrinoCDF(outputdir,
                      sigma=1.0,
                      luminosity=0.0,
                      emin=1e4,
-                     emax=1e7):
+                     emax=1e7,
+                     verbose=True):
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
@@ -54,9 +55,10 @@ def calc_NeutrinoCDF(outputdir,
                                                  sigma=sigma)
 
     delta_gamma = 2-index
-    print_config(LF, Transient, timescale, Evolution, density, N_sample,
-                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
-                 mode=" - Calculating Neutrino CDFs ")
+    if verbose:
+        print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                    luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                    mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here
@@ -75,12 +77,29 @@ def calc_NeutrinoCDF(outputdir,
     NeutrinoCDF = np.cumsum(NeutrinoPDF)
     NeutrinoCDF = NeutrinoCDF / NeutrinoCDF[-1]
 
-    out = output_writer_CDF(outputdir, filename)
-    out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
+    if filename is None:
+        results = {}
+        results['header'] = {'LF': LF, 'Transient': Transient, 
+            'timescale': timescale, 'fluxnorm': fluxnorm, 
+            'delta_gamma': delta_gamma,
+            'luminosity': luminosity}
+        cdf = {'z': [], 'flux': [], 'nu_cdf': []}
+    else:
+        out = output_writer_CDF(outputdir, filename)
+        out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
     for z, nuCDF in zip(redshift_bins, NeutrinoCDF):
         flux = population.Lumi2Flux(luminosities, index, emin, emax, z)
-        out.write(z, flux, nuCDF)
-    out.finish()
+        if filename is None:
+            for key, val in [('z', z), ('flux', flux), ('nu_cdf', nuCDF)]:
+                cdf[key].append(val)
+        else:
+            out.write(z, flux, nuCDF)
+    
+    if filename is None:
+        results['cdf'] = cdf
+        return results
+    else:
+        out.finish()
 
 if __name__ == "__main__":
     outputdir = get_outputdir()
