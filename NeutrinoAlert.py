@@ -32,7 +32,8 @@ def calc_NeutrinoAlert(outputdir,
                        luminosity=0.0,
                        emin=1e4,
                        emax=1e7,
-                       AlertNumber=1):
+                       AlertNumber=1,
+                       verbose=True):
     if Transient:
         population = TransientSourcePopulation(cosmology,
                                                get_evolution(Evolution),
@@ -55,15 +56,24 @@ def calc_NeutrinoAlert(outputdir,
                                                  sigma=sigma)
 
     delta_gamma = 2-index
-    print_config(LF, Transient, timescale, Evolution, density, N_sample,
-                 luminosity, fluxnorm, delta_gamma, zmax, luminosity,
-                 mode=" - Calculating Neutrino CDFs ")
+    if verbose:
+        print_config(LF, Transient, timescale, Evolution, density, N_sample,
+                    luminosity, fluxnorm, delta_gamma, zmax, luminosity,
+                    mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here
     ##################################################
-    out = output_writer(outputdir, filename)
-    out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
+    if filename is None:
+        results = {}
+        results['header'] = {'LF': LF, 'Transient': Transient, 
+            'timescale': timescale, 'fluxnorm': fluxnorm, 
+            'delta_gamma': delta_gamma,
+            'luminosity': luminosity}
+        alerts = {'z': [], 'dec': [], 'flux': []}
+    else:
+        out = output_writer(outputdir, filename)
+        out.write_header(LF, Transient, timescale, fluxnorm, delta_gamma, luminosity)
 
     # Generate a histogram to store redshifts.
     # Default: Starts at z = 0.0005 and increases in steps of 0.001
@@ -77,7 +87,7 @@ def calc_NeutrinoAlert(outputdir,
         NeutrinoPDF_z = [population.RedshiftDistribution(z)*((1+z)/(1+z0))**(-index+2)/(population.LuminosityDistance(z)**2.) for z in redshift_bins]
     invCDF = InverseCDF(redshift_bins, NeutrinoPDF_z)
 
-    for i in range(0, options.AlertNumber):
+    for i in range(0, AlertNumber):
         z = invCDF.sample()
         # Random declination over the entire sky
         sinDec = 2 * np.random.rand() - 1
@@ -87,8 +97,17 @@ def calc_NeutrinoAlert(outputdir,
         if Transient:
           flux = population.fluence2flux(flux, z)
 
-        out.write(declin, z, flux)
-    out.finish()
+        if filename is None:
+            for key, val in [('z', float(z)), ('dec', declin), ('flux', flux)]:
+                alerts[key].append(val)
+        else:
+            out.write(declin, z, flux)
+
+    if filename is None:
+        results['alerts'] = alerts
+        return results
+    else:
+        out.finish()
 
 if __name__ == "__main__":
     outputdir = get_outputdir()
