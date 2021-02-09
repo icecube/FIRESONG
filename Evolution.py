@@ -197,7 +197,7 @@ class SourcePopulation(object):
         if index != 2.0:
             integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
         else:
-            integral = np.log(u_lim) - np.log(l_lim)
+            integral = np.log(u_lim/l_lim)
         return E0**index * integral
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
@@ -378,7 +378,7 @@ class LuminosityEvolution(object):
         if index != 2.0:
             integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
         else:
-            integral = np.log(u_lim) - np.log(l_lim)
+            integral = np.log(u_lim/l_lim)
         return E0**index * integral
 
 class HardingAbazajian(LuminosityEvolution):
