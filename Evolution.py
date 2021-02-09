@@ -192,12 +192,11 @@ class SourcePopulation(object):
 
     def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
         """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
-        l_lim = emin/(1.+z)
-        u_lim = emax/(1.+z)
         if index != 2.0:
-            integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
+            denom = (1+z)**(index-2)
+            integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
         else:
-            integral = np.log(u_lim/l_lim)
+            integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
@@ -373,12 +372,11 @@ class LuminosityEvolution(object):
 
     def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
         """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
-        l_lim = emin/(1.+z)
-        u_lim = emax/(1.+z)
         if index != 2.0:
-            integral = (u_lim**(2-index)-l_lim**(2-index)) / (2-index)
+            denom = (1+z)**(index-2)
+            integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
         else:
-            integral = np.log(u_lim/l_lim)
+            integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral
 
 class HardingAbazajian(LuminosityEvolution):
