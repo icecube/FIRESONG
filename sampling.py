@@ -21,8 +21,9 @@ class InverseCDF(object):
 
         self.rng = np.random.RandomState(seed)
         cdf = np.cumsum(pdf)/np.sum(pdf)
-        mask = np.diff(cdf) > 0
-        self.invCDF = interp1d(cdf[1:][mask], x[1:][mask] + (x[1]-x[0])/2., kind='linear')
+        mask = np.diff(cdf, prepend=0) > 0
+        self.invCDF = interp1d(cdf[mask], x[mask], kind='linear',
+                               bounds_error=False, fill_value='extrapolate')
 
     def __call__(self, x):
         x = np.atleast_1d(x)
