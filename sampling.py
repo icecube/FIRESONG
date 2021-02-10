@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import interp1d
 
 
 class InverseCDF(object):
@@ -21,12 +21,14 @@ class InverseCDF(object):
 
         self.rng = np.random.RandomState(seed)
         cdf = np.cumsum(pdf)/np.sum(pdf)
-        mask = np.diff(cdf) > 0
-        self.invCDF = UnivariateSpline(cdf[1:][mask], x[1:][mask] + (x[1]-x[0])/2., k=1, s=0)
+        mask = np.diff(cdf, prepend=0) > 0
+        self.invCDF = interp1d(cdf[mask], x[mask], kind='linear',
+                               bounds_error=False, fill_value='extrapolate')
 
     def __call__(self, x):
+        x = np.atleast_1d(x)
         """ Returns the inverse CDF at point(s) x """
-        if any(np.atleast_1d(x) < 0) or any(np.atleast_1d(x) > 1):
+        if any(x < 0) or any(x > 1):
             raise ValueError("x out of bounds. x has to be in range 0..1")
         return self.invCDF(x)
 
