@@ -194,7 +194,7 @@ class SourcePopulation(object):
         """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
         if index != 2.0:
             denom = (1+z)**(index-2)
-            integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
+            integral = denom * (emax**(2-index)-emin**(2-index)) / (2-index)
         else:
             integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral
