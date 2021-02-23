@@ -21,9 +21,17 @@ class InverseCDF(object):
 
         self.rng = np.random.RandomState(seed)
         cdf = np.cumsum(pdf)/np.sum(pdf)
-        mask = np.diff(cdf, prepend=0) > 0
+
+        # Pad the arrays to ensure the cdf starts/ends at the right points
+        cdf = np.concatenate([[0,], cdf, [1,]])
+        x = np.concatenate([[x.min()-np.finfo(x.dtype).eps,],
+                            x,
+                            [x.max()+np.finfo(x.dtype).eps,]])
+
+        # Also prepend a 0 here to ensure the shape stays the same
+        mask = np.diff(cdf, prepend=0) >= 0
         self.invCDF = interp1d(cdf[mask], x[mask], kind='linear',
-                               bounds_error=False, fill_value='extrapolate')
+                               bounds_error=False, fill_value=(x.min(), x.max()))
 
     def __call__(self, x):
         x = np.atleast_1d(x)
