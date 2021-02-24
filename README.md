@@ -14,7 +14,7 @@ Proc. of the 35th International Cosmic Ray Conference (ICRC2017),
 Bexco, Busan, Korea.
 
 # Instructions
-Set up the enviromental error FIRESONG so
+Set up the enviromental error FIRESONG so (say bash)
 export FIRESONG=/location/of/firesong/
 
 This is needed to read data files (e.g. exposure data from IceCube)
@@ -25,18 +25,8 @@ Several scripts are provided:
   the Universe according to the parameters provided (e.g. local
   neutrino source density). The transient functionality has not been
   tested. 
-* NeutrinoAlert.py - Generates a list of neutrinos that have the
-  proper statisitical properties of neutrino alerts produced by
-  IceCube. Currently this has ONLY been tested for Standard Candle
-  Sources.
 * FluxPDF.py - Generated the flux probability density distribution of a 
   source.
-* CTA/CTA-Firesong.py - Reads in neutrinos generated with
-  NeutrinoAlert.py and calculates a significance for 0.5, 5 and 50
-  hour observation. Currenly only CTA-North is implemented. Though
-  adding CTA-South is straight forward.
-* CTA/CTA-Sensitivity.py - Command line version of CTA/CTA-Firesong.py
-  but for a single source and a single observation time. 
 
 # Tests
 All unittest could be run by
@@ -80,8 +70,6 @@ Added the option [--L] to specify luminosity for source. Please input the lumino
 v1.0 - May 3, 2017
 Public Release
 
-
-
 v0.2 - beta - January 9, 2017
 Major functionality is in place. 
 
@@ -92,8 +80,6 @@ There are two modes of operation:
 Firesong.py : It creates a random instance of all the neutrino sources in the Universe. Steady sources have been the most tested. Transient source functionality is present, but not verified. All luminosity functions and evolution options have been tested
 NeutrinoAlert.py : The desired number of IceCube detected neutrinos can be simulated. Steady sources have been the most tested. Transient source functionality is present, but not verified. Currently it only works with standard candle sources.
 The CTA/ folder provides an example use case of the output of NeutrinoAlert.py
-
-
 
 v0.1 - alpha - December 16, 2016
 Major functionality is in place.
@@ -106,5 +92,3 @@ end of the run. Data I/O is a major limitation for the code at high
 densities and with many simultanous runs in the cluster. This needs
 to be fixed before beta.
 
-# Desired changes
-* Make CTA/CTA-Sensitivity.py into a module that can be imported into CTA/CTA-Firesong.py
