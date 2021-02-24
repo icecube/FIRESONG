@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+"""Calculates features of various cosmic evolution models"""
+
 import numpy as np
 import scipy
 import cosmolopy
@@ -7,6 +9,17 @@ cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
 
 
 def get_evolution(evol):
+    """
+    Get specific evolution model
+
+    Args: 
+        evol (str): Name of evolution model, options are "NoEvolution",
+            "HB2006SFR", "YMKBH2008SFR", "CC2015SNR", "MD2014SFR". See specific
+            classes for more details of each model
+
+    Returns:
+        Evolution: relevant Evolution object
+    """
     evolutions = {"NoEvolution": NoEvolution,
                   "HB2006SFR": HopkinsBeacom2006StarFormationRate,
                   "YMKBH2008SFR": YukselEtAl2008StarFormationRate,
@@ -20,6 +33,9 @@ def get_evolution(evol):
     return evolutions[evol]()
 
 class Evolution(object):
+    """
+    Abstract class to handle all evolution models
+    """
     def __init__(self):
         pass
 
@@ -31,15 +47,39 @@ class Evolution(object):
 
 
 class NoEvolution(Evolution):
+    """
+    Evolution model that is flat over cosmic history
+    """
     def parametrization(self, x):
         return 1.
 
 
 class HopkinsBeacom2006StarFormationRate(Evolution):
-    """ StarFormationHistory (SFR), from Hopkins and Beacom 2006,
-    unit = M_sun/yr/Mpc^3 """
+    """ 
+    StarFormationHistory (SFR), from Hopkins and Beacom 2006,
+    unit = M_sun/yr/Mpc^3 
+
+    Model is a piecewise linear fit with the following segments in
+    log10(1+z) - log10(rho) space:
+    intercepts      slopes          domain
+    ----------      ------          ------
+    -1.82           3.28            z <= 1.04
+    -0.724          -0.26           1.04 <= z <= 4.48
+    4.99            -8.0            4.48 <= z
+
+    Reference: doi:10.1086/506610
+    """
 
     def parametrization(self, x):
+        """
+        Star formation rate at a given redshift
+
+        Args:
+            x (array or float): 1 + z values
+
+        Returns:
+            Array or float: Star formation rate
+        """
         x = np.atleast_1d(x)
         result = np.zeros_like(x)
         m0 = x < 0.30963
@@ -53,14 +93,35 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
         return result
 
 class YukselEtAl2008StarFormationRate(Evolution):
-    """ Star Formation Rate in units of M_sun/yr/Mpc^3
-    arXiv:0804.4008  Eq.5
+    """ 
+    Star Formation Rate in units of M_sun/yr/Mpc^3
+
+    Model is a continuous broken power law,
+    $$ \dot{\rho}_{*}(z)=\dot{\rho}_{0}\left[(1+z)^{a \eta}
+    +\left(\frac{1+z}{B}\right)^{b \eta}
+    +\left(\frac{1+z}{C}\right)^{c \eta}\right]^{1 / \eta} $$
+
+    with a = 3.4, b=-0.3, c=-3.5, B=5160.63662037,
+    C=9.06337604231, $\dot{\rho}$=0.02, eta=10
+
+    The given function results in breaks around z=1,4
+
+    Reference: arXiv:0804.4008  Eq.5
     """
 
     def __call__(self, z):
         return self.parametrization(1.+z)
 
     def parametrization(self, x):
+        """
+        Star formation rate at a given redshift
+
+        Args:
+            x (array or float): 1 + z values
+
+        Returns:
+            Array or float: Star formation rate
+        """
         a = 3.4
         b = -0.3
         c = -3.5
@@ -76,15 +137,32 @@ class YukselEtAl2008StarFormationRate(Evolution):
                      (x/C)**(c*eta))**(1./eta)
 
 class CandelsClash2015SNRate(Evolution):
-    """This is the implied SRF from Goods/Candels/Clash (2015)
+    """
+    This is the implied SFR from Goods/Candels/Clash (2015)
     derive from CC SNe rate and assuming one rate is proportional to the other.
     They use the same functional form as Madau and Dickinson (2014)
-    unit = M_sun/yr/Mpc^3 """
+    unit = M_sun/yr/Mpc^3 
+
+    Model takes the functional form of 
+    $$ \psi(z)=\frac{A(1+z)^{C}}{((1+z) / B)^{D}+1} $$
+    with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1
+
+    Reference: arXiv:1509.06574
+    """
     
     def __call__(self, z):
         return self.parametrization(1.+z)
     
     def parametrization(self, x):
+        """
+        Star formation rate at a given redshift
+
+        Args:
+            x (array or float): 1 + z values
+
+        Returns:
+            Array or float: Star formation rate
+        """
         a = 0.015
         b = 1.5
         c = 5.0
@@ -94,13 +172,30 @@ class CandelsClash2015SNRate(Evolution):
 
 
 class MadauDickinson2014CSFH(Evolution):
-    """ StarFormationHistory (SFR), from Madau and Dickinson (2014),
-    unit = M_sun/yr/Mpc^3 """
+    """ 
+    StarFormationHistory (SFR), from Madau and Dickinson (2014),
+    unit = M_sun/yr/Mpc^3 
+
+    Model takes the same functional form as Candels/Clash,  
+    $$ \psi(z)=\frac{A(1+z)^{C}}{((1+z) / B)^{D}+1} $$,
+    but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6
+
+    Reference: arXiv:1403.0007
+    """
 
     def __call__(self, z):
         return self.parametrization(1.+z)
         
     def parametrization(self, x):
+        """
+        Star formation rate at a given redshift
+
+        Args:
+            x (array or float): 1 + z values
+
+        Returns:
+            Array or float: Star formation rate
+        """
         a = 0.015
         b = 2.7
         c = 2.9
@@ -110,7 +205,28 @@ class MadauDickinson2014CSFH(Evolution):
 
 
 class SourcePopulation(object):
+    """
+    Given an evolution to follow, create a population
+    of neutrino sources
+
+    Args:
+        cosmology (dict): kwargs to pass to cosmolopy, defaults are
+            'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678
+        evolution (Evolution instance): Evolution model for neutrino
+            source population
+
+    Attrbitues:
+        _zlocal (float): Describes limit of nearby sources
+        Mpc2cm (float): Conversion factor
+        GeV_per_sec_2_ergs_per_year (float): Conversion factor
+        evolution (Evolution): Evolution model for neutrino source population
+        cosmology (cosmolopy instance)
+    """
+
     def __init__(self, cosmology, evolution):
+        """
+        Constructor
+        """
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                     # Mpc / cm
         self.GeV_per_sec_2_ergs_per_year = 50526.  # (GeV/sec) / (ergs/yr)
@@ -120,18 +236,49 @@ class SourcePopulation(object):
         self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
 
     def RedshiftDistribution(self, z):
-        """ can remove 4*pi becaue we just use this in a normalized way """
+        """ 
+        Provides the unnormalized PDF of number of sources vs. redshift
+        by multiplying the $dN/dz = d\rho/dz * dV/dz$
+        Note: can remove 4*pi becaue we just use this in a normalized way 
+
+        Args:
+            z (array or float): Redshift values
+
+        Returns
+            Array of float: Unnormalized PDF of number vs. redshift
+        """
         return 4 * np.pi * self.evolution(z) * \
             cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
 
     def RedshiftIntegral(self, zmax):
-        """ $$ \int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
-        \,\mathrm{d}V_c(z) \,\mathrm{d}z $$ """
+        """ 
+        Integrates the redshift distribution to find the total
+        number of sources (before accounting for density) out to zmax
+
+        $$ \int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
+        \,\mathrm{d}V_c(z) \,\mathrm{d}z $$ 
+
+        Args:
+            zmax (float): upper bound of integral
+
+        Returns:
+            float: Number of sources from z=0 to z=zmax
+        """
 
         integrand = lambda z: self.RedshiftDistribution(z)
         return scipy.integrate.quad(integrand, 0, zmax)[0]
 
     def LuminosityDistance(self, z):
+        """
+        Convert redshift to luminosity distance.
+        If passing many redshifts, a 1d spline is used as cosmolopy can be slow
+
+        Args:
+            z (array or float): redshift(s)
+
+        Returns:
+            array or float: Luminosity distance(s) in Mpc
+        """
         # Wrapper function - so that cosmolopy is only imported here.
         if np.ndim(z) > 0:
             if len(z) > 1000:
@@ -149,6 +296,13 @@ class SourcePopulation(object):
         \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
         V_c(z) \,\mathrm{d}z}{\int_0^{0.01}
         \frac{\mathrm{d}N}{\mathrm{d}z} V_c(z) \,\mathrm{d}z} $$
+
+        Args:
+            density (float): local density of neutrino sources in Mpc^-3
+            zmax (float): Maximal redshift to consider
+
+        Returns:
+            float: total number of sources within z_max
         """
         vlocal = cosmolopy.distance.comoving_volume(self._zlocal,
                                                     **self.cosmology)
@@ -159,13 +313,26 @@ class SourcePopulation(object):
 
     def Flux2Lumi(self, fluxnorm, index, emin, emax, z=1, E0=1e5):
         """
+        Converts a flux to a luminosity
+
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
         \mathrm{d}E\,4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluxnorm units are []
+        fluxnorm units are [UNITS]
+
+        Args:
+            fluxnorm (array or float): Flux of a source in UNITS
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+
+        Returns:
+            float: luminosity in ergs/yr
         """
         flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         luminosity = fluxnorm / E0**2. * flux_integral *  \
@@ -175,14 +342,26 @@ class SourcePopulation(object):
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
         """
+        Converts a luminosity to a flux
+
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
         \mathrm{d}E\,4\pi d_L^2(z=1) $$
 
-        Lumi given in ergs/yr
         Note fluxnorm is E0^2*fluxnorm
-        fluxnorm units are []
+        fluxnorm units are [UNITS]
+
+        Args:
+            luminosity (array or float): luminosity of sources in ergs/yr
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+        
+        Returns:
+            fluxnorm (array or float): flux of source(s) in UNITS
         """
         flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         fluxnorm = luminosity / 4. / np.pi / \
@@ -191,7 +370,21 @@ class SourcePopulation(object):
         return fluxnorm
 
     def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
-        """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
+        """ 
+        Calculates energy content in a neutrino flux
+
+        $$integ_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE$$ 
+        
+        Args:
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+
+        Returns:
+            float: Energy flux between emin and emax
+        """
         if index != 2.0:
             denom = (1+z)**(index-2)
             integral = denom * (emax**(2-index)-emin**(2-index)) / (2-index)
@@ -200,12 +393,27 @@ class SourcePopulation(object):
         return E0**index * integral
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
-        """ $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
+        """ 
+        Given a total diffuse neutrino flux, calculate the individual 
+        flux contribution from a single source
+        
+        $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
         {N_\mathrm{tot}\,d_L^2(z=1)\, \int_0^{10}
         \frac{ (1+z)^{-\gamma+2} }{d_L(z)^2}
         \frac{\frac{\mathrm{d}N}{\mathrm{d}z} V_c(z)}
         { \int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z'}
         V_c(z') \,\mathrm{d}z'} \,\mathrm{d}z} $$
+
+        Args:
+            fluxnorm (float): diffuse astrophysical neutrino flux in UNITS
+            density (float): local density of neutrino sources in Mpc^-3
+            zmax (float): Maximum redshift considered
+            index (float): Spectral index of the flux
+            z0 (float, optional, default=1.): Redshift of the source in 
+                question
+
+        Returns:
+            float: fluxnorm of a source at redshift z0
         """
         norm = self.RedshiftIntegral(zmax)
         Ntotal = self.Nsources(density, zmax)
@@ -223,7 +431,22 @@ class SourcePopulation(object):
 
     def StandardCandleLuminosity(self, fluxnorm, density, zmax, index,
                                  emin, emax, E0=1e5):
-        """ """
+        """ 
+        Calculates the standard candle luminosity that characterizes a 
+        population of sources which have a fixed total flux
+
+        Args:
+            fluxnorm (float): diffuse astrophysical neutrino flux in UNITS
+            density (float): local density of neutrino sources in Mpc^-3
+            zmax (float): Maximum redshift considered
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            E0 (float, optional, default=1): pivot energy in GeV
+
+        Returns:
+            float: characteristic luminosity of the population
+        """
 
         flux = self.StandardCandleSources(fluxnorm, density, zmax, index, z0=1)
         luminosity = self.Flux2Lumi(flux, index, emin, emax, z=1, E0=E0)
