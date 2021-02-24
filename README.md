@@ -29,10 +29,6 @@ Several scripts are provided:
   proper statisitical properties of neutrino alerts produced by
   IceCube. Currently this has ONLY been tested for Standard Candle
   Sources.
-* SingleNeutrinoCDF.py - Generates the cummulative distribution
-  function of a neutrino alert vs. redshift. This has ONLY been tested
-  for Standard Candle sources, so it is equivalent to CDF of neutrino
-  alert vs. flux.
 * FluxPDF.py - Generated the flux probability density distribution of a 
   source.
 * CTA/CTA-Firesong.py - Reads in neutrinos generated with
@@ -46,19 +42,19 @@ Several scripts are provided:
 All unittest could be run by
 
 ```
-python -m unittest discover ./
+python -m unittest discover tests/
 ```
 
 If you want to run a test for a certain file seperatly user either
 
 ```
-python -m unittest test_<...>
+python -m unittest tests/test_<...>
 ```
 
 or 
 
 ```
-python test_<...>.py
+python tests/test_<...>.py
 ```
 
 # Authors as of May 3, 2017
