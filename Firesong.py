@@ -1,13 +1,12 @@
 #!/usr/bin/python
-# Authors: Chris Tung
-#          Ignacio Taboada
-#
 
-# General imports
-#from __future__ import division
+"""The main module for simulating neutrino sources."""
+
+
 import argparse
-# Numpy / Scipy
+
 import numpy as np
+
 # Firesong code
 from Evolution import get_evolution, SourcePopulation
 from Evolution import TransientSourcePopulation, cosmology
@@ -32,8 +31,45 @@ def firesong_simulation(outputdir,
                         emin=1e4,
                         emax=1e7,
                         seed=None,
-                        zNEAR=-1,
                         verbose=True):
+    """
+    Simulate a universe of neutrino sources
+
+    Args:
+        outputdir (str or None): path to write output. If None, return results
+            without writing a file
+        filename (str or None): name of the output file. If None, return 
+            results without writing a file
+        density (float, optional, default=1e-9): local density of neutrino
+            sources. Units of Mpc^-3 (Mpc^-3 yr^-1 if Transient=True)
+        Transient (bool, optional, default=False): If true, simulate 
+            transient neutrino sources instead of steady sources
+        timescale (bool, optional, default=1000): Timescale in seconds
+            for transient sources
+        zmin (float, optional, default=0.0005): Closest redshift to consider
+        zmax (float, optional, default=10.): Farthest redshift to consider
+        bins (int, optional, default=1000): Number of bins used when creating
+            the redshift PDF
+        fluxnorm (float, optional, default=0.9e-8): Normalization on the total
+            astrophysical diffuse flux, E^2d\Phi/dE. Units of GeV s^-1 sr^-1
+        index (float, optional, default=2.13): Spectral index of diffuse flux
+        LF (string, optional, default="SC"): Luminosity function, choose 
+            between standard candle (SC), LogNormal (LG)
+        sigma (float, optional, default=1.0): Width of lognormal distribution
+            if LF="LG"
+        luminosity (float, optional, default=0.0): Manually fix the 
+            luminosity of sources if not equal to 0. Overrides fluxnorm. 
+            Units of erg/yr
+        emin (float, optional, default=1e4): Minimum neutrino energy in GeV
+        emax (float, optional, default=1e7): Maximum neutrino energy in GeV
+        seed (int or None, optional, default=None): random number seed
+        verbose (bool, optional, default=True): print simulation paramaters
+            if True else suppress printed output
+
+    Returns:
+        dict: keys contain simulation results, including the input params
+            as well as the sources. Only returned if filename is None
+    """
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
@@ -89,7 +125,7 @@ def firesong_simulation(outputdir,
     # Transient mode, but flux in steady source mode,
     # until TotalFlux(TotalFluence) is calculated
     
-    # sample source
+    # sample sources
     zs = invCDF(rng.uniform(low=0.0, high=1.0, size = N_sample))
     lumis = luminosity_function.sample_distribution(nsources=N_sample, rng=rng)
     if np.ndim(lumis) < 1:
@@ -113,7 +149,7 @@ def firesong_simulation(outputdir,
     else:
         out.write(declins, zs, fluxes)
 
-    # For transient source, we calculate the total fluence from all sources,
+    # For transient sources, we calculate the total fluence from all sources,
     # then obtain the diffuse flux by doing a time average over a year
     if Transient:
         TotalFlux = TotalFlux / population.yr2sec
@@ -167,9 +203,6 @@ if __name__ == "__main__":
     parser.add_argument("--L", action="store",
                         dest="luminosity", type=float, default=0.0,
                         help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
-    parser.add_argument("--zNEAR", action="store", dest="zNEAR",
-                        type=float, default=-1,
-                        help="Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.")
     options = parser.parse_args()
 
     firesong_simulation(outputdir,
@@ -183,5 +216,4 @@ if __name__ == "__main__":
                         index=options.index,
                         LF=options.LF,
                         sigma=options.sigma,
-                        luminosity=options.luminosity,
-                        zNEAR=options.zNEAR)
+                        luminosity=options.luminosity)
