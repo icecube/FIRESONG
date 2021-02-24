@@ -215,7 +215,7 @@ class SourcePopulation(object):
         evolution (Evolution instance): Evolution model for neutrino
             source population
 
-    Attrbitues:
+    Attributes:
         _zlocal (float): Describes limit of nearby sources
         Mpc2cm (float): Conversion factor
         GeV_per_sec_2_ergs_per_year (float): Conversion factor
@@ -454,12 +454,44 @@ class SourcePopulation(object):
 
 
 class TransientSourcePopulation(SourcePopulation):
+    """
+    Given an evolution to follow, create a population
+    of neutrino sources that only emit for a finite period of time
+
+    See also: SourcePopulation
+
+    Args:
+        cosmology (dict): kwargs to pass to cosmolopy, defaults are
+            'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678
+        evolution (Evolution instance): Evolution model for neutrino
+            source population
+        timescale (float): Duration (in seconds) of emission
+
+    Attributes:
+        timescale (float): Duration (in seconds) of emission
+        yr2sec (float): Conversion factor
+    """
+
     def __init__(self, cosmology, evolution, timescale):
+        """
+        Constructor
+        """
         super(TransientSourcePopulation, self).__init__(cosmology, evolution)
         self.timescale = timescale
         self.yr2sec = 86400*365
 
     def RedshiftDistribution(self, z):
+        """
+        Provides the unnormalized PDF of number of sources vs. redshift
+        by multiplying the $dN/dz = d\rho/dz * dV/dz$. Corrects for 
+        time-dilation with extra factor of 1/1+z
+
+        Args:
+            z (array or float): Redshift values
+
+        Returns
+            Array of float: Unnormalized PDF of number vs. redshift
+        """
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
