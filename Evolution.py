@@ -49,7 +49,7 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
         result[m1] = np.power(10, -0.26*x[m1]-0.724)
         result[m2] = np.power(10, -8.0*x[m2]+4.99)
         if len(result) == 1:
-            return np.asscalar(result)
+            return result.item()
         return result
 
 class YukselEtAl2008StarFormationRate(Evolution):
