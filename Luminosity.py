@@ -1,18 +1,20 @@
 #!/usr/bin/python
 
+"""Classes to help with various luminosity functions"""
+
 # imports
 import numpy as np
 from scipy.stats import lognorm
 
 
 class LuminosityFunction(object):
-    """Abstract Luminosity Function class.
-    Defines the minimal requirements for a Luminosity Function class"""
+    """Luminosity Function class.
+    """
 
     def __init__(self, mean_luminosity):
         """Luminosity function.
 
-        Parameters:
+        Args:
             - mean luminosity (Not not median and not log(mean))
         """
         self.mean = mean_luminosity
@@ -35,7 +37,7 @@ class SC_LuminosityFunction(LuminosityFunction):
     def sample_distribution(self, nsources=None, rng=None):
         """ Samples from the Luminosity Function nsource times
 
-        Parameters:
+        Args:
             number of sources
         """
         return self.mean
@@ -43,7 +45,7 @@ class SC_LuminosityFunction(LuminosityFunction):
     def pdf(self, lumi):
         """ Gives the value of the PDF at lumi.
 
-        Parameters:
+        Args:
             lumi: float or array-like, point where PDF is evaluated.
 
         Notes:
@@ -64,7 +66,7 @@ class SC_LuminosityFunction(LuminosityFunction):
     def cdf(self, lumi):
         """ Gives the value of the CDF at lumi.
 
-        Parameters:
+        Args:
             lumi: float or array-like, point where CDF is evaluated.
 
         Notes:
@@ -86,7 +88,7 @@ class LG_LuminosityFunction(LuminosityFunction):
     def __init__(self, mean_luminosity, width):
         """ Log Normal Luminosity function.
 
-        Parameters:
+        Args:
             - mean luminosity (Not not median and not log(mean))
             - width in dex (width in log10)
 
@@ -105,7 +107,7 @@ class LG_LuminosityFunction(LuminosityFunction):
     def sample_distribution(self, nsources=None, rng=None):
         """ Samples from the Luminosity Function nsource times
 
-        Parameters:
+        Args:
             number of sources
         """
         if rng is None:
@@ -113,53 +115,49 @@ class LG_LuminosityFunction(LuminosityFunction):
         return rng.lognormal(self.mu, self.sigma, nsources)
 
     def pdf(self, lumi):
-        """ Gives the value of the PDF at lumi.
+        r""" Gives the value of the PDF at lumi.
 
-        Parameters:
+        Args:
             lumi: float or array-like, point where PDF is evaluated.
 
         Notes:
             PDF given by:
-                     1                 /     (ln(x) - mu)^2   \
-            -------------------- * exp | -  ----------------  |
-             x sigma sqrt(2 pi)        \       2 sigma^2      /
+
+            $$ \frac{1}{x\sigma \sqrt{2\pi}} \times 
+            \exp{-\frac{(\ln(x)-\mu)^2}{2\sigma^1}}$$
         """
         return np.exp(self.mu) * \
             lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf(self, lumi):
-        """ Gives the value of the CDF at lumi.
+        r""" Gives the value of the CDF at lumi.
 
-        Parameters:
+        Args:
             lumi: float or array-like, point where CDF is evaluated.
 
         Notes:
             CDF given by:
-             1     1       /  (ln(x) - mu)^2   \
-            --- + --- erf |  ----------------   |
-             2     2       \   sqrt(2) sigma   /
+
+            $$ \frac{1}{2} + \frac{1}{2} \times 
+            \mathrm{erf}\left( \frac{(\ln(x)-\mu)^2}{\sqrt{2}\sigma}\right)$$
         """
         return lognorm.cdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
 
 class PL_LuminosityFunction(LuminosityFunction):
-    """ Power-law distribution defined between x_min and x_max.
+    r""" Power-law distribution defined between x_min and x_max.
 
         PDF:
-                       (1-alpha)
-            ------------------------------------ * x^(-alpha)
-            (x_max^(1-alpha) - x_min^(1-alpha))
-
+        $$\frac{1-\alpha}{x_{max}^{1-\alpha}-x_{min}^{1-\alpha}}\times
+        x^{-\alpha}$$
 
         CDF:
-              x^(1-alpha) - x_min^(1-alpha)
-            ---------------------------------
-            x_max^(1-alpha) - x_min^(1-alpha)
-
+        $$\frac{x^{1-\alpha}-x_{min}^{1-\alpha}}
+        {x_{max}^{1-\alpha}-x_{min}^{1-\alpha}}$$
 
         inv.CDF:
-            P^-1(x) = (x_min^beta + (x_max^beta -x_min^beta)*x)^(1/beta)
-
+        $$ P^{-1}(x) = (x_{min}^{\beta} + (x_{max}^{\beta}
+         -x_{min}^{\beta})*x)^{1/\beta}$$
 
         Formulars from: http://up-rs-esp.github.io/bpl/
         and: Clauset, A., Shalizi, C. R., Newman, M. E. J.
@@ -189,7 +187,7 @@ class PL_LuminosityFunction(LuminosityFunction):
     def sample_distribution(self, nsources=None, rng=None):
         """Samples from the Luminosity Function nsource times
 
-        Parameters:
+        Args:
             number of sources
         """
         if rng is None:
@@ -200,16 +198,15 @@ class PL_LuminosityFunction(LuminosityFunction):
                                    self.Fmin**beta)*x)**(1./beta)
 
     def pdf(self, lumi):
-        """Gives the value of the PDF at lumi.
+        r"""Gives the value of the PDF at lumi.
 
-        Parameters:
+        Args:
             lumi: float or array-like, point where PDF is evaluated.
 
         Notes:
             PDF given by:
-                       (1-alpha)
-            ------------------------------------ * x^(-alpha)
-            (x_max^(1-alpha) - x_min^(1-alpha))
+            $$\frac{1-\alpha}{x_{max}^{1-\alpha}-x_{min}^{1-\alpha}}
+            \times x^{-\alpha}$$
         """
 
         norm = (1+self.index)/(self.Fmax**(1+self.index) -
@@ -219,16 +216,15 @@ class PL_LuminosityFunction(LuminosityFunction):
         return pdf
 
     def cdf(self, lumi):
-        """Gives the value of the CDF at lumi.
+        r"""Gives the value of the CDF at lumi.
 
-        Parameters:
+        Args:
             lumi: float or array-like, point where CDF is evaluated.
 
         Note:
             CDF given by:
-             x^(1-alpha) - x_min^(1-alpha)
-            ---------------------------------
-            x_max^(1-alpha) - x_min^(1-alpha)
+            $$\frac{x^{1-\alpha}-x_{min}^{1-\alpha}}
+            {x_{max}^{1-\alpha}-x_{min}^{1-\alpha}}$$
         """
         return (lumi**(1+self.index) - self.Fmin**(1+self.index)) / \
                ((self.Fmax**(1+self.index) - self.Fmin**(1+self.index)))
@@ -241,7 +237,7 @@ def get_LuminosityFunction(mean_luminosity, LF, **kwargs):
         - LG - Log-Normal
         - PL - Power-Law
 
-    Parameters:
+    Args:
         - options: Namespace with LF and needed parameters to
                    construct luminosity function.
         - mean_luminosity: mean luminosity.

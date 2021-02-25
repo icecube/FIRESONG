@@ -1,4 +1,7 @@
 #!/usr/bin/python
+# Authors: Chris Tung
+#          Ignacio Taboada
+#
 
 """The main module for simulating neutrino sources."""
 
@@ -51,7 +54,7 @@ def firesong_simulation(outputdir,
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
         fluxnorm (float, optional, default=0.9e-8): Normalization on the total
-            astrophysical diffuse flux, E^2d\Phi/dE. Units of GeV s^-1 sr^-1
+            astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1
         index (float, optional, default=2.13): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose 
             between standard candle (SC), LogNormal (LG)

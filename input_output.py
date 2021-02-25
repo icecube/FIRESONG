@@ -1,4 +1,7 @@
 #!/usr/bin/python
+
+"""Classed to handle the writing of simulation results to files"""
+
 import re
 import os
 import gzip
@@ -23,7 +26,6 @@ class output_writer(object):
     """
     def __init__(self, outputdir, filename, zNEAR=0):
         """
-        Constructor
         """
         self.output = self.open_file(outputdir, filename)
         self.z_near = zNEAR

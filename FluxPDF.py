@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # Authors: Theo Glauch
-#
+
+"""Calculates the PDF of neutrino fluxes for a given set of parameters"""
 
 # General imports
 from __future__ import division
@@ -34,6 +35,56 @@ def flux_pdf(outputdir,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False,
              verbose=True):
+    """
+    Simulate a universe of neutrino sources and calculate the PDF of fluxes
+
+    Args:
+        outputdir (str or None): path to write output. If None, return results
+            without writing a file
+        filename (str or None): name of the output file. If None, return 
+            results without writing a file
+        density (float, optional, default=1e-9): local density of neutrino
+            sources. Units of Mpc^-3 (Mpc^-3 yr^-1 if Transient=True)
+        Transient (bool, optional, default=False): If true, simulate 
+            transient neutrino sources instead of steady sources
+        timescale (bool, optional, default=1000): Timescale in seconds
+            for transient sources
+        zmin (float, optional, default=0.0005): Closest redshift to consider
+        zmax (float, optional, default=10.): Farthest redshift to consider
+        bins (int, optional, default=1000): Number of bins used when creating
+            the redshift PDF
+        fluxnorm (float, optional, default=0.9e-8): Normalization on the total
+            astrophysical diffuse flux, E^2d Phi/dE. Units of GeV s^-1 sr^-1
+        index (float, optional, default=2.13): Spectral index of diffuse flux
+        LF (string, optional, default="SC"): Luminosity function, choose
+            between standard candle (SC), LogNormal (LG)
+        sigma (float, optional, default=1.0): Width of lognormal distribution
+            if LF="LG"
+        luminosity (float, optional, default=0.0): Manually fix the 
+            luminosity of sources if not equal to 0. Overrides fluxnorm. 
+            Units of erg/yr
+        emin (float, optional, default=1e4): Minimum neutrino energy in GeV
+        emax (float, optional, default=1e7): Maximum neutrino energy in GeV
+        LumiMin (float, optional, default=1e45): Minimum luminosity considered
+            in UNITS
+        LumiMin (float, optional, default=1e54): Max luminosity considered,
+            in UNITS
+        nLbins (int, optional, default=120): Number of luminosity bins
+        logFMin (float, optional, default=-10.): minimum log10 of flux to 
+            consider, in UNITS
+        logFMax (float, optional, default=6.): max log10 of flux to 
+            consider, in UNITS
+        nFluxBins (int, optional, default=200): Number of flux bins
+        with_dFdz (bool, optional, default=False): Include the derivative
+            of the flux pdf vs. redshift
+        verbose (bool, optional, default=True): print simulation paramaters
+            if True else suppress printed output
+
+    Returns:
+        tuple of arrays: Return lists of the fluxes and their counts,
+            equivalent to the counts in a histogram with fluxes as bin-edges.
+            Choice to include derivative of the PDF as well if with_dFdz
+    """
 
     if Transient:
         population = TransientSourcePopulation(cosmology,

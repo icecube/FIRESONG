@@ -12,7 +12,7 @@ def get_evolution(evol):
     """
     Get specific evolution model
 
-    Args: 
+    Args:
         evol (str): Name of evolution model, options are "NoEvolution",
             "HB2006SFR", "YMKBH2008SFR", "CC2015SNR", "MD2014SFR". See specific
             classes for more details of each model
@@ -61,11 +61,14 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
 
     Model is a piecewise linear fit with the following segments in
     log10(1+z) - log10(rho) space:
-    intercepts      slopes          domain
-    ----------      ------          ------
-    -1.82           3.28            z <= 1.04
-    -0.724          -0.26           1.04 <= z <= 4.48
-    4.99            -8.0            4.48 <= z
+
+    intercepts, slopes, domain: 
+    
+    -1.82, 3.28, z <= 1.04 
+
+    -0.724, -0.26, 1.04 <= z <= 4.48 
+
+    4.99, -8.0, 4.48 <= z
 
     Reference: doi:10.1086/506610
     """
@@ -93,8 +96,8 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
         return result
 
 class YukselEtAl2008StarFormationRate(Evolution):
-    """ 
-    Star Formation Rate in units of M_sun/yr/Mpc^3
+    r""" 
+    Star Formation Rate in units of $\frac{M_{sun}}{yr Mpc^3}$
 
     Model is a continuous broken power law,
     $$ \dot{\rho}_{*}(z)=\dot{\rho}_{0}\left[(1+z)^{a \eta}
@@ -137,7 +140,7 @@ class YukselEtAl2008StarFormationRate(Evolution):
                      (x/C)**(c*eta))**(1./eta)
 
 class CandelsClash2015SNRate(Evolution):
-    """
+    r"""
     This is the implied SFR from Goods/Candels/Clash (2015)
     derive from CC SNe rate and assuming one rate is proportional to the other.
     They use the same functional form as Madau and Dickinson (2014)
@@ -172,12 +175,12 @@ class CandelsClash2015SNRate(Evolution):
 
 
 class MadauDickinson2014CSFH(Evolution):
-    """ 
+    r""" 
     StarFormationHistory (SFR), from Madau and Dickinson (2014),
     unit = M_sun/yr/Mpc^3 
 
     Model takes the same functional form as Candels/Clash,  
-    $$ \psi(z)=\frac{A(1+z)^{C}}{((1+z) / B)^{D}+1} $$,
+    $$ \psi(z)=\frac{A(1+z)^{C}}{((1+z) / B)^{D}+1} $$
     but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6
 
     Reference: arXiv:1403.0007
@@ -225,7 +228,6 @@ class SourcePopulation(object):
 
     def __init__(self, cosmology, evolution):
         """
-        Constructor
         """
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                     # Mpc / cm
@@ -236,9 +238,9 @@ class SourcePopulation(object):
         self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
 
     def RedshiftDistribution(self, z):
-        """ 
+        r""" 
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $dN/dz = d\rho/dz * dV/dz$
+        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$
         Note: can remove 4*pi becaue we just use this in a normalized way 
 
         Args:
@@ -251,7 +253,7 @@ class SourcePopulation(object):
             cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
 
     def RedshiftIntegral(self, zmax):
-        """ 
+        r""" 
         Integrates the redshift distribution to find the total
         number of sources (before accounting for density) out to zmax
 
@@ -290,7 +292,7 @@ class SourcePopulation(object):
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def Nsources(self, density, zmax):
-        """ Total number of sources within $z_\mathrm{max}$:
+        r""" Total number of sources within $z_{\mathrm{max}}$:
 
         $$ N_\mathrm{tot} = \rho\cdot V_c(z=0.01)
         \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
@@ -312,13 +314,13 @@ class SourcePopulation(object):
         return Ntotal
 
     def Flux2Lumi(self, fluxnorm, index, emin, emax, z=1, E0=1e5):
-        """
+        r"""
         Converts a flux to a luminosity
 
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
-        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+        \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are [UNITS]
@@ -341,13 +343,13 @@ class SourcePopulation(object):
         return luminosity
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
-        """
+        r"""
         Converts a luminosity to a flux
 
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
-        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+        \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
         fluxnorm units are [UNITS]
@@ -370,10 +372,10 @@ class SourcePopulation(object):
         return fluxnorm
 
     def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
-        """ 
+        r""" 
         Calculates energy content in a neutrino flux
 
-        $$integ_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE$$ 
+        $$\int_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^{-index} dE$$ 
         
         Args:
             index (float): Spectral index of the flux
@@ -393,7 +395,7 @@ class SourcePopulation(object):
         return E0**index * integral
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
-        """ 
+        r""" 
         Given a total diffuse neutrino flux, calculate the individual 
         flux contribution from a single source
         
@@ -474,16 +476,15 @@ class TransientSourcePopulation(SourcePopulation):
 
     def __init__(self, cosmology, evolution, timescale):
         """
-        Constructor
         """
         super(TransientSourcePopulation, self).__init__(cosmology, evolution)
         self.timescale = timescale
         self.yr2sec = 86400*365
 
     def RedshiftDistribution(self, z):
-        """
+        r"""
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $dN/dz = d\rho/dz * dV/dz$. Corrects for 
+        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$. Corrects for 
         time-dilation with extra factor of 1/1+z
 
         Args:
@@ -495,7 +496,7 @@ class TransientSourcePopulation(SourcePopulation):
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
-        """ 
+        r""" 
         Given a total diffuse neutrino flux, calculate the individual 
         fluence contribution from a single standard candle source,
         given that the burst rate density is measured in per year
@@ -532,7 +533,7 @@ class TransientSourcePopulation(SourcePopulation):
         return fluence
 
     def Flux2Lumi(self, fluxnorm, index, emin, emax, z=1, E0=1e5):
-        """
+        r"""
         Converts a fluence to a luminosity. Transient sources require
         fluence to be divided by timescale so that luminosity has
         proper units
@@ -565,13 +566,13 @@ class TransientSourcePopulation(SourcePopulation):
         return luminosity / self.timescale
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
-        """
+        r"""
         Converts a luminosity to a fluence
 
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
-        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+        \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
         fluence units are [UNITS]
@@ -621,7 +622,7 @@ def get_LEvolution(le_model, lmin, lmax):
     Get specific LuminosityEvolution model (a luminosity distribution
     that is a function of z)
 
-    Args: 
+    Args:
         le_model (str): Name of luminosity-evolution model, only supported
             optioin is "HA2014BL"
         lmin (float): Minimum luminosity considered in UNITS
@@ -696,10 +697,10 @@ class LuminosityEvolution(object):
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def RedshiftDistribution(self, z):
-        """
+        r"""
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $dN/dz = d\rho(L,z)/dz * dV/dz$, accounting
-        for the luminosity dependence on z
+        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$, 
+        accounting for the luminosity dependence on z
 
         $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
 
@@ -761,11 +762,11 @@ class LuminosityEvolution(object):
         return self.luminosity_bins[index_2]
 
     def Nsources(self, zmax):
-        """
+        r"""
         Integrates full 2-dimensional source count distribution over 
             redshift and luminosity
 
-        $$ N_{tot} = \int_0^z_{max} P(z) dz$$ 
+        $$ N_{tot} = \int_0^{z_{max}} P(z) dz$$ 
 
         Args:
             zmax (float): Maximum redshift to consider
@@ -776,13 +777,13 @@ class LuminosityEvolution(object):
         return scipy.integrate.quad(lambda z: self.RedshiftDistribution(z), 0, zmax)[0]
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
-        """
+        r"""
         Converts a luminosity to a fluence
 
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
-        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+        \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
         fluence units are [UNITS]
@@ -805,10 +806,10 @@ class LuminosityEvolution(object):
         return fluxnorm
 
     def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
-        """ 
+        r""" 
         Calculates energy content in a neutrino flux
 
-        $$integ_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE$$ 
+        $$\int_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^{-index} dE$$ 
         
         Args:
             index (float): Spectral index of the flux
