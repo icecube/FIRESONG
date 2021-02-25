@@ -458,7 +458,7 @@ class TransientSourcePopulation(SourcePopulation):
     Given an evolution to follow, create a population
     of neutrino sources that only emit for a finite period of time
 
-    See also: SourcePopulation
+    See also: :class:`SourcePopulation`
 
     Args:
         cosmology (dict): kwargs to pass to cosmolopy, defaults are
@@ -495,10 +495,29 @@ class TransientSourcePopulation(SourcePopulation):
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
 
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
-        # For transient source, Fluxnorm will be the fluence of a
-        # standard candle at z=1, with unit GeV/cm^2 given that the
-        # burst rate density is measured in per year.
+        """ 
+        Given a total diffuse neutrino flux, calculate the individual 
+        fluence contribution from a single standard candle source,
+        given that the burst rate density is measured in per year
+        
+        $$ \Phi_{z=1}^{PS} = \frac{4 \pi \Phi_\mathrm{diffuse}}
+        {N_\mathrm{tot}\,d_L^2(z=1)\, \int_0^{10}
+        \frac{ (1+z)^{-\gamma+2} }{d_L(z)^2}
+        \frac{\frac{\mathrm{d}N}{\mathrm{d}z} V_c(z)}
+        { \int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z'}
+        V_c(z') \,\mathrm{d}z'} \,\mathrm{d}z} $$
 
+        Args:
+            fluxnorm (float): diffuse astrophysical neutrino flux in UNITS
+            density (float): local density of neutrino sources in Mpc^-3
+            zmax (float): Maximum redshift considered
+            index (float): Spectral index of the flux
+            z0 (float, optional, default=1.): Redshift of the source in 
+                question
+
+        Returns:
+            float: fluence of a source at redshift z0 in GeV/cm^2
+        """
         norm = self.RedshiftIntegral(zmax)
         Ntotal = self.Nsources(density, zmax)
         all_sky_flux = 4 * np.pi * fluxnorm * self.yr2sec
@@ -513,6 +532,30 @@ class TransientSourcePopulation(SourcePopulation):
         return fluence
 
     def Flux2Lumi(self, fluxnorm, index, emin, emax, z=1, E0=1e5):
+        """
+        Converts a fluence to a luminosity. Transient sources require
+        fluence to be divided by timescale so that luminosity has
+        proper units
+
+        $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
+        \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
+        \left(\frac{E}{E_0}\right)^{-\gamma}\,
+        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+
+        Note fluxnorm is E0^2*fluxnorm
+        fluxnorm units are [UNITS]
+
+        Args:
+            fluxnorm (array or float): Flux of a source in UNITS
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+
+        Returns:
+            float: luminosity in UNITS
+        """
         luminosity = super(TransientSourcePopulation, self).Flux2Lumi(fluxnorm,
                                                                       index,
                                                                       emin,
@@ -522,6 +565,28 @@ class TransientSourcePopulation(SourcePopulation):
         return luminosity / self.timescale
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
+        """
+        Converts a luminosity to a fluence
+
+        $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
+        \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
+        \left(\frac{E}{E_0}\right)^{-\gamma}\,
+        \mathrm{d}E\,4\pi d_L^2(z=1) $$
+
+        Note fluxnorm is E0^2*fluxnorm
+        fluence units are [UNITS]
+
+        Args:
+            luminosity (array or float): luminosity of sources in ergs/yr
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+        
+        Returns:
+            array or float: fluence of source(s) in UNITS
+        """
         flux = super(TransientSourcePopulation, self).Lumi2Flux(luminosity,
                                                                 index,
                                                                 emin,
@@ -531,6 +596,17 @@ class TransientSourcePopulation(SourcePopulation):
         return flux * self.timescale
 
     def fluence2flux(self, fluence, z):
+        """
+        Calculates flux measured on Earth, which is red-shifted fluence
+        divided by (1+z)*timescale
+
+        Args:
+            fluence (array or float): fluence of source(s) in UNITS
+            z (array or float): redshift of source(s)
+
+        Returns:
+            array or float: fluxes of the sources in UNITS
+        """
         # For transient sources, the flux measured on Earth will be
         # red-shifted-fluence/{(1+z)*burst duration}
         flux = fluence / ((1.+z)*self.timescale)
@@ -541,6 +617,19 @@ class TransientSourcePopulation(SourcePopulation):
 #############
 
 def get_LEvolution(le_model, lmin, lmax):
+    """
+    Get specific LuminosityEvolution model (a luminosity distribution
+    that is a function of z)
+
+    Args: 
+        le_model (str): Name of luminosity-evolution model, only supported
+            optioin is "HA2014BL"
+        lmin (float): Minimum luminosity considered in UNITS
+        lmax (float): Maximum luminosity considered in UNITS
+
+    Returns:
+        LuminosityEvolution: relevant luminosity-evolution object
+    """
     evolutions = {"HA2014BL": HardingAbazajian(lmin, lmax)
                   }
     if not le_model in list(evolutions.keys()):
@@ -550,10 +639,28 @@ def get_LEvolution(le_model, lmin, lmax):
 
 class LuminosityEvolution(object):
     """
-    For the Luminosity Distribution that depends on z
+    Abstract class for the a Luminosity Distribution that depends on z
+
+    Args:
+        lmin (float): Minimum luminosity considered in UNITS
+        lmax (float): Maximum luminosity considered in UNITS
+        cosmology (dict, optional, default=cosmology): kwargs to pass 
+            to cosmolopy, defaults are 'omega_M_0': 0.308, 
+            'omega_lambda_0': 0.692, 'h': 0.678
+
+    Attributes:
+        lmin (float): Minimum luminosity considered in UNITS
+        lmax (float): Maximum luminosity considered in UNITS
+        _zlocal (float): Describes limit of nearby sources
+        Mpc2cm (float): Conversion factor
+        GeV_per_sec_2_ergs_per_year (float): Conversion factor
+        cosmology (cosmolopy instance)
     """
 
     def __init__(self, lmin, lmax, cosmology=cosmology):
+        """
+        Constructor
+        """
         self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
         self.lmin = lmin
         self.lmax = lmax
@@ -562,9 +669,22 @@ class LuminosityEvolution(object):
         self.GeV_per_sec_2_ergs_per_sec = 1.60218e-3  # (GeV/sec) / (ergs/s)
 
     def LF(self, L, z):
+        """
+        Luminosity functions should be implemented by inherited classes
+        """
         raise NotImplementedError("Please Specify Model")
 
     def LuminosityDistance(self, z):
+        """
+        Convert redshift to luminosity distance.
+        If passing many redshifts, a 1d spline is used as cosmolopy can be slow
+
+        Args:
+            z (array or float): redshift(s)
+
+        Returns:
+            array or float: Luminosity distance(s) in Mpc
+        """
         # Wrapper function - so that cosmolopy is only imported here.
         if np.ndim(z) > 0:
             if len(z) > 1000:
@@ -577,13 +697,41 @@ class LuminosityEvolution(object):
 
     def RedshiftDistribution(self, z):
         """
+        Provides the unnormalized PDF of number of sources vs. redshift
+        by multiplying the $dN/dz = d\rho(L,z)/dz * dV/dz$, accounting
+        for the luminosity dependence on z
+
         $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
+
+        Args:
+            z (array or float): Redshift values
+
+        Returns
+            Array of float: Unnormalized PDF of number vs. redshift
         """
         integral = scipy.integrate.quad(lambda L: self.LF(L, z), self.lmin, self.lmax)[0]
         return integral * cosmolopy.distance.diff_comoving_volume(z, **self.cosmology) * \
             4*np.pi
 
     def L_CDF(self, redshift_bins, luminosity_bins):
+        """
+        Creates a 2-dimensional cumulative distribution function
+        of the number of sources as a function of redshift and luminosity
+
+        Args:
+            redshift_bins (array): redshift bin-edges for evaluating the 
+                CDF
+            luminosity_bins (array): luminosity bin-edges for evaluating the 
+                CDF 
+
+        Attributes:
+            redshift_bins (array): redshift bin-edges for evaluating the 
+                CDF
+            luminosity_bins (array): luminosity bin-edges for evaluating the 
+                CDF
+            Lcdf (2d array): 2D CDF of number of sources vs. redshift and 
+                luminosity
+        """
         # 2D phase space scan of L and z
         l, z = np.meshgrid(luminosity_bins, redshift_bins)
         L_PDF = self.LF(l, z)
@@ -596,6 +744,15 @@ class LuminosityEvolution(object):
         self.Lcdf = L_CDF
 
     def Luminosity_Sampling(self, z):
+        """
+        Samples luminosities of sources given their redshifts
+
+        Args:
+            z (array or float): redshift(s) of source(s)
+
+        Returns:
+            array or float: Sampled luminosities
+        """
         z = np.atleast_1d(z)
         test = np.random.rand(z.shape[0])
         index_1 = np.searchsorted(self.redshift_bins, z)
@@ -605,19 +762,41 @@ class LuminosityEvolution(object):
 
     def Nsources(self, zmax):
         """
+        Integrates full 2-dimensional source count distribution over 
+            redshift and luminosity
+
         $$ N_{tot} = \int_0^z_{max} P(z) dz$$ 
+
+        Args:
+            zmax (float): Maximum redshift to consider
+
+        Returns:
+            float: Total number of sources for the luminosity-evolution model
         """
         return scipy.integrate.quad(lambda z: self.RedshiftDistribution(z), 0, zmax)[0]
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
         """
+        Converts a luminosity to a fluence
+
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
         \left(\frac{E}{E_0}\right)^{-\gamma}\,
         \mathrm{d}E\,4\pi d_L^2(z=1) $$
-        Lumi given in ergs/yr
+
         Note fluxnorm is E0^2*fluxnorm
-        fluxnorm units are []
+        fluence units are [UNITS]
+
+        Args:
+            luminosity (array or float): luminosity of sources in ergs/yr
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+        
+        Returns:
+            array or float: fluence of source(s) in UNITS
         """
         flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         fluxnorm = luminosity / 4. / np.pi / \
@@ -626,7 +805,21 @@ class LuminosityEvolution(object):
         return fluxnorm
 
     def EnergyIntegral(self, index, emin, emax, z=1, E0=1e5):
-        """ integal_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE """
+        """ 
+        Calculates energy content in a neutrino flux
+
+        $$integ_{emin/(1+z)}^{emax/(1+z)} E*(E/E0)^(-index) dE$$ 
+        
+        Args:
+            index (float): Spectral index of the flux
+            emin (float): Minimum neutrino energy in GeV
+            emax (float): Maximum neutrino energy in GeV
+            z (array or float, optional, default=1): Redshifts
+            E0 (float, optional, default=1): pivot energy in GeV
+
+        Returns:
+            float: Energy flux between emin and emax
+        """
         if index != 2.0:
             denom = (1+z)**(index-2)
             integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
@@ -635,10 +828,26 @@ class LuminosityEvolution(object):
         return E0**index * integral
 
 class HardingAbazajian(LuminosityEvolution):
-    """
-    Luminosity Evolution model for Blazars
+    """ 
+    Luminosity dependent density evolution for gamma-ray blazars based
+        on X-ray AGN luminosity function
+
+    See also: :class:`LuminosityEvolution`
+
+    Reference: arXiv:1206.4734
     """
     def LF(self, L, z):
+        """
+        Luminosity function based on X-ray AGN
+
+        Args:
+            L (float): luminosity in UNITS
+            z (float): redshift
+
+        Returns:
+            float: local PDF value of source count vs. luminosity
+                and redshift
+        """
         A = 5.04e-6
         gamma1 = 0.43
         L0 = 10**43.94
@@ -665,11 +874,30 @@ class HardingAbazajian(LuminosityEvolution):
         return LF_L*LF_F
 
     def Nsources(self, zmax):
+        """
+        Calculates total number of sources in the universe out to zmax
+
+        Args:
+            zmax (float): Maximum redshift to consider
+
+        Returns:
+            float: Total number of sources
+        """
         kappa = 9.54e-6
         nsource = super(HardingAbazajian, self).Nsources(zmax)
         return nsource*kappa
 
     def Luminosity_Sampling(self, z):
+        """
+        Samples luminosities of sources given their redshifts, with 
+            appropriately applied unit conversion
+
+        Args:
+            z (array or float): redshift(s) of source(s)
+
+        Returns:
+            array or float: Sampled luminosities
+        """
         L_x_to_rad = 4.21
         L = super(HardingAbazajian, self).Luminosity_Sampling(z)
         return 10**(L+L_x_to_rad)
