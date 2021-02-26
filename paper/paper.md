@@ -26,7 +26,7 @@ affiliations:
 
 The IceCube neutrino observatory has discoved an all-sky neutrino flux
 in the 10 TeV to 10 PeV energy range
-[@PhysRevLett.125.121104,@2019ICRC...36.1004S,@2019ICRC...36.1017S]. IceCube
+[@PhysRevLett.125.121104,@2019ICRC...36.1004S;@2019ICRC...36.1017S]. IceCube
 finds that a power law in energy is a good description of the flux,
 with an spectral index ranging from -2.28 to -2.89, depending on the
 observation channel used. This flux is apparently isotropic,
