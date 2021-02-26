@@ -12,6 +12,6 @@ Contributors
 
 * Theo Glauch <theo.glauch@icecube.wisc.edu>
 * Michael Larson <michael.larson@icecube.wisc.edu>
-* Alex Pizzuto <pizzuto@wisc.edu>
+* Alex Pizzuto <pizzuto@icecube.wisc.edu>
 * René Reimann <reimann@icecube.wisc.edu>
 

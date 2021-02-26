@@ -20,7 +20,7 @@ affiliations:
   index: 1
   date: 26 February 2021
   bibliography: paper.bib
-  ---
+---
 
 # Background
 
@@ -49,9 +49,23 @@ the Seyfert II galaxy, another subtype of AGN, NGC
 sources. IceCube has ruled out GRBs as constributing more than 1% of
 the diffuse flux [@somebody].
 
-The identification of the main sources of the diffuse flux remains an
-open topic. 
+The properties of various proposed extragalactic neutrino
+source (or also reservoir) classes, such as starburst galaxies,
+blazars, low luminosity GRBs, Flat Spectrum Radio Quasars, BL Lacs and
+galaxy clusters can be summarized in terms of the local density (or
+density rate for transient sources) as a function of luminosity (or
+per-burst equivalent isotropic energy for transient sources)
+[@somebody]. The correct description of each of these classes of 
+objects depends on, e.g., the redshift evolution of the density of
+sources; but more generally on the luminosity function of the
+objects. The exitance of a diffuse extragalactic neutrino flux can be
+described as a inverse relationship between density (density-rate) and
+luminosity (isotropic energy) [@somebody]. This relationship also
+depends on the evolution assumed. Note by Ignacio: We can provide an
+example Kowalski plot - but this is not critically needed.
 
+The identification of the main sources of the diffuse flux remains an
+open research topic.
 
 # Summary
 
@@ -59,6 +73,10 @@ Summary FIRESONG
 
 Code is tailored for muon neutrinos, but can trivially be adapted by
 a user to include all flavors. 
+
+# Usage
+
+Give a brief description on how to use Firesong.
 
 # Statement of Need
 
