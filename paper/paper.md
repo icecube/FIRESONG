@@ -25,7 +25,7 @@ affiliations:
 # Background
 
 The IceCube neutrino observatory has discoved an all-sky neutrino flux
-in the 10 TeV to 10 PeV energy range [@somebody]. This flux is apparently isotropic,
+in the 10 TeV to 10 PeV energy range [@PhysRevLett.125.121104,@2019ICRC...36.1004S]. This flux is apparently isotropic,
 consistent with an extragalactic origin for these neutrinos. The flux
 is also consistent with equal flux for each of the three neutrino
 flavors [@somebody], as consistent with expectations for standard
