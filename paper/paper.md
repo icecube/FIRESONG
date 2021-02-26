@@ -25,18 +25,18 @@ affiliations:
 # Background
 
 The IceCube neutrino observatory has discoved an all-sky neutrino flux
-in the 10 TeV to 10 PeV energy range [@PhysRevLett.125.121104,@2019ICRC...36.1004S]. This flux is apparently isotropic,
+in the 10 TeV to 10 PeV energy range
+[@PhysRevLett.125.121104,@2019ICRC...36.1004S,@2019ICRC...36.1017S]. IceCube
+finds that a power law in energy is a good description of the flux,
+with an spectral index ranging from -2.28 to -2.89, depending on the
+observation channel used. This flux is apparently isotropic,
 consistent with an extragalactic origin for these neutrinos. The flux
 is also consistent with equal flux for each of the three neutrino
-flavors [@somebody], as consistent with expectations for standard
-neutrino oscillations over astrophysical baselines. The origin of this
-flux is of great scientific interest as it is expected that neutrino
-sources are also sources of ultra-high-energy cosmic rays, which also
-have an unknown origin [@somebody]. IceCube finds that a power law in
-energy is a good description of the flux, with an spectral index
-ranging from -2.28 to -2.89, depending on the observation channel used
-[@somebody].
-
+flavors [@somebody], as consistent with 
+expectations for standard neutrino oscillations over astrophysical
+baselines. The origin of this flux is of great scientific interest as
+it is expected that neutrino sources are also sources of
+ultra-high-energy cosmic rays, which also have an unknown origin. 
 IceCube has identified the blazar, a sub-type of Active Galactic
 Nuclei (AGN), TXS 0506+056 as a candidate neutrino source
 [@somebody]. However, there's also evidence, also by IceCube that gamma-ray bright
