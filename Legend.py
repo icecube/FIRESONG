@@ -3,6 +3,9 @@
 #          Ignacio Taboada
 #
 
+"""Example script that simulates a population of sources with a luminosity
+    distribution that is dependent on redshift"""
+
 # General imports
 # from __future__ import division
 import argparse
@@ -28,6 +31,34 @@ def legend_simulation(outputdir,
                       lmax=48,
                       seed=None,
                       zNEAR=-1):
+    """
+    Simulate a universe of neutrino sources with luminosity distribution 
+        dependent on redshift
+
+    Args:
+        outputdir (str or None): path to write output. If None, return results
+            without writing a file
+        filename (str): name of the output file. 
+        L_Evolution (str): Name of luminosity evolution model
+        zmin (float, optional, default=0.0005): Closest redshift to consider
+        zmax (float, optional, default=10.): Farthest redshift to consider
+        bins (int, optional, default=1000): Number of bins used when creating
+            the redshift PDF
+        fluxnorm (float, optional, default=0.9e-8): Normalization on the total
+            astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1
+        index (float, optional, default=2.13): Spectral index of diffuse flux
+        emin (float, optional, default=1e4): Minimum neutrino energy in GeV
+        emax (float, optional, default=1e7): Maximum neutrino energy in GeV
+        lmin (float, optional, default=38): Minimum log10 luminosity in UNITS
+        lmax (float, optional, default=38): Maximum log10 luminosity in UNITS
+        seed (int or None, optional, default=None): random number seed
+        verbose (bool, optional, default=True): print simulation paramaters
+            if True else suppress printed output
+
+    Returns:
+        dict: keys contain simulation results, including the input params
+            as well as the sources. Only returned if filename is None
+    """
 
     LE_model = get_LEvolution(L_Evolution, lmin, lmax)
 
