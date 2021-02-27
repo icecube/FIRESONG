@@ -7,32 +7,37 @@ tags:
    - Cosmology
 authors:
    - name: Chun Fai Tung
-      affiliation: 1
+   affiliation: 1
    - name: Theo Glauch
-      affiliation: 2
+   affiliation: 2
    - name: Michael Larson
-      affiliation: 3
+   affiliation: 3
    - name: Alex Pizzuto
-      affiliation: 4
+   affiliation: 4
    - name: Rene Reimann
-      affiliation: 5
+   affiliation: 5
    - name: Ignacio Taboada
-      orcid: 0000-0003-3509-3457
-      affiliation:1
+   orcid: 0000-0003-3509-3457
+   affiliation: 1
 affiliations:
   - name: School of Physics. Georgia Institute of Technology. Atlanta, GA 30332, USA
-     index: 1
+  index: 1
   - name: TUM
-     index: 2
+  index: 2
   - name: UMd
-     index: 3
+  index: 3
   - name: UW Madison
-     index: 4
+  index: 4
   - name: Rene institution
-	 index: 5
+  index: 5
 date: 26 February 2021
 bibliography: paper.bib
 ---
+
+# Summary
+
+What we need here is a non-physicist description of this work. The
+background section has a more scientific description.
 
 # Background
 
@@ -90,17 +95,17 @@ but also cumbersome and error prone. Indeed several authors have similar
 (usually private) code. ``FIRESONG`` provides a publicly 
 mantained framework for these simulations.  ``FIRESONG`` depends on
 the ``cosmolopy`` package [@cosmolopy] 
-for cosmological calculations. ``FIRESONG`` depends on ``numpy`` [@numpy]
+for cosmological calculations. ``FIRESONG`` also depends on ``numpy`` [@numpy]
 and ``scipy`` [@scipy]. ``FIRESONG`` has already been used on scientific
 publication by several observatories of neutrinos or gamma rays:
 IceCube [@RenePaper], HAWC and IceCube [@HugoPaper], 
-HAWC [@hawcICRC17] and CTA[ @ctaICRC19]. Though originally concieved
-as a stand along project, maintanance of ``FIRESONG`` is currently
+HAWC [@hawcICRC17] and CTA [@ctaICRC19]. Though originally concieved
+as a stand alone project, maintanance of ``FIRESONG`` is currently
 provided by IceCube collaboration members.
 
 # Usage
 
-Give a brief description on how to use Firesong.py, Legend.py and FluxPDF.py.
+Provide a brief description on how to use Firesong.py, Legend.py and FluxPDF.py.
 
 
 # Acknowledgements
