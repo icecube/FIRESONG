@@ -1,5 +1,5 @@
 ---
-title = 'FIRESONG: A python package to simulate populations of
+title: 'FIRESONG: A python package to simulate populations of
 extragalactic neutrino sources'
 tags:
   - Python
