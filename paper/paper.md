@@ -3,7 +3,7 @@ title:  'FIRESONG: A python package to simulate populations of extragalactic neu
 tags:
    - Python
    - Neutrinos
-   - Multi-messenger Astrophysics
+   - Multi messenger Astrophysics
    - Cosmology
 authors:
    - name: Chun Fai Tung
@@ -28,7 +28,8 @@ affiliations:
      index: 3
   - name: UW Madison
      index: 4
-  - name: I don't know
+  - name: Rene's institution
+	 index: 5
 date: 26 February 2021
 bibliography: paper.bib
 ---
@@ -51,7 +52,7 @@ ultra-high-energy cosmic rays, which also have an unknown origin.
 IceCube has identified the blazar, a sub-type of Active Galactic
 Nuclei (AGN), TXS 0506+056 as a candidate neutrino source
 [@somebody]. However, there's also evidence, also by IceCube that gamma-ray bright
-blazars contribute to no more than 20% of the diffuse flux
+blazars contribute to no more than approximately 20% of the diffuse flux
 [@somebody]. More recently IceCube has found a neutrino point source hot-spot, just below
 the 3 sigma threshold normally assigned to evidence, correlated with
 the Seyfert II galaxy, another subtype of AGN, NGC
@@ -78,27 +79,34 @@ example Kowalski plot - but this is not critically needed.
 The identification of the main sources of the diffuse flux remains an
 open research topic.
 
-# Summary
+# Statement of Need
 
-Summary FIRESONG
-
-Code is tailored for muon neutrinos, but can trivially be adapted by
-a user to include all flavors. 
+``FIRESONG`` is a python package  to be used by researchers interested in
+simulating populations of neutrino sources in the universe and to put
+these simulations in the context of IceCube's observation of a diffuse
+neutrino flux.  The calculations needed to conduct these simulations
+are well established 
+but also cumbersome and error prone. Indeed several authors have similar
+(usually private) code. ``FIRESONG`` provides a publicly 
+mantained framework for these simulations.  ``FIRESONG`` depends on
+the ``cosmolopy`` package [@cosmolopy] 
+for cosmological calculations. ``FIRESONG`` depends on ``numpy`` [@numpy]
+and ``scipy`` [@scipy]. ``FIRESONG`` has already been used on scientific
+publication by several observatories of neutrinos or gamma rays:
+IceCube [@RenePaper], HAWC and IceCube [@HugoPaper], 
+HAWC [@hawcICRC17] and CTA[ @ctaICRC19]. Though originally concieved
+as a stand along project, maintanance of ``FIRESONG`` is currently
+provided by IceCube collaboration members.
 
 # Usage
 
-Give a brief description on how to use Firesong.
+Give a brief description on how to use Firesong.py, Legend.py and FluxPDF.py.
 
-# Statement of Need
-
-Why do we need this
 
 # Acknowledgements
 
-We acknowledge: Markus Ahlers (he gave Ignacio the idea, though
-probably he has forgotten), Konstancja Satalecka, George Japaridze and
-the IceCube collaboration.
-Note, we should consult these people!
-IT acknowledges grant Blah.
+We acknowldge comments, support and ideas by:  Markus Ahlers,
+Konstancja Satalecka, George Japaridze and the IceCube collaboration.
+CFT, ML, AP and IT acknowledge support by NSF grant PHY-1913607.
 
-#References
+# References
