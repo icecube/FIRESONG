@@ -114,8 +114,23 @@ provided by IceCube collaboration members.
 
 # Usage
 
-Provide a brief description on how to use Firesong.py, Legend.py and FluxPDF.py.
+``FIRESONG`` can be invoked from the command line as ``Firesong.py`` and
+configured via command line options outputing a file with a simulated list of
+neutrino sources. Alternatively ``FIRESONG`` can also be imported and
+produce a python dictionary of the simulated neutrino
+sources. ``FIRESONG`` can be used to simulate steady or transient
+sources. If no luminosity (isotropic equivalent energy) is provided,
+``FIRESONG`` calculates it, as a function of local density (density
+rate) and other parameters, so that the IceCube diffuse flux is fully
+saturated. Lack of knowledge of the properties of neutrino sources
+inspire simplistic choices for implemented luminosity distributions: a
+delta function (Standard Candle), a lognormal distribution or a power
+law distribution. Various models of Star Formation History are
+implemented as well as no evolution.
 
+Write about Legend.py
+
+Write about FluxPDF.py
 
 # Acknowledgements
 
