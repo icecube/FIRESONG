@@ -1,29 +1,24 @@
 ---
-title: 'FIRESONG: A python package to simulate populations of extragalactic neutrino sources'
+title:  'FIRESONG: A python package to simulate populations of extragalactic neutrino sources'
 tags:
   - Python
   - Neutrinos
   - Multi-messenger Astrophysics
   - Cosmology
 authors:
-  - name: Chun Fai Tung
-     orcid: XXXXXXXX
-     affiliation: 1
-  - name: Theo Glauch
-     orcid: XXXXXXXX
-     affiliation: 2
-  - name: Michael Larson
-     orcid: XXXXXXXX
-     affiliation: 3
-  - name: Alex Pizzuto
-     orcid: XXXXXXXX
-     affiliation: 4
-  - name: René Reiman
-     orcid: XXXXXXXX
-     affiliation: 5
-  - name: Ignacio Taboada
-     orcid: 0000-0003-3509-3457
-     affiliation:1
+   - name: Chun Fai Tung
+      affiliation: 1
+   - name: Theo Glauch
+      affiliation: 2
+   - name: Michael Larson
+      affiliation: 3
+   - name: Alex Pizzuto
+      affiliation: 4
+   - name: René Reiman
+      affiliation: 5
+   - name: Ignacio Taboada
+      orcid: 0000-0003-3509-3457
+      affiliation:1
 affiliations:
   - name: School of Physics. Georgia Institute of Technology. Atlanta, GA 30332, USA
      index: 1
