@@ -28,7 +28,7 @@ affiliations:
      index: 3
   - name: UW Madison
      index: 4
-  - name: Rene's institution
+  - name: Rene institution
 	 index: 5
 date: 26 February 2021
 bibliography: paper.bib
@@ -38,7 +38,7 @@ bibliography: paper.bib
 
 The IceCube neutrino observatory has discoved an all-sky neutrino flux
 in the 10 TeV to 10 PeV energy range
-[@PhysRevLett.125.121104;@2019ICRC...36.1004S;@2019ICRC...36.1017S]. IceCube
+[@IceCube:2019a;@IceCube:2019b;@IceCube:2020]. IceCube
 finds that a power law in energy is a good description of the flux,
 with an spectral index ranging from -2.28 to -2.89, depending on the
 observation channel used. This flux is apparently isotropic,
