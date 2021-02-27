@@ -1,10 +1,10 @@
 ---
 title:  'FIRESONG: A python package to simulate populations of extragalactic neutrino sources'
 tags:
-  - Python
-  - Neutrinos
-  - Multi-messenger Astrophysics
-  - Cosmology
+   - Python
+   - Neutrinos
+   - Multi-messenger Astrophysics
+   - Cosmology
 authors:
    - name: Chun Fai Tung
       affiliation: 1
@@ -14,7 +14,7 @@ authors:
       affiliation: 3
    - name: Alex Pizzuto
       affiliation: 4
-   - name: Rene Reiman
+   - name: Rene Reimann
       affiliation: 5
    - name: Ignacio Taboada
       orcid: 0000-0003-3509-3457
@@ -31,16 +31,13 @@ affiliations:
   - name: I don't know
 date: 26 February 2021
 bibliography: paper.bib
-
-# Optional fields if submitting to a AAS journal too, see this blog post:
-# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
 ---
 
 # Background
 
 The IceCube neutrino observatory has discoved an all-sky neutrino flux
 in the 10 TeV to 10 PeV energy range
-[@PhysRevLett.125.121104,@2019ICRC...36.1004S;@2019ICRC...36.1017S]. IceCube
+[@PhysRevLett.125.121104;@2019ICRC...36.1004S;@2019ICRC...36.1017S]. IceCube
 finds that a power law in energy is a good description of the flux,
 with an spectral index ranging from -2.28 to -2.89, depending on the
 observation channel used. This flux is apparently isotropic,
@@ -104,3 +101,4 @@ the IceCube collaboration.
 Note, we should consult these people!
 IT acknowledges grant Blah.
 
+#References
