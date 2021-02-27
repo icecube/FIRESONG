@@ -625,8 +625,8 @@ def get_LEvolution(le_model, lmin, lmax):
     Args:
         le_model (str): Name of luminosity-evolution model, only supported
             optioin is "HA2014BL"
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
 
     Returns:
         LuminosityEvolution: relevant luminosity-evolution object
@@ -643,15 +643,15 @@ class LuminosityEvolution(object):
     Abstract class for the a Luminosity Distribution that depends on z
 
     Args:
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
         cosmology (dict, optional, default=cosmology): kwargs to pass 
             to cosmolopy, defaults are 'omega_M_0': 0.308, 
             'omega_lambda_0': 0.692, 'h': 0.678
 
     Attributes:
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
         _zlocal (float): Describes limit of nearby sources
         Mpc2cm (float): Conversion factor
         GeV_per_sec_2_ergs_per_year (float): Conversion factor
@@ -754,12 +754,14 @@ class LuminosityEvolution(object):
         Returns:
             array or float: Sampled luminosities
         """
+        lumi = []
         z = np.atleast_1d(z)
         test = np.random.rand(z.shape[0])
         index_1 = np.searchsorted(self.redshift_bins, z)
         for test, index in zip(test, index_1):
             index_2 = np.searchsorted(self.Lcdf[index], test)
-        return self.luminosity_bins[index_2]
+            lumi.append(self.luminosity_bins[index_2])
+        return np.array(lumi)
 
     def Nsources(self, zmax):
         r"""
@@ -823,7 +825,7 @@ class LuminosityEvolution(object):
         """
         if index != 2.0:
             denom = (1+z)**(index-2)
-            integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
+            integral = denom * (emax**(2-index)-emin**(2-index)) / (2-index)
         else:
             integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral
@@ -836,13 +838,15 @@ class HardingAbazajian(LuminosityEvolution):
     See also: :class:`LuminosityEvolution`
 
     Reference: arXiv:1206.4734
+               arXiv:1012.1247
+               arXiv:0308140
     """
     def LF(self, L, z):
         """
         Luminosity function based on X-ray AGN
 
         Args:
-            L (float): luminosity in UNITS
+            L (float): log10 of luminosity in erg/s
             z (float): redshift
 
         Returns:
@@ -865,13 +869,18 @@ class HardingAbazajian(LuminosityEvolution):
         z = np.atleast_1d(z)
         zc = np.zeros_like(L)
         LF_F = np.zeros_like(L)
+        # luminosity distribution at z=0
         LF_L = A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
+        # density indices 1 and 2 --> constant in this model
         p1 = p10 + beta1 * (L-44.0)
         p2 = p20 + beta2 * (L-44.0)
+        # zc, where peak evolution happens
         zc[L>=La] = zc0
         zc[L<La] = zc0*10**((L[L<La]-La)*alpha)
-        LF_F[z-zc<=0] = (1+z[z-zc<=0])**p1[z-zc<=0]
-        LF_F[z-zc>0] = (1+zc[z-zc>0])**p1[z-zc>0]*((1+z[z-zc>0])/(1+zc[z-zc>0]))**p2[z-zc>0]
+        # density evolution
+        LF_F[z<zc] = (1+z[z<zc])**p1[z<zc]
+        LF_F[z>=zc] = (1+zc[z>=zc])**p1[z>=zc]*((1+z[z>=zc])/(1+zc[z>=zc]))**p2[z>=zc]
+        # total evolution
         return LF_L*LF_F
 
     def Nsources(self, zmax):
@@ -884,7 +893,7 @@ class HardingAbazajian(LuminosityEvolution):
         Returns:
             float: Total number of sources
         """
-        kappa = 9.54e-6
+        kappa = 9.54e-6         #model specific
         nsource = super(HardingAbazajian, self).Nsources(zmax)
         return nsource*kappa
 
@@ -899,6 +908,6 @@ class HardingAbazajian(LuminosityEvolution):
         Returns:
             array or float: Sampled luminosities
         """
-        L_x_to_rad = 4.21
+        L_x_to_rad = 4.21           #model specific
         L = super(HardingAbazajian, self).Luminosity_Sampling(z)
         return 10**(L+L_x_to_rad)

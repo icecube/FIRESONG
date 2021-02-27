@@ -180,6 +180,6 @@ def print_config_LEGEND(L_Evolution, lmin, lmax, N_sample):
     str += "##### LEGEND initializing        #####\n"
     str += "Luminosity Evolution model = {L_Evolution}\n"
     str += "Source Luminosity Limit = {lmin} - {lmax} erg/s \n"
-    str += "Totla number of sources in the universe: {N_sample} \n"
+    str += "Total number of sources in the universe: {N_sample} \n"
     str += "##### LEGEND initialization done #####"
     print((str.format(**locals())))
