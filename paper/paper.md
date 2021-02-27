@@ -14,7 +14,7 @@ authors:
       affiliation: 3
    - name: Alex Pizzuto
       affiliation: 4
-   - name: René Reiman
+   - name: Rene Reiman
       affiliation: 5
    - name: Ignacio Taboada
       orcid: 0000-0003-3509-3457
@@ -32,6 +32,8 @@ affiliations:
 date: 26 February 2021
 bibliography: paper.bib
 
+# Optional fields if submitting to a AAS journal too, see this blog post:
+# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
 ---
 
 # Background
