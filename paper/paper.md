@@ -15,6 +15,7 @@ authors:
    - name: Alex Pizzuto
    affiliation: 4
    - name: Rene Reimann
+   orcid: 0000-0002-1983-8271
    affiliation: 5
    - name: Ignacio Taboada
    orcid: 0000-0003-3509-3457
@@ -28,7 +29,7 @@ affiliations:
   index: 3
   - name: UW Madison
   index: 4
-  - name: Rene institution
+  - name: Johannes Gutenberg University Mainz, Institute of Physics - QUANTUM, 55128 Mainz, Germany
   index: 5
 date: 26 February 2021
 bibliography: paper.bib
