@@ -2,11 +2,7 @@
 FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays
 
 # Set up
-Set up the enviromental error FIRESONG so (say bash)
-export FIRESONG=/location/of/firesong/
-
-This is needed to read data files (e.g. exposure data from IceCube)
-and to write output data.
+Set up the enviromental variable FIRESONG. In bash: `export FIRESONG=/location/of/firesong/`.
 
 # Basic usage
 Several scripts are provided:
@@ -15,7 +11,8 @@ Several scripts are provided:
   neutrino source density). The transient functionality has not been
   tested. 
 * FluxPDF.py - Generated the flux probability density distribution of a 
-  source.
+source.
+* Legend.py - 
 
 # Tests
 All unittest could be run by
