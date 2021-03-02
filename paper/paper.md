@@ -11,6 +11,7 @@ authors:
    - name: Theo Glauch
    affiliation: 2
    - name: Michael Larson
+   orcid: 0000-0002-6996-1155
    affiliation: 3
    - name: Alex Pizzuto
    orcid: 0000-0002-8466-8168
@@ -26,7 +27,7 @@ affiliations:
   index: 1
   - name: TUM
   index: 2
-  - name: UMd
+  - name: Dept. of Physics, University of Maryland, College Park, MD 20742, USA
   index: 3
   - name: Dept. of Physics and Wisconsin IceCube Particle Astrophysics Center, University of Wisconsin–Madison, Madison, WI 53706, USA
   index: 4
