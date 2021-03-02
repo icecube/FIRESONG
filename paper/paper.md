@@ -13,6 +13,7 @@ authors:
    - name: Michael Larson
    affiliation: 3
    - name: Alex Pizzuto
+   orcid: 0000-0002-8466-8168
    affiliation: 4
    - name: Rene Reimann
    orcid: 0000-0002-1983-8271
@@ -27,7 +28,7 @@ affiliations:
   index: 2
   - name: UMd
   index: 3
-  - name: UW Madison
+  - name: Dept. of Physics and Wisconsin IceCube Particle Astrophysics Center, University of Wisconsin–Madison, Madison, WI 53706, USA
   index: 4
   - name: Johannes Gutenberg University Mainz, Institute of Physics - QUANTUM, 55128 Mainz, Germany
   index: 5
