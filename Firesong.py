@@ -181,22 +181,22 @@ if __name__ == "__main__":
                         type=float, default=1e-9,
                         help='Local neutrino source density [1/Mpc^3]')
     parser.add_argument("--evolution", action="store",
-                        dest="Evolution", default='HB2006SFR',
-                        help="Source evolution options:  HB2006SFR (default), YMKBH2008SFR, CC2015SNR , MD2014SFR, NoEvolution")
+                        dest="Evolution", default='MD2014SFR',
+                        help="Source evolution options:  HB2006SFR, YMKBH2008SFR, CC2015SNR , MD2014SFR (default), NoEvolution")
     parser.add_argument("--transient", action='store_true',
                         dest='Transient', default=False,
-                        help='Simulate transient sources, NOT TESTED YET!')
+                        help='Simulate transient sources')
     parser.add_argument("--timescale", action='store',
                         dest='timescale', type=float,
-                        default=1000., help='time scale of transient sources, default is 1000sec.')
+                        default=1000., help='time scale of transient sources in seconds, default is 1000sec.')
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
                         help="Highest redshift to be simulated")
     parser.add_argument("--fluxnorm", action="store", dest='fluxnorm',
-                        type=float, default=0.9e-8,
+                        type=float, default=1.44e-8,
                         help="Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
     parser.add_argument("--index", action="store", dest='index',
-                        type=float, default=2.13,
+                        type=float, default=2.28,
                         help="Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
     parser.add_argument("--LF", action="store", dest="LF", default="SC",
                         help="Luminosity function, SC for standard candles, LG for lognormal, PL for powerlaw")
