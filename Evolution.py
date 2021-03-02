@@ -97,7 +97,7 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
 
 class YukselEtAl2008StarFormationRate(Evolution):
     r""" 
-    Star Formation Rate in units of $\frac{M_{sun}}{yr Mpc^3}$
+    Star Formation Rate in units of \(\frac{M_{sun}}{yr Mpc^3}\)
 
     Model is a continuous broken power law,
     $$ \dot{\rho}_{*}(z)=\dot{\rho}_{0}\left[(1+z)^{a \eta}
@@ -105,7 +105,7 @@ class YukselEtAl2008StarFormationRate(Evolution):
     +\left(\frac{1+z}{C}\right)^{c \eta}\right]^{1 / \eta} $$
 
     with a = 3.4, b=-0.3, c=-3.5, B=5160.63662037,
-    C=9.06337604231, $\dot{\rho}$=0.02, eta=10
+    C=9.06337604231, \(\dot{\rho}\)=0.02, eta=10
 
     The given function results in breaks around z=1,4
 
@@ -240,7 +240,7 @@ class SourcePopulation(object):
     def RedshiftDistribution(self, z):
         r""" 
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\)
         Note: can remove 4*pi becaue we just use this in a normalized way 
 
         Args:
@@ -292,7 +292,7 @@ class SourcePopulation(object):
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def Nsources(self, density, zmax):
-        r""" Total number of sources within $z_{\mathrm{max}}$:
+        r""" Total number of sources within \(z_{\mathrm{max}}\):
 
         $$ N_\mathrm{tot} = \rho\cdot V_c(z=0.01)
         \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
@@ -484,7 +484,7 @@ class TransientSourcePopulation(SourcePopulation):
     def RedshiftDistribution(self, z):
         r"""
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$. Corrects for 
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\). Corrects for 
         time-dilation with extra factor of 1/1+z
 
         Args:
@@ -699,7 +699,7 @@ class LuminosityEvolution(object):
     def RedshiftDistribution(self, z):
         r"""
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$, 
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\), 
         accounting for the luminosity dependence on z
 
         $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
