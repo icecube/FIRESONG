@@ -5,10 +5,16 @@
 import numpy as np
 import scipy
 import cosmolopy
-from astropy.cosmology import Planck15
 
-#cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
-cosmology = {'omega_M_0': Planck15.Om0, 'omega_lambda_0': Planck15.Ode0, 'h': Planck15.H0.value}
+from astropy.cosmology import Planck15
+from astropy.cosmology import LambdaCDM
+
+cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
+#cosmology = {'omega_M_0': Planck15.Om0, 'omega_lambda_0': Planck15.Ode0, 'h': Planck15.H0.value}
+
+#Planck15 = LambdaCDM(H0=cosmology['h'],
+#                     Om0=cosmology['omega_M_0'],
+#                     Ode0=cosmology['omega_lambda_0'])
 
 def get_evolution(evol):
     """
@@ -237,7 +243,7 @@ class SourcePopulation(object):
         self.evolution = evolution
         self.use_astropy = use_astropy
         
-        if use_astropy:
+        if self.use_astropy:
             self.cosmology = Planck15
         else:
             self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
