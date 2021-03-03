@@ -53,6 +53,9 @@ class NoEvolution(Evolution):
     def parametrization(self, x):
         return 1.
 
+    def __str__(self):
+        return "No Evolution"
+
 
 class HopkinsBeacom2006StarFormationRate(Evolution):
     """ 
@@ -94,6 +97,9 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
         if len(result) == 1:
             return result.item()
         return result
+
+    def __str__(self):
+        return "Hopkins and Beacom (2006)"
 
 class YukselEtAl2008StarFormationRate(Evolution):
     r""" 
@@ -139,6 +145,9 @@ class YukselEtAl2008StarFormationRate(Evolution):
         return r0 * (x**(a*eta) + (x/B)**(b*eta) +
                      (x/C)**(c*eta))**(1./eta)
 
+    def __str__(self):
+            return "Yuksel et al. (2008)"
+
 class CandelsClash2015SNRate(Evolution):
     r"""
     This is the implied SFR from Goods/Candels/Clash (2015)
@@ -172,6 +181,9 @@ class CandelsClash2015SNRate(Evolution):
         d = 6.1
         density = a*(x**c) / (1. + ( x / b)**d )
         return density
+    
+    def __str__(self):
+        return "Strolger et al. (2015)"
 
 
 class MadauDickinson2014CSFH(Evolution):
@@ -205,6 +217,9 @@ class MadauDickinson2014CSFH(Evolution):
         d = 5.6
         density = a*(x**b) / (1. + (x/c)**d ) 
         return density
+
+    def __str__(self):
+        return "Madau and Dickinson (2014)"
 
 
 class SourcePopulation(object):
@@ -841,6 +856,9 @@ class HardingAbazajian(LuminosityEvolution):
                arXiv:1012.1247
                arXiv:0308140
     """
+    def __str__(self):
+        return "Harding and Abazajian (2012)"
+        
     def LF(self, L, z):
         """
         Luminosity function based on X-ray AGN
