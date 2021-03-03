@@ -89,7 +89,7 @@ class LG_LuminosityFunction(LuminosityFunction):
         """ Log Normal Luminosity function.
 
         Args:
-            - mean luminosity (Not not median and not log(mean))
+            - mean luminosity (Not median and not log(mean))
             - width in dex (width in log10)
 
         Note:
@@ -126,8 +126,7 @@ class LG_LuminosityFunction(LuminosityFunction):
             $$ \frac{1}{x\sigma \sqrt{2\pi}} \times 
             \exp{-\frac{(\ln(x)-\mu)^2}{2\sigma^1}}$$
         """
-        return np.exp(self.mu) * \
-            lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
+        return lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf(self, lumi):
         r""" Gives the value of the CDF at lumi.
