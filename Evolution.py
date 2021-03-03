@@ -301,9 +301,7 @@ class SourcePopulation(object):
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
                 spl = scipy.interpolate.UnivariateSpline(zz, f(zz))
-                        
                 return spl(z)
-        print(z, f(z))
         return f(z)
 
     def Nsources(self, density, zmax):
