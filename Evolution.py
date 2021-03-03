@@ -5,8 +5,10 @@
 import numpy as np
 import scipy
 import cosmolopy
-cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
+from astropy.cosmology import Planck15
 
+#cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
+cosmology = {'omega_M_0': Planck15.Om0, 'omega_lambda_0': Planck15.Ode0, 'h': Planck15.H0.value}
 
 def get_evolution(evol):
     """
@@ -226,16 +228,19 @@ class SourcePopulation(object):
         cosmology (cosmolopy instance)
     """
 
-    def __init__(self, cosmology, evolution):
+    def __init__(self, cosmology, evolution, use_astropy=False):
         """
         """
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                     # Mpc / cm
         self.GeV_per_sec_2_ergs_per_year = 50526.  # (GeV/sec) / (ergs/yr)
         self.evolution = evolution
-
-        # Flat universe
-        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+        self.use_astropy = use_astropy
+        
+        if use_astropy:
+            self.cosmology = Planck15
+        else:
+            self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
 
     def RedshiftDistribution(self, z):
         r""" 
@@ -249,8 +254,12 @@ class SourcePopulation(object):
         Returns
             Array of float: Unnormalized PDF of number vs. redshift
         """
-        return 4 * np.pi * self.evolution(z) * \
-            cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
+        if self.use_astropy:
+            return 4 * np.pi * self.evolution(z) * \
+                self.cosmology.differential_comoving_volume(z).value
+        else:
+            return 4 * np.pi * self.evolution(z) * \
+                cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
 
     def RedshiftIntegral(self, zmax):
         r""" 
@@ -281,15 +290,21 @@ class SourcePopulation(object):
         Returns:
             array or float: Luminosity distance(s) in Mpc
         """
+        if self.use_astropy:
+            f = lambda z: self.cosmology.luminosity_distance(z).value
+        else:
+            f = lambda z: cosmolopy.distance.luminosity_distance(z,
+                                                    **self.cosmology)
+        
         # Wrapper function - so that cosmolopy is only imported here.
         if np.ndim(z) > 0:
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
-                spl = scipy.interpolate.UnivariateSpline(zz, 
-                        cosmolopy.distance.luminosity_distance(zz, 
-                            **self.cosmology))
+                spl = scipy.interpolate.UnivariateSpline(zz, f(zz))
+                        
                 return spl(z)
-        return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+        print(z, f(z))
+        return f(z)
 
     def Nsources(self, density, zmax):
         r""" Total number of sources within \(z_{\mathrm{max}}\):
@@ -306,8 +321,11 @@ class SourcePopulation(object):
         Returns:
             float: total number of sources within z_max
         """
-        vlocal = cosmolopy.distance.comoving_volume(self._zlocal,
-                                                    **self.cosmology)
+        if self.use_astropy:
+            vlocal = self.cosmology.comoving_volume(self._zlocal).value
+        else:
+            vlocal = cosmolopy.distance.comoving_volume(self._zlocal,
+                                                        **self.cosmology)
         Ntotal = density * vlocal / \
             (self.RedshiftIntegral(self._zlocal) /
              self.RedshiftIntegral(zmax))
@@ -481,20 +499,6 @@ class TransientSourcePopulation(SourcePopulation):
         self.timescale = timescale
         self.yr2sec = 86400*365
 
-    def RedshiftDistribution(self, z):
-        r"""
-        Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\). Corrects for 
-        time-dilation with extra factor of 1/1+z
-
-        Args:
-            z (array or float): Redshift values
-
-        Returns
-            Array of float: Unnormalized PDF of number vs. redshift
-        """
-        return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
-
     def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
         r""" 
         Given a total diffuse neutrino flux, calculate the individual 
@@ -658,16 +662,21 @@ class LuminosityEvolution(object):
         cosmology (cosmolopy instance)
     """
 
-    def __init__(self, lmin, lmax, cosmology=cosmology):
+    def __init__(self, lmin, lmax, cosmology=cosmology, use_astropy=False):
         """
         Constructor
         """
-        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
         self.lmin = lmin
         self.lmax = lmax
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                     # Mpc / cm
         self.GeV_per_sec_2_ergs_per_sec = 1.60218e-3  # (GeV/sec) / (ergs/s)
+
+        if self.use_astropy:
+            self.cosmology = Planck15
+        else:
+            self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+
 
     def LF(self, L, z):
         """
@@ -686,15 +695,20 @@ class LuminosityEvolution(object):
         Returns:
             array or float: Luminosity distance(s) in Mpc
         """
+        if self.use_astropy:
+            f = lambda z: self.cosmology.luminosity_distance(z).value
+        else:
+            f = lambda z: cosmolopy.distance.luminosity_distance(z,
+                                                    **self.cosmology)
+        
         # Wrapper function - so that cosmolopy is only imported here.
         if np.ndim(z) > 0:
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
-                spl = scipy.interpolate.UnivariateSpline(zz,
-                        cosmolopy.distance.luminosity_distance(zz,
-                            **self.cosmology))
+                spl = scipy.interpolate.UnivariateSpline(zz, f(zz))
+                        
                 return spl(z)
-        return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+        return f(z)
 
     def RedshiftDistribution(self, z):
         r"""
@@ -711,8 +725,12 @@ class LuminosityEvolution(object):
             Array of float: Unnormalized PDF of number vs. redshift
         """
         integral = scipy.integrate.quad(lambda L: self.LF(L, z), self.lmin, self.lmax)[0]
-        return integral * cosmolopy.distance.diff_comoving_volume(z, **self.cosmology) * \
-            4*np.pi
+        if self.use_astropy:
+            return 4 * np.pi * integral * \
+                self.cosmology.differential_comoving_volume(z).value
+        else:
+            return 4 * np.pi * integral * \
+                cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
 
     def L_CDF(self, redshift_bins, luminosity_bins):
         """

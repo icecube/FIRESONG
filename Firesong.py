@@ -11,11 +11,11 @@ import argparse
 import numpy as np
 
 # Firesong code
-from Evolution import get_evolution, SourcePopulation
-from Evolution import TransientSourcePopulation, cosmology
-from Luminosity import get_LuminosityFunction
-from input_output import output_writer, print_config, get_outputdir
-from sampling import InverseCDF
+from .Evolution import get_evolution, SourcePopulation
+from .Evolution import TransientSourcePopulation, cosmology
+from .Luminosity import get_LuminosityFunction
+from .input_output import output_writer, print_config, get_outputdir
+from .sampling import InverseCDF
 
 def firesong_simulation(outputdir,
                         filename='Firesong.out',
@@ -33,6 +33,7 @@ def firesong_simulation(outputdir,
                         luminosity=0.0,
                         emin=1e4,
                         emax=1e7,
+                        use_astropy=False,
                         seed=None,
                         verbose=True):
     """
@@ -77,9 +78,12 @@ def firesong_simulation(outputdir,
     if Transient:
         population = TransientSourcePopulation(cosmology,
                                                get_evolution(Evolution),
-                                               timescale=timescale)
+                                               timescale=timescale,
+                                               use_astropy=use_astropy)
     else:
-        population = SourcePopulation(cosmology, get_evolution(Evolution))
+        population = SourcePopulation(cosmology,
+                                      get_evolution(Evolution),
+                                      use_astropy=use_astropy)
 
     N_sample = int(population.Nsources(density, zmax))
 
