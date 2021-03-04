@@ -20,14 +20,14 @@ from sampling import InverseCDF
 def firesong_simulation(outputdir,
                         filename='Firesong.out',
                         density=1e-9,
-                        Evolution="HB2006SFR",
+                        Evolution="MD2014SFR",
                         Transient=False,
                         timescale=1000.,
                         zmin=0.0005,
                         zmax=10.,
                         bins=10000,
-                        fluxnorm=0.9e-8,
-                        index=2.13,
+                        fluxnorm=1.44e-8,
+                        index=2.28,
                         LF="SC",
                         sigma=1.0,
                         luminosity=0.0,
@@ -53,9 +53,9 @@ def firesong_simulation(outputdir,
         zmax (float, optional, default=10.): Farthest redshift to consider
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
-        fluxnorm (float, optional, default=0.9e-8): Normalization on the total
+        fluxnorm (float, optional, default=1.44e-8): Normalization on the total
             astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1
-        index (float, optional, default=2.13): Spectral index of diffuse flux
+        index (float, optional, default=2.28): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose 
             between standard candle (SC), LogNormal (LG)
         sigma (float, optional, default=1.0): Width of lognormal distribution
@@ -179,33 +179,33 @@ if __name__ == "__main__":
                         default='Firesong.out', help='Output filename')
     parser.add_argument('-d', action='store', dest='density',
                         type=float, default=1e-9,
-                        help='Local neutrino source density [1/Mpc^3]')
+                        help='Local neutrino source density [1/Mpc^3] (default 1e-9 / Mpc^3)')
     parser.add_argument("--evolution", action="store",
                         dest="Evolution", default='MD2014SFR',
                         help="Source evolution options:  HB2006SFR, YMKBH2008SFR, CC2015SNR , MD2014SFR (default), NoEvolution")
     parser.add_argument("--transient", action='store_true',
                         dest='Transient', default=False,
-                        help='Simulate transient sources')
+                        help='Simulate transient sources (default False)')
     parser.add_argument("--timescale", action='store',
                         dest='timescale', type=float,
-                        default=1000., help='time scale of transient sources in seconds, default is 1000sec.')
+                        default=1000., help='time scale of transient sources in seconds (default 1000 seconds)')
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
-                        help="Highest redshift to be simulated")
+                        help="Highest redshift to be simulated (default 10.)")
     parser.add_argument("--fluxnorm", action="store", dest='fluxnorm',
                         type=float, default=1.44e-8,
-                        help="Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
+                        help="Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index) GeV/cm^2.s.sr (default 1.44e-8)")
     parser.add_argument("--index", action="store", dest='index',
                         type=float, default=2.28,
-                        help="Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr")
+                        help="Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index) GeV/cm^2.s.sr (default 2.28)")
     parser.add_argument("--LF", action="store", dest="LF", default="SC",
-                        help="Luminosity function, SC for standard candles, LG for lognormal, PL for powerlaw")
+                        help="Luminosity function, SC for standard candles (default), LG for lognormal, PL for powerlaw")
     parser.add_argument("--sigma", action="store",
                         dest="sigma", type=float, default=1.0,
-                        help="Width of a log normal Luminosity function in dex, default: 1.0")
+                        help="Width of a log normal Luminosity function in dex (default 1.0)")
     parser.add_argument("--L", action="store",
                         dest="luminosity", type=float, default=0.0,
-                        help="Set luminosity for each source, will reset fluxnorm option, unit erg/yr")
+                        help="Set luminosity for each source [erg/year]. Resets fluxnorm option")
     options = parser.parse_args()
 
     firesong_simulation(outputdir,

@@ -1,12 +1,22 @@
 #!/usr/bin/python
 
-"""Calculates features of various cosmic evolution models"""
+"""
+Calculates features of various cosmic evolution models
+
+Cosmological parameters are hardcoded to Planck (2018) results: 
+\(\Omega_{M} = 0.315\), \(\Omega_{L} = 1 - \Omega_{M}\), \(h = 0.674 \)
+
+Planck Collaboration A&A 641, A6 (2020)
+arXiv:1807.06209
+
+"""
 
 import numpy as np
 import scipy
 import cosmolopy
-cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
-
+# These are Planck 2015 values
+#cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
+cosmology = {'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674}
 
 def get_evolution(evol):
     """

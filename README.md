@@ -8,8 +8,7 @@ Set up the enviromental variable FIRESONG. In bash: `export FIRESONG=/location/o
 Several scripts are provided:
 * Firesong.py - Generates an instance of all neutrino sources in
   the Universe according to the parameters provided (e.g. local
-  neutrino source density). The transient functionality has not been
-  tested. 
+  neutrino source density).
 * FluxPDF.py - Generated the flux probability density distribution of a 
 source.
 * Legend.py - 
