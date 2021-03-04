@@ -47,12 +47,12 @@ class TestFiresongSimulation(unittest.TestCase):
 
     def test_firesong_luminosity(self):
         self.assertAlmostEqual(np.log10(self.firesong_uni['header']['luminosity']),
-            np.log10(3.6471202781753894e+52),
+            np.log10(6.099042878096284e+52),
             places=3)
 
     def test_firesong_number(self):
         self.assertEqual(len(self.firesong_uni['sources']['z']),
-            18460)
+            18370)
 
     def test_median_redshift(self):
         self.assertAlmostEqual(np.median(self.firesong_uni['sources']['z']),
@@ -62,9 +62,9 @@ class TestFiresongSimulation(unittest.TestCase):
     def test_total_flux(self):
         # Compares both the quoted sum to the direct
         # sum of sources, compares these both to input flux
-        self.assertAlmostEqual(np.log10(self.firesong_uni['total_flux']/9e-9),
+        self.assertAlmostEqual(np.log10(self.firesong_uni['total_flux']/1.44e-8),
             0.0,
-            places=2)
+            places=1)
         self.assertAlmostEqual(np.log10(np.sum(self.firesong_uni['sources']['flux'])),
             np.log10(self.firesong_uni['total_flux']*4.*np.pi),
             places=3)

@@ -89,7 +89,7 @@ class TestSourcePopulation(unittest.TestCase):
 
     def test_Nsources(self):
         self.assertEqual(self.pop.Nsources(1e-9, zmax=10.),
-                         3769.7731306195333)
+                         3745.1796382799967)
 
     def test_Flux_Lumi(self):
         L = self.pop.Lumi2Flux(1e50, 2.0, 1e3, 1e7, z=1)
@@ -105,7 +105,7 @@ class TestSourcePopulation(unittest.TestCase):
                                                         1e-9,
                                                         zmax=10.,
                                                         index=2.0),
-                         9.2911752992097727e-11)
+                         9.244753729666578e-11)
 
 
 class TestTransientSourcePopulation(unittest.TestCase):
