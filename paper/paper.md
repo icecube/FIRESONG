@@ -3,7 +3,9 @@ title:  'FIRESONG: A python package to simulate populations of extragalactic neu
 tags:
    - Python
    - Neutrinos
-   - Multi messenger Astrophysics
+   - Neutrino Sources
+   - Cosmic Rays
+   - Multi Messenger Astrophysics
    - Cosmology
 authors:
    - name: Chun Fai Tung
@@ -42,13 +44,12 @@ bibliography: paper.bib
 Neutrinos provide a new perspective on the universe. Due to their weak
 interaction with matter, neutrinos carry information from places where
 electromagnetic radiation, e.g., gamma rays, cannot
-escape. Though astrophysical neutrinos have been identified, the class
+escape. Though astrophysical neutrinos have been detected, the class
 or classes of objects that produce them have not been unequivocally
 identified. ``FIRESONG`` simulations populate the universe with
 neutrino sources. These simulations can be used, among other things,
-to establish if a given class of astronomical sources are viable
-sources of astrophysical neutrinos. 
-
+to study if a given class of astronomical sources is viable
+to explain measured astrophysical neutrinos. 
 
 # Background
 
@@ -60,15 +61,14 @@ with an spectral index ranging from -2.28 to -2.89, depending on the
 observation channel used. This flux is apparently isotropic,
 consistent with an extragalactic origin for these neutrinos. The flux
 is also consistent with equal flux for each of the three neutrino
-flavors [@IceCube:2019c], as consistent with 
-expectations for standard neutrino oscillations over astrophysical
+flavors [@IceCube:2019c], as expected for standard neutrino oscillations over astrophysical
 baselines. The origin of this flux is of great scientific interest as
 it is expected that neutrino sources are also sources of
 ultra-high-energy cosmic rays, which also have an unknown origin. 
 IceCube has identified the blazar, a sub-type of Active Galactic
 Nuclei (AGN), TXS 0506+056 as a candidate neutrino source
-[@IceCube:2018a;@IceCube:2018b]. However, there's also evidence, also
-by IceCube that gamma-ray bright blazars contribute to no more than
+[@IceCube:2018a;@IceCube:2018b]. However, there's also evidence, by
+IceCube that gamma-ray bright blazars contribute to no more than 
 approximately 27% of the diffuse flux [IceCube:2017a]. More recently
 IceCube has found a neutrino point source hot-spot, just below the 3
 sigma threshold normally assigned to evidence, correlated with the
@@ -79,7 +79,7 @@ ruled out GRBs as constributing more than 1% of the diffuse flux
 [@IceCube:2015].
 
 The properties of various proposed extragalactic neutrino
-source (or also reservoir) classes, such as starburst galaxies,
+source and/or reservoir classes, such as starburst galaxies,
 blazars, low luminosity GRBs, Flat Spectrum Radio Quasars, BL Lacs and
 galaxy clusters can be summarized in terms of the local density (or
 density rate for transient sources) as a function of luminosity (or
@@ -87,24 +87,23 @@ per-burst equivalent isotropic energy for transient sources)
 [@Kowalski:2014;@MuraseWaxman:2016]. The correct description of each of these classes of 
 objects depends on, e.g., the redshift evolution of the density of
 sources; but more generally on the luminosity function of the
-objects. The exitance of a diffuse extragalactic neutrino flux can be
+objects. The existence of a diffuse extragalactic neutrino flux can be
 described as a inverse relationship between density (density-rate) and
-luminosity (isotropic energy) [@Kowalski:2014]. This relationship also
-depends on the evolution assumed. Note by Ignacio: We can provide an
-example Kowalski plot - but this is not critically needed.
+luminosity (isotropic equivalent energy) [@Kowalski:2014]. This relationship also
+depends on the evolution assumed.
 
-The identification of the main sources of the diffuse flux remains an
+The identification of the main sources of the diffuse neutrino flux remains an
 open research topic.
 
 # Statement of Need
 
-``FIRESONG`` is a python package  to be used by researchers interested in
+``FIRESONG`` is a python package to be used by researchers interested in
 simulating populations of neutrino sources in the universe and to put
 these simulations in the context of IceCube's observation of a diffuse
-neutrino flux.  The calculations needed to conduct these simulations
+neutrino flux. The calculations needed to conduct these simulations
 are well established 
 but also cumbersome and error prone. Indeed several authors have similar
-(usually private) code. ``FIRESONG`` provides a publicly 
+(usually private) code. ``FIRESONG`` provides an open source 
 mantained framework for these simulations.  ``FIRESONG`` depends on
 the ``cosmolopy`` package [@cosmolopy] 
 for cosmological calculations. ``FIRESONG`` also depends on ``numpy``
@@ -124,10 +123,10 @@ produce a python dictionary of the simulated neutrino
 sources. ``FIRESONG`` can be used to simulate steady or transient
 sources. If no luminosity (isotropic equivalent energy) is provided,
 ``FIRESONG`` calculates it, as a function of local density (density
-rate) and other parameters, so that the IceCube diffuse flux is fully
+rate) and other parameters, so that the IceCube neutrino diffuse flux is fully
 saturated. Lack of knowledge of the properties of neutrino sources
-inspire simplistic choices for implemented luminosity distributions: a
-delta function (Standard Candle), a lognormal distribution or a power
+motivate simple choices for implemented luminosity distributions: a
+delta function (standard candle), a lognormal distribution or a power
 law distribution. Various models of Star Formation History are
 implemented as well as no evolution.
 
@@ -137,8 +136,8 @@ Write about FluxPDF.py
 
 # Acknowledgements
 
-We acknowldge comments, support and ideas by:  Markus Ahlers,
-Konstancja Satalecka, George Japaridze and the IceCube collaboration.
+We acknowldge comments, support and ideas by:  Markus Ahlers, George
+Japaridze, Konstancja Satalecka and the IceCube collaboration. 
 CFT, ML, AP and IT acknowledge support by NSF grant PHY-1913607.
 
 # References
