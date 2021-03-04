@@ -31,7 +31,7 @@ def flux_pdf(outputdir,
              luminosity=0.0,
              emin=1e4,
              emax=1e7,
-             LumMin=1e45, LumMax=1e54, nLbins=120,
+             LumMin=1e45, LumMax=1e54, nLbins=500,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False,
              verbose=True):
@@ -125,43 +125,47 @@ def flux_pdf(outputdir,
     logFlux_array = np.linspace(logFMin, logFMax, nFluxBins)
     deltaLogFlux = float(logFMax-logFMin) / nFluxBins
 
-    Count_array = np.zeros(nFluxBins)
     fluxOutOfBounds = []
     if with_dFdz:
         Flux_from_fixed_z = np.zeros(bins)
 
-    # Integration
-    # Loop over redshift bins
-    for i, z in enumerate(zs):
-        tot_flux_from_z = 0.
-        # Loop over Luminosity bins
-        for lum in Ls:
-            # Number of Sources in
-            dN = N_sample * luminosity_function.pdf(10**lum) * deltaL * \
-                (population.RedshiftDistribution(z)/int_norm) * deltaz
+    # bin-by-bin integration
+    if LF == "SC":
+        pdf_dL = np.where(np.abs(Ls - np.log10(luminosity_function.mean))
+            < deltaL/2., 1.0, 0.0)
+    else:
+        prepend_val = 10.**(Ls[0] - deltaL) # ensures shapes match
+        pdf_dL = luminosity_function.pdf(10**Ls) * \
+            np.diff(10.**Ls, prepend=prepend_val)
 
-            # Flux to Source Strength
-            logF = np.log10(population.Lumi2Flux(10**lum,
-                                                 index=index,
-                                                 emin=emin,
-                                                 emax=emax,
-                                                 z=z))
+    pdf_dz = population.RedshiftDistribution(zs) * deltaz / int_norm
+    dNs = N_sample * pdf_dz[:,np.newaxis] * pdf_dL
 
-            # Add dN to Histogram
-            if logF < logFMax and logF > logFMin:
-                idx = int((logF-logFMin) / deltaLogFlux)
-                Count_array[idx] += dN
-                if with_dFdz:
-                    tot_flux_from_z += dN*10**logF
-            else:
-                fluxOutOfBounds.append(logF)
-        if with_dFdz:
-            Flux_from_fixed_z[i] = tot_flux_from_z
+    # flux scales linearly with luminosity for a fixed redshift,
+    # so just calculate the z dependence and scale by luminosity after
+    flux_from_redshift = population.Lumi2Flux(1.,
+            index=index,
+            emin=emin,
+            emax=emax,
+            z=zs)
+    fluxes_all = flux_from_redshift[:,np.newaxis] * (10.**Ls)
+    logFs = np.log10(fluxes_all)
+    
+    # Find which flux bins the fluxes fall into
+    indices = np.digitize(logFs, bins=logFlux_array) - 1
+    mask = (indices >= 0) & (indices < len(logFlux_array) - 1)
+
+    # Calculate the sources out of bounds and the sums for each flux
+    fluxOutOfBounds = logFs[~mask]
+    Count_array = np.array([np.sum(dNs[indices == ind]) for ind in range(nFluxBins)])
+
+    # Project the sum to isolate z dependence
+    Flux_from_fixed_z = np.sum(dNs * (10.**logFs), axis=1)
 
     if filename is None:
         if with_dFdz:
             return logFlux_array, Count_array, zs, Flux_from_fixed_z
-        return logFlux_array, Count_array
+        return logFlux_array, Count_array 
 
     out = output_writer_PDF(outputdir, filename)
     out.write(logFlux_array, Count_array)
@@ -188,7 +192,7 @@ if __name__ == "__main__":
                         help="Source evolution options:  HB2006SFR (default), NoEvolution")
     parser.add_argument("--transient", action='store_true',
                         dest='Transient', default=False,
-                        help='Simulate transient sources, NOT TESTED YET!')
+                        help='Simulate transient sources')
     parser.add_argument("--timescale", action='store',
                         dest='timescale', type=float,
                         default=1000., help='time scale of transient sources, default is 1000sec.')
@@ -222,7 +226,7 @@ if __name__ == "__main__":
                         dest="lRange", type=float, default=[1e45, 1e54],
                         help="Set the minimal and maximal integration bounderis in luminosity, unit erg/yr")
     parser.add_argument("--lBins", action="store",
-                        dest="lBins", type=float, default=120,
+                        dest="lBins", type=float, default=500,
                         help="Set number of log10(luminosity) bins used in integration")
     parser.add_argument("--fRange", action="store", nargs=2,
                         dest="fRange", type=float, default=[-10, 6],
