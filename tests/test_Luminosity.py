@@ -15,8 +15,8 @@ import numpy as np
 
 
 class TestLuminosity(unittest.TestCase):
-    """ Tests get_evolution function, Evolution class and
-        all implemented Evolutions.
+    """ Tests Luminosity classes, with focus on standard
+        candles and lognormal distributions
     """
 
     @classmethod

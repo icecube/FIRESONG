@@ -21,7 +21,11 @@ class TestEvolution(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ once before all tests """
-        pass
+        cls.evol1 = Evolution.get_evolution("NoEvolution")
+        cls.evol2 = Evolution.get_evolution("HB2006SFR")
+        cls.evol3 = Evolution.get_evolution("MD2014SFR")
+        cls.evol4 = Evolution.get_evolution("YMKBH2008SFR")
+        cls.evol5 = Evolution.get_evolution("CC2015SNR")
 
     @classmethod
     def tearDownClass(cls):
@@ -30,8 +34,7 @@ class TestEvolution(unittest.TestCase):
 
     def setUp(self):
         "before each test"
-        self.evol1 = Evolution.get_evolution("NoEvolution")
-        self.evol2 = Evolution.get_evolution("HB2006SFR")
+        pass
 
     def tearDown(self):
         "after each test"
@@ -44,22 +47,42 @@ class TestEvolution(unittest.TestCase):
             Evolution.get_evolution("Test")
 
     def test_EvolutionBaseClass(self):
-        pass
+        evol = Evolution.Evolution()
+        with self.assertRaises(NotImplementedError):
+            evol(1.)
 
     def test_NoEvolution(self):
         self.assertEqual(self.evol1(1.), self.evol1(2.))
+        self.assertEqual(str(self.evol1), 
+            "No Evolution")
 
     def test_HopkinsBeacom2006StarFormationRate(self):
-        pass
+        self.assertAlmostEqual(self.evol2(1.),
+            0.14702066600558594,
+            3)
+        self.assertEqual(str(self.evol2), 
+            "Hopkins and Beacom (2006)")
 
     def test_YukselEtAl2008StarFormationRate(self):
-        pass
+        self.assertAlmostEqual(self.evol4(1.),
+            0.19698310613518824,
+            3)
+        self.assertEqual(str(self.evol4), 
+            "Yuksel et al. (2008)")
 
     def test_CandelsClash2015SNRate(self):
-        pass
+        self.assertAlmostEqual(self.evol5(1.),
+            0.0707688850689447,
+            3)
+        self.assertEqual(str(self.evol5), 
+            "Strolger et al. (2015)")
 
     def test_MadauDickinson2014CSFH(self):
-        pass
+        self.assertAlmostEqual(self.evol3(1.),
+            0.08665290222624604,
+            3)
+        self.assertEqual(str(self.evol3), 
+            "Madau and Dickinson (2014)")
 
 
 class TestSourcePopulation(unittest.TestCase):
@@ -114,7 +137,14 @@ class TestTransientSourcePopulation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ once before all tests """
-        pass
+        evol = Evolution.get_evolution("NoEvolution")
+        cls.transient_pop = Evolution.TransientSourcePopulation(
+            Evolution.cosmology,
+            evol,
+            1000.)
+        cls.pop = Evolution.SourcePopulation(
+            Evolution.cosmology,
+            evol)
 
     @classmethod
     def tearDownClass(cls):
@@ -131,8 +161,11 @@ class TestTransientSourcePopulation(unittest.TestCase):
 
     ### tests start here ###
 
-    def test_0(self):
-        pass
+    def test_redshift_dist(self):
+        self.assertEqual(
+            self.transient_pop.RedshiftDistribution(2.) * (1.+2.),
+            self.pop.RedshiftDistribution(2.)
+        )
 
 
 if __name__ == "__main__":
