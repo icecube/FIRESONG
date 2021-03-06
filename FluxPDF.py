@@ -18,7 +18,7 @@ from input_output import output_writer_PDF, get_outputdir, print_config
 def flux_pdf(outputdir,
              filename=None,
              density=1e-9,
-             Evolution="HB2006SFR",
+             Evolution="MD2014SFR",
              Transient=False,
              timescale=1000.,
              zmin=0.0005,
@@ -65,9 +65,9 @@ def flux_pdf(outputdir,
             Units of erg/yr
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
-        LumiMin (float, optional, default=1e45): Minimum luminosity considered
+        LumMin (float, optional, default=1e45): Minimum luminosity considered
             in UNITS
-        LumiMin (float, optional, default=1e54): Max luminosity considered,
+        LumMax (float, optional, default=1e54): Max luminosity considered,
             in UNITS
         nLbins (int, optional, default=120): Number of luminosity bins
         logFMin (float, optional, default=-10.): minimum log10 of flux to 
