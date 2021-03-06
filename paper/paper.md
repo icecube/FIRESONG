@@ -133,7 +133,7 @@ implemented as well as no evolution.
 
 Write about Legend.py
 
-Write about FluxPDF.py
+Luminosity functions provide the source density as a function of source luminosity and cosmological redshift. For observational purposes, however, we usually care about the source count distribution, i.e., a function giving the total number of sources with a specific flux at Earth. The ``FluxPDF.py`` of ``FIRESONG`` calculates a smooth source count distribution by marginalising over any luminosity function and summing up all the contributions after accounting for their distance. Once generated, this 1D distribution can be further used to generate specific realisations of the luminosity function. This is extremely fast, but doesn’t provide any information on the sources original redshifts. In that sense it is complementary to the sampling of ``Firesong.py`` and specifically useful for cases where the density of sources is extremely high. 
 
 # Acknowledgements
 
