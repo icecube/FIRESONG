@@ -21,7 +21,9 @@ Several scripts are provided:
 * FluxPDF.py - Generated the flux probability density distribution of a 
 source. It complements FIRESONG.py because is it much faster for large
 source densities. Only the flux of neutrino sources is calculated.
-* Legend.py - 
+* Legend.py - Generates an instance of gamma-ray sources in the universe
+  according to a luminosity denpendent density evolution (LDDE). Both the 
+  redshift and the gamma-ray flux (without attenuation) are calculated.
 
 # Tests
 All unittest could be run by
