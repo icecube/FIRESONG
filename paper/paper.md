@@ -130,7 +130,17 @@ delta function (standard candle), a lognormal distribution or a power
 law distribution. Various models of Star Formation History are
 implemented as well as no evolution.
 
-Write about Legend.py
+Legend.py can also be invoked from the command line as ```Lengend.py``` 
+and configured in a similar way as ```Firesong.py```. It can also be 
+executed in the Python console by importing the function 
+```legend_simulation``` from ```Legend```. If invoked as a function,
+the output will be a dictionary if the filename option is set to ```None```.
+The output dictionary contains the declinations, distances, and fluxes 
+of the simulated sources. Simulation of transient sources is not supported 
+by ```Legend```. Since ```Legend``` is motivated by Luminosity Dependent 
+Density Evolution (LDDE), the distribution of luminosities is decided by 
+the evolution model.  
+
 
 Luminosity functions provide the source density as a function of
 source luminosity and cosmological redshift. For observational
