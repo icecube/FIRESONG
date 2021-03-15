@@ -13,7 +13,6 @@ arXiv:1807.06209
 
 import numpy as np
 import scipy
-import cosmolopy
 from distance import *
 # These are Planck 2015 values
 #cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
@@ -263,7 +262,9 @@ class SourcePopulation(object):
 
         # Flat universe
         if use_cosmolopy:
-            self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+            import cosmolopy
+            self.cosmolopy = cosmolopy
+            self.cosmology = self.cosmolopy.distance.set_omega_k_0(cosmology)
         else:
             self.cosmology = cosmology
 
@@ -281,7 +282,7 @@ class SourcePopulation(object):
         """
         if self.use_cosmolopy:
             return 4 * np.pi * self.evolution(z) * \
-                cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
+                self.cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
         else:
             return 4 * np.pi * self.evolution(z) * \
                 diff_comoving_volume(z, **self.cosmology)
@@ -321,7 +322,7 @@ class SourcePopulation(object):
                 zz = np.linspace(0., 10., 500)
                 if self.use_cosmolopy:
                     spl = scipy.interpolate.UnivariateSpline(zz, 
-                            cosmolopy.distance.luminosity_distance(zz, 
+                            self.cosmolopy.distance.luminosity_distance(zz, 
                                 **self.cosmology))
                 else:
                     spl = scipy.interpolate.UnivariateSpline(zz, 
@@ -329,7 +330,7 @@ class SourcePopulation(object):
                                 **self.cosmology))
                 return spl(z)
         if self.use_cosmolopy:
-            return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+            return self.cosmolopy.distance.luminosity_distance(z, **self.cosmology)
         else:
             return luminosity_distance(z, **self.cosmology)
 
@@ -349,7 +350,7 @@ class SourcePopulation(object):
             float: total number of sources within z_max
         """
         if self.use_cosmolopy:
-            vlocal = cosmolopy.distance.comoving_volume(self._zlocal,
+            vlocal = self.cosmolopy.distance.comoving_volume(self._zlocal,
                                                         **self.cosmology)
         else:
             vlocal = comoving_volume(self._zlocal, **self.cosmology)
@@ -519,10 +520,10 @@ class TransientSourcePopulation(SourcePopulation):
         yr2sec (float): Conversion factor
     """
 
-    def __init__(self, cosmology, evolution, timescale):
+    def __init__(self, cosmology, evolution, timescale, use_cosmolopy=True):
         """
         """
-        super(TransientSourcePopulation, self).__init__(cosmology, evolution)
+        super(TransientSourcePopulation, self).__init__(cosmology, evolution, use_cosmolopy)
         self.timescale = timescale
         self.yr2sec = 86400*365
 
@@ -703,11 +704,17 @@ class LuminosityEvolution(object):
         cosmology (cosmolopy instance)
     """
 
-    def __init__(self, lmin, lmax, cosmology=cosmology):
+    def __init__(self, lmin, lmax, cosmology=cosmology, use_cosmolopy=True):
         """
         Constructor
         """
-        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+        self.use_cosmolopy = use_cosmolopy
+        if use_cosmolopy:
+            import cosmolopy
+            self.cosmolopy = cosmolopy
+            self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+        else:
+            self.cosmology =cosmology
         self.lmin = lmin
         self.lmax = lmax
         self._zlocal = 0.01
@@ -735,11 +742,19 @@ class LuminosityEvolution(object):
         if np.ndim(z) > 0:
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
-                spl = scipy.interpolate.UnivariateSpline(zz,
-                        cosmolopy.distance.luminosity_distance(zz,
+                if self.use_cosmolopy:
+                    spl = scipy.interpolate.UnivariateSpline(zz,
+                            self.cosmolopy.distance.luminosity_distance(zz,
+                            **self.cosmology))
+                else:
+                    spl = scipy.interpolate.UnivariateSpline(zz,
+                            luminosity_distance(zz,
                             **self.cosmology))
                 return spl(z)
-        return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+        if self.use_cosmolopy:
+            return self.cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+        else:
+            luminosity_distance(z, **self.cosmology)
 
     def RedshiftDistribution(self, z):
         r"""
@@ -756,8 +771,12 @@ class LuminosityEvolution(object):
             Array of float: Unnormalized PDF of number vs. redshift
         """
         integral = scipy.integrate.quad(lambda L: self.LF(L, z), self.lmin, self.lmax)[0]
-        return integral * cosmolopy.distance.diff_comoving_volume(z, **self.cosmology) * \
-            4*np.pi
+        if self.use_cosmolopy:
+            return integral * self.cosmolopy.distance.diff_comoving_volume(z, **self.cosmology) * \
+                4*np.pi
+        else:
+            return integral * diff_comoving_volume(z, **self.cosmology) * \
+                4*np.pi
 
     def L_CDF(self, redshift_bins, luminosity_bins):
         """

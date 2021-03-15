@@ -78,7 +78,8 @@ def firesong_simulation(outputdir,
     if Transient:
         population = TransientSourcePopulation(cosmology,
                                                get_evolution(Evolution),
-                                               timescale=timescale)
+                                               timescale=timescale,
+                                               use_cosmolopy=use_cosmolopy)
     else:
         population = SourcePopulation(cosmology, get_evolution(Evolution), 
             use_cosmolopy=use_cosmolopy)
