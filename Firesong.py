@@ -34,7 +34,8 @@ def firesong_simulation(outputdir,
                         emin=1e4,
                         emax=1e7,
                         seed=None,
-                        verbose=True):
+                        verbose=True,
+                        use_cosmolopy=True):
     """
     Simulate a universe of neutrino sources
 
@@ -79,7 +80,8 @@ def firesong_simulation(outputdir,
                                                get_evolution(Evolution),
                                                timescale=timescale)
     else:
-        population = SourcePopulation(cosmology, get_evolution(Evolution))
+        population = SourcePopulation(cosmology, get_evolution(Evolution), 
+            use_cosmolopy=use_cosmolopy)
 
     N_sample = int(population.Nsources(density, zmax))
 

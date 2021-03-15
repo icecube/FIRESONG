@@ -14,6 +14,7 @@ arXiv:1807.06209
 import numpy as np
 import scipy
 import cosmolopy
+from distance import *
 # These are Planck 2015 values
 #cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
 cosmology = {'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674}
@@ -251,16 +252,20 @@ class SourcePopulation(object):
         cosmology (cosmolopy instance)
     """
 
-    def __init__(self, cosmology, evolution):
+    def __init__(self, cosmology, evolution, use_cosmolopy=True):
         """
         """
         self._zlocal = 0.01
         self.Mpc2cm = 3.086e24                     # Mpc / cm
         self.GeV_per_sec_2_ergs_per_year = 50526.  # (GeV/sec) / (ergs/yr)
         self.evolution = evolution
+        self.use_cosmolopy = use_cosmolopy
 
         # Flat universe
-        self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+        if use_cosmolopy:
+            self.cosmology = cosmolopy.distance.set_omega_k_0(cosmology)
+        else:
+            self.cosmology = cosmology
 
     def RedshiftDistribution(self, z):
         r""" 
@@ -274,8 +279,12 @@ class SourcePopulation(object):
         Returns
             Array of float: Unnormalized PDF of number vs. redshift
         """
-        return 4 * np.pi * self.evolution(z) * \
-            cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
+        if self.use_cosmolopy:
+            return 4 * np.pi * self.evolution(z) * \
+                cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)
+        else:
+            return 4 * np.pi * self.evolution(z) * \
+                diff_comoving_volume(z, **self.cosmology)
 
     def RedshiftIntegral(self, zmax):
         r""" 
@@ -310,11 +319,19 @@ class SourcePopulation(object):
         if np.ndim(z) > 0:
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
-                spl = scipy.interpolate.UnivariateSpline(zz, 
-                        cosmolopy.distance.luminosity_distance(zz, 
-                            **self.cosmology))
+                if self.use_cosmolopy:
+                    spl = scipy.interpolate.UnivariateSpline(zz, 
+                            cosmolopy.distance.luminosity_distance(zz, 
+                                **self.cosmology))
+                else:
+                    spl = scipy.interpolate.UnivariateSpline(zz, 
+                            luminosity_distance(zz, 
+                                **self.cosmology))
                 return spl(z)
-        return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+        if self.use_cosmolopy:
+            return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
+        else:
+            return luminosity_distance(z, **self.cosmology)
 
     def Nsources(self, density, zmax):
         r""" Total number of sources within \(z_{\mathrm{max}}\):
@@ -331,8 +348,11 @@ class SourcePopulation(object):
         Returns:
             float: total number of sources within z_max
         """
-        vlocal = cosmolopy.distance.comoving_volume(self._zlocal,
-                                                    **self.cosmology)
+        if self.use_cosmolopy:
+            vlocal = cosmolopy.distance.comoving_volume(self._zlocal,
+                                                        **self.cosmology)
+        else:
+            vlocal = comoving_volume(self._zlocal, **self.cosmology)
         Ntotal = density * vlocal / \
             (self.RedshiftIntegral(self._zlocal) /
              self.RedshiftIntegral(zmax))

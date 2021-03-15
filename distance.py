@@ -32,7 +32,10 @@ def comoving_distance(z,z_0=0, **kwargs):
 
     z = np.atleast_1d(z)
     D_c = np.array([D_h*quad(lambda x:1./E(x, **kwargs), z_0, lim, epsabs=1.e-5)[0] for lim in z])
-    return D_c
+    if np.size(D_c) > 1:
+        return D_c
+    else:
+        return D_c[0]
 
 def angular_diameter_distance(z, **kwargs):
     '''
