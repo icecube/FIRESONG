@@ -25,6 +25,31 @@ source densities. Only the flux of neutrino sources is calculated.
   according to a luminosity denpendent density evolution (LDDE). Both the 
   redshift and the gamma-ray flux (without attenuation) are calculated.
 
+Examples:
+
+* ```python Firesong.py -d 1e-6 --evolution CC2015SNR --zmax 4.0
+--fluxnorm 1.44e-8 --index 2.28 --LF SC```
+wlll simulate neutrino sources with a local density of 10^-6 Mpc^-3
+with a source denstiy evolution that folows the Clash and Candels 2015
+Supernova Rate (CC2015SNR). The simulation will be done up to a
+redshift of 4.0. The neutrino luminosity, because it is not specified
+as an option, will be calculated internally to saturate a muon neutrino diffuse
+flux with a normalization, at 100 TeV, of E^2d\phi/dE = 1.44 x 10^-8
+GeV.cm^-2.s^-1.sr^-1 and with a spectral index of -2.28. Neutrino
+luminosoty is distributed as a delta function, i.e., standard candle (SC).
+*```python Firesong.py -d 1e-6 --evolution MD2016SFR --zmax 8.0
+--index 2.28 --LF SC -L 1e51```
+wlll simulate neutrino sources with a local density of 10^-6 Mpc^-3
+with a source denstiy evolution that folows the Madau and Dickinson 2016
+Star Formation Rate History (MD2014SFR). The simulation will be done up to a
+redshift of 8.0.  The neutrino power law spectral index is -2.28. Neutrino
+luminosoty is distributed as a delta function, i.e., standard candle (SC)
+and is set to be 10^51 erg/year. Note that muon neutrino diffuse flux
+normalization is ignored when a luminosity is specified, but the
+spectral index should still be provided. This mode of operation allows
+the exploration of the luminosity vs. local density plane (aka
+Kowalski plot).
+
 # Tests
 All unittest could be run by
 
