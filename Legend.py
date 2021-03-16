@@ -29,7 +29,8 @@ def legend_simulation(outputdir,
                       lmin=38,
                       lmax=48,
                       seed=None,
-                      verbose=True):
+                      verbose=True,
+                      use_cosmolopy=True):
     """
     Simulate a universe of neutrino sources with luminosity distribution 
         dependent on redshift
@@ -59,7 +60,7 @@ def legend_simulation(outputdir,
             as well as the sources. Only returned if filename is None
     """
 
-    LE_model = get_LEvolution(L_Evolution, lmin, lmax)
+    LE_model = get_LEvolution(L_Evolution, lmin, lmax, use_cosmolopy=use_cosmolopy)
 
     N_sample = int(LE_model.Nsources(zmax))
 

@@ -664,7 +664,7 @@ class TransientSourcePopulation(SourcePopulation):
 #LEGEND AREA#
 #############
 
-def get_LEvolution(le_model, lmin, lmax):
+def get_LEvolution(le_model, lmin, lmax, use_cosmolopy=True):
     """
     Get specific LuminosityEvolution model (a luminosity distribution
     that is a function of z)
@@ -678,7 +678,7 @@ def get_LEvolution(le_model, lmin, lmax):
     Returns:
         LuminosityEvolution: relevant luminosity-evolution object
     """
-    evolutions = {"HA2014BL": HardingAbazajian(lmin, lmax)
+    evolutions = {"HA2014BL": HardingAbazajian(lmin, lmax, use_cosmolopy=use_cosmolopy)
                   }
     if not le_model in list(evolutions.keys()):
         raise NotImplementedError("Luminosity Evolution " +
@@ -750,13 +750,12 @@ class LuminosityEvolution(object):
                             **self.cosmology))
                 else:
                     spl = scipy.interpolate.UnivariateSpline(zz,
-                            self.distance.luminosity_distance(zz,
-                            **self.cosmology))
+                            self.distance.luminosity_distance(zz))
                 return spl(z)
         if self.use_cosmolopy:
             return self.cosmolopy.distance.luminosity_distance(z, **self.cosmology)
         else:
-            self.distance.luminosity_distance(z, **self.cosmology)
+            self.distance.luminosity_distance(z)
 
     def RedshiftDistribution(self, z):
         r"""
@@ -777,8 +776,7 @@ class LuminosityEvolution(object):
             return integral * self.cosmolopy.distance.diff_comoving_volume(z, **self.cosmology) * \
                 4*np.pi
         else:
-            return integral * self.distance.diff_comoving_volume(z, **self.cosmology) * \
-                4*np.pi
+            return integral * self.distance.diff_comoving_volume(z) * 4*np.pi
 
     def L_CDF(self, redshift_bins, luminosity_bins):
         """
