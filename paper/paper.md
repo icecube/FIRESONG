@@ -8,33 +8,33 @@ tags:
    - Multi Messenger Astrophysics
    - Cosmology
 authors:
-   - name: Chun Fai Tung
-   affiliation: 1
-   - name: Theo Glauch
-   affiliation: 2
-   - name: Michael Larson
-   orcid: 0000-0002-6996-1155
-   affiliation: 3
-   - name: Alex Pizzuto
-   orcid: 0000-0002-8466-8168
-   affiliation: 4
-   - name: Rene Reimann
-   orcid: 0000-0002-1983-8271
-   affiliation: 5
-   - name: Ignacio Taboada
-   orcid: 0000-0003-3509-3457
-   affiliation: 1
+  - name: Chun Fai Tung
+    affiliation: 1
+  - name: Theo Glauch
+    affiliation: 2
+  - name: Michael Larson
+    orcid: 0000-0002-6996-1155
+    affiliation: 3
+  - name: Alex Pizzuto
+    orcid: 0000-0002-8466-8168
+    affiliation: 4
+  - name: Rene Reimann
+    orcid: 0000-0002-1983-8271
+    affiliation: 5
+  - name: Ignacio Taboada
+    orcid: 0000-0003-3509-3457
+    affiliation: 1
 affiliations:
   - name: School of Physics. Georgia Institute of Technology. Atlanta, GA 30332, USA
-  index: 1
+    index: 1
   - name: TUM
-  index: 2
+    index: 2
   - name: Dept. of Physics, University of Maryland, College Park, MD 20742, USA
-  index: 3
+    index: 3
   - name: Dept. of Physics and Wisconsin IceCube Particle Astrophysics Center, University of Wisconsin–Madison, Madison, WI 53706, USA
-  index: 4
+    index: 4
   - name: Johannes Gutenberg University Mainz, Institute of Physics - QUANTUM, 55128 Mainz, Germany
-  index: 5
+    index: 5
 date: 26 February 2021
 bibliography: paper.bib
 ---
@@ -69,7 +69,7 @@ IceCube has identified the blazar, a sub-type of Active Galactic
 Nuclei (AGN), TXS 0506+056 as a candidate neutrino source
 [@IceCube:2018a;@IceCube:2018b]. However, there's also evidence, by
 IceCube that gamma-ray bright blazars contribute to no more than 
-approximately 27% of the diffuse flux [IceCube:2017a]. More recently
+approximately 27% of the diffuse flux [@IceCube:2017a]. More recently
 IceCube has found a neutrino point source hot-spot, just below the 3
 sigma threshold normally assigned to evidence, correlated with the
 Seyfert II galaxy, another subtype of AGN, NGC 1068 [@IceCube:2020b]. Over
