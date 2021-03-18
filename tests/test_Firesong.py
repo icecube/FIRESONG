@@ -11,7 +11,8 @@ or:
 
 import os
 import unittest
-import Firesong, Evolution
+import firesong.Firesong as Firesong
+import firesong.Evolution as Evolution
 import numpy as np
 
 class TestFiresongSimulation(unittest.TestCase):

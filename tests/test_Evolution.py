@@ -10,7 +10,7 @@ or:
 """
 
 import unittest
-import Evolution
+import firesong.Evolution as Evolution
 
 
 class TestEvolution(unittest.TestCase):

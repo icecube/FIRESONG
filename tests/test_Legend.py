@@ -11,7 +11,8 @@ or:
 
 import os
 import unittest
-import Legend, Evolution
+import firesong.Legend as Legend
+import firesong.Evolution as Evolution
 import numpy as np
 
 class TestLegendSimulation(unittest.TestCase):

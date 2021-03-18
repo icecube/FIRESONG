@@ -10,7 +10,7 @@ or:
 """
 
 import unittest
-import input_output
+import firesong.input_output as input_output
 
 
 class TestOutputWriter(unittest.TestCase):
