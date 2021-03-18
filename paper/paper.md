@@ -9,6 +9,7 @@ tags:
    - Cosmology
 authors:
   - name: Chun Fai Tung
+    orcid: 0000-0001-6920-7841
     affiliation: 1
   - name: Theo Glauch
     affiliation: 2
