@@ -48,7 +48,7 @@ from input_output import output_writer_PDF, get_outputdir, print_config
 def flux_pdf(outputdir,
              filename=None,
              density=1e-9,
-             Evolution=&#34;HB2006SFR&#34;,
+             Evolution=&#34;MD2014SFR&#34;,
              Transient=False,
              timescale=1000.,
              zmin=0.0005,
@@ -61,7 +61,7 @@ def flux_pdf(outputdir,
              luminosity=0.0,
              emin=1e4,
              emax=1e7,
-             LumMin=1e45, LumMax=1e54, nLbins=120,
+             LumMin=1e45, LumMax=1e54, nLbins=500,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False,
              verbose=True):
@@ -95,9 +95,9 @@ def flux_pdf(outputdir,
             Units of erg/yr
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
-        LumiMin (float, optional, default=1e45): Minimum luminosity considered
+        LumMin (float, optional, default=1e45): Minimum luminosity considered
             in UNITS
-        LumiMin (float, optional, default=1e54): Max luminosity considered,
+        LumMax (float, optional, default=1e54): Max luminosity considered,
             in UNITS
         nLbins (int, optional, default=120): Number of luminosity bins
         logFMin (float, optional, default=-10.): minimum log10 of flux to 
@@ -155,43 +155,47 @@ def flux_pdf(outputdir,
     logFlux_array = np.linspace(logFMin, logFMax, nFluxBins)
     deltaLogFlux = float(logFMax-logFMin) / nFluxBins
 
-    Count_array = np.zeros(nFluxBins)
     fluxOutOfBounds = []
     if with_dFdz:
         Flux_from_fixed_z = np.zeros(bins)
 
-    # Integration
-    # Loop over redshift bins
-    for i, z in enumerate(zs):
-        tot_flux_from_z = 0.
-        # Loop over Luminosity bins
-        for lum in Ls:
-            # Number of Sources in
-            dN = N_sample * luminosity_function.pdf(10**lum) * deltaL * \
-                (population.RedshiftDistribution(z)/int_norm) * deltaz
+    # bin-by-bin integration
+    if LF == &#34;SC&#34;:
+        pdf_dL = np.where(np.abs(Ls - np.log10(luminosity_function.mean))
+            &lt; deltaL/2., 1.0, 0.0)
+    else:
+        prepend_val = 10.**(Ls[0] - deltaL) # ensures shapes match
+        pdf_dL = luminosity_function.pdf(10**Ls) * \
+            np.diff(10.**Ls, prepend=prepend_val)
 
-            # Flux to Source Strength
-            logF = np.log10(population.Lumi2Flux(10**lum,
-                                                 index=index,
-                                                 emin=emin,
-                                                 emax=emax,
-                                                 z=z))
+    pdf_dz = population.RedshiftDistribution(zs) * deltaz / int_norm
+    dNs = N_sample * pdf_dz[:,np.newaxis] * pdf_dL
 
-            # Add dN to Histogram
-            if logF &lt; logFMax and logF &gt; logFMin:
-                idx = int((logF-logFMin) / deltaLogFlux)
-                Count_array[idx] += dN
-                if with_dFdz:
-                    tot_flux_from_z += dN*10**logF
-            else:
-                fluxOutOfBounds.append(logF)
-        if with_dFdz:
-            Flux_from_fixed_z[i] = tot_flux_from_z
+    # flux scales linearly with luminosity for a fixed redshift,
+    # so just calculate the z dependence and scale by luminosity after
+    flux_from_redshift = population.Lumi2Flux(1.,
+            index=index,
+            emin=emin,
+            emax=emax,
+            z=zs)
+    fluxes_all = flux_from_redshift[:,np.newaxis] * (10.**Ls)
+    logFs = np.log10(fluxes_all)
+    
+    # Find which flux bins the fluxes fall into
+    indices = np.digitize(logFs, bins=logFlux_array) - 1
+    mask = (indices &gt;= 0) &amp; (indices &lt; len(logFlux_array) - 1)
+
+    # Calculate the sources out of bounds and the sums for each flux
+    fluxOutOfBounds = logFs[~mask]
+    Count_array = np.array([np.sum(dNs[indices == ind]) for ind in range(nFluxBins)])
+
+    # Project the sum to isolate z dependence
+    Flux_from_fixed_z = np.sum(dNs * (10.**logFs), axis=1)
 
     if filename is None:
         if with_dFdz:
             return logFlux_array, Count_array, zs, Flux_from_fixed_z
-        return logFlux_array, Count_array
+        return logFlux_array, Count_array 
 
     out = output_writer_PDF(outputdir, filename)
     out.write(logFlux_array, Count_array)
@@ -218,7 +222,7 @@ if __name__ == &#34;__main__&#34;:
                         help=&#34;Source evolution options:  HB2006SFR (default), NoEvolution&#34;)
     parser.add_argument(&#34;--transient&#34;, action=&#39;store_true&#39;,
                         dest=&#39;Transient&#39;, default=False,
-                        help=&#39;Simulate transient sources, NOT TESTED YET!&#39;)
+                        help=&#39;Simulate transient sources&#39;)
     parser.add_argument(&#34;--timescale&#34;, action=&#39;store&#39;,
                         dest=&#39;timescale&#39;, type=float,
                         default=1000., help=&#39;time scale of transient sources, default is 1000sec.&#39;)
@@ -252,7 +256,7 @@ if __name__ == &#34;__main__&#34;:
                         dest=&#34;lRange&#34;, type=float, default=[1e45, 1e54],
                         help=&#34;Set the minimal and maximal integration bounderis in luminosity, unit erg/yr&#34;)
     parser.add_argument(&#34;--lBins&#34;, action=&#34;store&#34;,
-                        dest=&#34;lBins&#34;, type=float, default=120,
+                        dest=&#34;lBins&#34;, type=float, default=500,
                         help=&#34;Set number of log10(luminosity) bins used in integration&#34;)
     parser.add_argument(&#34;--fRange&#34;, action=&#34;store&#34;, nargs=2,
                         dest=&#34;fRange&#34;, type=float, default=[-10, 6],
@@ -297,7 +301,7 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="FIRESONG.FluxPDF.flux_pdf"><code class="name flex">
-<span>def <span class="ident">flux_pdf</span></span>(<span>outputdir, filename=None, density=1e-09, Evolution='HB2006SFR', Transient=False, timescale=1000.0, zmin=0.0005, zmax=10.0, bins=10000, fluxnorm=9e-09, index=2.13, LF='SC', sigma=1.0, luminosity=0.0, emin=10000.0, emax=10000000.0, LumMin=1e+45, LumMax=1e+54, nLbins=120, logFMin=-10, logFMax=6, nFluxBins=200, with_dFdz=False, verbose=True)</span>
+<span>def <span class="ident">flux_pdf</span></span>(<span>outputdir, filename=None, density=1e-09, Evolution='MD2014SFR', Transient=False, timescale=1000.0, zmin=0.0005, zmax=10.0, bins=10000, fluxnorm=9e-09, index=2.13, LF='SC', sigma=1.0, luminosity=0.0, emin=10000.0, emax=10000000.0, LumMin=1e+45, LumMax=1e+54, nLbins=500, logFMin=-10, logFMax=6, nFluxBins=200, with_dFdz=False, verbose=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Simulate a universe of neutrino sources and calculate the PDF of fluxes</p>
@@ -343,10 +347,10 @@ Units of erg/yr</dd>
 <dd>Minimum neutrino energy in GeV</dd>
 <dt><strong><code>emax</code></strong> :&ensp;<code>float</code>, optional, default=<code>1e7</code></dt>
 <dd>Maximum neutrino energy in GeV</dd>
-<dt><strong><code>LumiMin</code></strong> :&ensp;<code>float</code>, optional, default=<code>1e45</code></dt>
+<dt><strong><code>LumMin</code></strong> :&ensp;<code>float</code>, optional, default=<code>1e45</code></dt>
 <dd>Minimum luminosity considered
 in UNITS</dd>
-<dt><strong><code>LumiMin</code></strong> :&ensp;<code>float</code>, optional, default=<code>1e54</code></dt>
+<dt><strong><code>LumMax</code></strong> :&ensp;<code>float</code>, optional, default=<code>1e54</code></dt>
 <dd>Max luminosity considered,
 in UNITS</dd>
 <dt><strong><code>nLbins</code></strong> :&ensp;<code>int</code>, optional, default=<code>120</code></dt>
@@ -380,7 +384,7 @@ Choice to include derivative of the PDF as well if with_dFdz</dd>
 <pre><code class="python">def flux_pdf(outputdir,
              filename=None,
              density=1e-9,
-             Evolution=&#34;HB2006SFR&#34;,
+             Evolution=&#34;MD2014SFR&#34;,
              Transient=False,
              timescale=1000.,
              zmin=0.0005,
@@ -393,7 +397,7 @@ Choice to include derivative of the PDF as well if with_dFdz</dd>
              luminosity=0.0,
              emin=1e4,
              emax=1e7,
-             LumMin=1e45, LumMax=1e54, nLbins=120,
+             LumMin=1e45, LumMax=1e54, nLbins=500,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False,
              verbose=True):
@@ -427,9 +431,9 @@ Choice to include derivative of the PDF as well if with_dFdz</dd>
             Units of erg/yr
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
-        LumiMin (float, optional, default=1e45): Minimum luminosity considered
+        LumMin (float, optional, default=1e45): Minimum luminosity considered
             in UNITS
-        LumiMin (float, optional, default=1e54): Max luminosity considered,
+        LumMax (float, optional, default=1e54): Max luminosity considered,
             in UNITS
         nLbins (int, optional, default=120): Number of luminosity bins
         logFMin (float, optional, default=-10.): minimum log10 of flux to 
@@ -487,43 +491,47 @@ Choice to include derivative of the PDF as well if with_dFdz</dd>
     logFlux_array = np.linspace(logFMin, logFMax, nFluxBins)
     deltaLogFlux = float(logFMax-logFMin) / nFluxBins
 
-    Count_array = np.zeros(nFluxBins)
     fluxOutOfBounds = []
     if with_dFdz:
         Flux_from_fixed_z = np.zeros(bins)
 
-    # Integration
-    # Loop over redshift bins
-    for i, z in enumerate(zs):
-        tot_flux_from_z = 0.
-        # Loop over Luminosity bins
-        for lum in Ls:
-            # Number of Sources in
-            dN = N_sample * luminosity_function.pdf(10**lum) * deltaL * \
-                (population.RedshiftDistribution(z)/int_norm) * deltaz
+    # bin-by-bin integration
+    if LF == &#34;SC&#34;:
+        pdf_dL = np.where(np.abs(Ls - np.log10(luminosity_function.mean))
+            &lt; deltaL/2., 1.0, 0.0)
+    else:
+        prepend_val = 10.**(Ls[0] - deltaL) # ensures shapes match
+        pdf_dL = luminosity_function.pdf(10**Ls) * \
+            np.diff(10.**Ls, prepend=prepend_val)
 
-            # Flux to Source Strength
-            logF = np.log10(population.Lumi2Flux(10**lum,
-                                                 index=index,
-                                                 emin=emin,
-                                                 emax=emax,
-                                                 z=z))
+    pdf_dz = population.RedshiftDistribution(zs) * deltaz / int_norm
+    dNs = N_sample * pdf_dz[:,np.newaxis] * pdf_dL
 
-            # Add dN to Histogram
-            if logF &lt; logFMax and logF &gt; logFMin:
-                idx = int((logF-logFMin) / deltaLogFlux)
-                Count_array[idx] += dN
-                if with_dFdz:
-                    tot_flux_from_z += dN*10**logF
-            else:
-                fluxOutOfBounds.append(logF)
-        if with_dFdz:
-            Flux_from_fixed_z[i] = tot_flux_from_z
+    # flux scales linearly with luminosity for a fixed redshift,
+    # so just calculate the z dependence and scale by luminosity after
+    flux_from_redshift = population.Lumi2Flux(1.,
+            index=index,
+            emin=emin,
+            emax=emax,
+            z=zs)
+    fluxes_all = flux_from_redshift[:,np.newaxis] * (10.**Ls)
+    logFs = np.log10(fluxes_all)
+    
+    # Find which flux bins the fluxes fall into
+    indices = np.digitize(logFs, bins=logFlux_array) - 1
+    mask = (indices &gt;= 0) &amp; (indices &lt; len(logFlux_array) - 1)
+
+    # Calculate the sources out of bounds and the sums for each flux
+    fluxOutOfBounds = logFs[~mask]
+    Count_array = np.array([np.sum(dNs[indices == ind]) for ind in range(nFluxBins)])
+
+    # Project the sum to isolate z dependence
+    Flux_from_fixed_z = np.sum(dNs * (10.**logFs), axis=1)
 
     if filename is None:
         if with_dFdz:
             return logFlux_array, Count_array, zs, Flux_from_fixed_z
-        return logFlux_array, Count_array
+        return logFlux_array, Count_array 
 
     out = output_writer_PDF(outputdir, filename)
     out.write(logFlux_array, Count_array)
