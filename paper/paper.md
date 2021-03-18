@@ -110,7 +110,7 @@ for cosmological calculations. ``FIRESONG`` also depends on ``numpy``
 and ``scipy``. ``FIRESONG`` has already been used on scientific
 publication by several observatories of neutrinos or gamma rays:
 IceCube [@IceCube:2019d], HAWC and IceCube [@HAWCIceCube:2021], 
-HAWC [HAWC:2018] and CTA [@FiresongCTA:2019]. Though originally concieved
+HAWC [@HAWC:2018] and CTA [@FiresongCTA:2019]. Though originally concieved
 as a stand alone project, maintanance of ``FIRESONG`` is currently
 provided by IceCube collaboration members.
 
