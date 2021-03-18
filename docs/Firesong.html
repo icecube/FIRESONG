@@ -50,14 +50,14 @@ from sampling import InverseCDF
 def firesong_simulation(outputdir,
                         filename=&#39;Firesong.out&#39;,
                         density=1e-9,
-                        Evolution=&#34;HB2006SFR&#34;,
+                        Evolution=&#34;MD2014SFR&#34;,
                         Transient=False,
                         timescale=1000.,
                         zmin=0.0005,
                         zmax=10.,
                         bins=10000,
-                        fluxnorm=0.9e-8,
-                        index=2.13,
+                        fluxnorm=1.44e-8,
+                        index=2.28,
                         LF=&#34;SC&#34;,
                         sigma=1.0,
                         luminosity=0.0,
@@ -83,9 +83,9 @@ def firesong_simulation(outputdir,
         zmax (float, optional, default=10.): Farthest redshift to consider
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
-        fluxnorm (float, optional, default=0.9e-8): Normalization on the total
+        fluxnorm (float, optional, default=1.44e-8): Normalization on the total
             astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1
-        index (float, optional, default=2.13): Spectral index of diffuse flux
+        index (float, optional, default=2.28): Spectral index of diffuse flux
         LF (string, optional, default=&#34;SC&#34;): Luminosity function, choose 
             between standard candle (SC), LogNormal (LG)
         sigma (float, optional, default=1.0): Width of lognormal distribution
@@ -209,33 +209,33 @@ if __name__ == &#34;__main__&#34;:
                         default=&#39;Firesong.out&#39;, help=&#39;Output filename&#39;)
     parser.add_argument(&#39;-d&#39;, action=&#39;store&#39;, dest=&#39;density&#39;,
                         type=float, default=1e-9,
-                        help=&#39;Local neutrino source density [1/Mpc^3]&#39;)
+                        help=&#39;Local neutrino source density [1/Mpc^3] (default 1e-9 / Mpc^3)&#39;)
     parser.add_argument(&#34;--evolution&#34;, action=&#34;store&#34;,
-                        dest=&#34;Evolution&#34;, default=&#39;HB2006SFR&#39;,
-                        help=&#34;Source evolution options:  HB2006SFR (default), YMKBH2008SFR, CC2015SNR , MD2014SFR, NoEvolution&#34;)
+                        dest=&#34;Evolution&#34;, default=&#39;MD2014SFR&#39;,
+                        help=&#34;Source evolution options:  HB2006SFR, YMKBH2008SFR, CC2015SNR , MD2014SFR (default), NoEvolution&#34;)
     parser.add_argument(&#34;--transient&#34;, action=&#39;store_true&#39;,
                         dest=&#39;Transient&#39;, default=False,
-                        help=&#39;Simulate transient sources, NOT TESTED YET!&#39;)
+                        help=&#39;Simulate transient sources (default False)&#39;)
     parser.add_argument(&#34;--timescale&#34;, action=&#39;store&#39;,
                         dest=&#39;timescale&#39;, type=float,
-                        default=1000., help=&#39;time scale of transient sources, default is 1000sec.&#39;)
+                        default=1000., help=&#39;time scale of transient sources in seconds (default 1000 seconds)&#39;)
     parser.add_argument(&#34;--zmax&#34;, action=&#34;store&#34;, type=float,
                         dest=&#34;zmax&#34;, default=10.,
-                        help=&#34;Highest redshift to be simulated&#34;)
+                        help=&#34;Highest redshift to be simulated (default 10.)&#34;)
     parser.add_argument(&#34;--fluxnorm&#34;, action=&#34;store&#34;, dest=&#39;fluxnorm&#39;,
-                        type=float, default=0.9e-8,
-                        help=&#34;Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr&#34;)
+                        type=float, default=1.44e-8,
+                        help=&#34;Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index) GeV/cm^2.s.sr (default 1.44e-8)&#34;)
     parser.add_argument(&#34;--index&#34;, action=&#34;store&#34;, dest=&#39;index&#39;,
-                        type=float, default=2.13,
-                        help=&#34;Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr&#34;)
+                        type=float, default=2.28,
+                        help=&#34;Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index) GeV/cm^2.s.sr (default 2.28)&#34;)
     parser.add_argument(&#34;--LF&#34;, action=&#34;store&#34;, dest=&#34;LF&#34;, default=&#34;SC&#34;,
-                        help=&#34;Luminosity function, SC for standard candles, LG for lognormal, PL for powerlaw&#34;)
+                        help=&#34;Luminosity function, SC for standard candles (default), LG for lognormal, PL for powerlaw&#34;)
     parser.add_argument(&#34;--sigma&#34;, action=&#34;store&#34;,
                         dest=&#34;sigma&#34;, type=float, default=1.0,
-                        help=&#34;Width of a log normal Luminosity function in dex, default: 1.0&#34;)
+                        help=&#34;Width of a log normal Luminosity function in dex (default 1.0)&#34;)
     parser.add_argument(&#34;--L&#34;, action=&#34;store&#34;,
                         dest=&#34;luminosity&#34;, type=float, default=0.0,
-                        help=&#34;Set luminosity for each source, will reset fluxnorm option, unit erg/yr&#34;)
+                        help=&#34;Set luminosity for each source [erg/year]. Resets fluxnorm option&#34;)
     options = parser.parse_args()
 
     firesong_simulation(outputdir,
@@ -260,7 +260,7 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="FIRESONG.Firesong.firesong_simulation"><code class="name flex">
-<span>def <span class="ident">firesong_simulation</span></span>(<span>outputdir, filename='Firesong.out', density=1e-09, Evolution='HB2006SFR', Transient=False, timescale=1000.0, zmin=0.0005, zmax=10.0, bins=10000, fluxnorm=9e-09, index=2.13, LF='SC', sigma=1.0, luminosity=0.0, emin=10000.0, emax=10000000.0, seed=None, verbose=True)</span>
+<span>def <span class="ident">firesong_simulation</span></span>(<span>outputdir, filename='Firesong.out', density=1e-09, Evolution='MD2014SFR', Transient=False, timescale=1000.0, zmin=0.0005, zmax=10.0, bins=10000, fluxnorm=1.44e-08, index=2.28, LF='SC', sigma=1.0, luminosity=0.0, emin=10000.0, emax=10000000.0, seed=None, verbose=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Simulate a universe of neutrino sources</p>
@@ -288,10 +288,10 @@ for transient sources</dd>
 <dt><strong><code>bins</code></strong> :&ensp;<code>int</code>, optional, default=<code>1000</code></dt>
 <dd>Number of bins used when creating
 the redshift PDF</dd>
-<dt><strong><code>fluxnorm</code></strong> :&ensp;<code>float</code>, optional, default=<code>0.9e-8</code></dt>
+<dt><strong><code>fluxnorm</code></strong> :&ensp;<code>float</code>, optional, default=<code>1.44e-8</code></dt>
 <dd>Normalization on the total
 astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1</dd>
-<dt><strong><code>index</code></strong> :&ensp;<code>float</code>, optional, default=<code>2.13</code></dt>
+<dt><strong><code>index</code></strong> :&ensp;<code>float</code>, optional, default=<code>2.28</code></dt>
 <dd>Spectral index of diffuse flux</dd>
 <dt>LF (string, optional, default="SC"): Luminosity function, choose</dt>
 <dt>between standard candle (SC), LogNormal (LG)</dt>
@@ -325,14 +325,14 @@ as well as the sources. Only returned if filename is None</dd>
 <pre><code class="python">def firesong_simulation(outputdir,
                         filename=&#39;Firesong.out&#39;,
                         density=1e-9,
-                        Evolution=&#34;HB2006SFR&#34;,
+                        Evolution=&#34;MD2014SFR&#34;,
                         Transient=False,
                         timescale=1000.,
                         zmin=0.0005,
                         zmax=10.,
                         bins=10000,
-                        fluxnorm=0.9e-8,
-                        index=2.13,
+                        fluxnorm=1.44e-8,
+                        index=2.28,
                         LF=&#34;SC&#34;,
                         sigma=1.0,
                         luminosity=0.0,
@@ -358,9 +358,9 @@ as well as the sources. Only returned if filename is None</dd>
         zmax (float, optional, default=10.): Farthest redshift to consider
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
-        fluxnorm (float, optional, default=0.9e-8): Normalization on the total
+        fluxnorm (float, optional, default=1.44e-8): Normalization on the total
             astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1
-        index (float, optional, default=2.13): Spectral index of diffuse flux
+        index (float, optional, default=2.28): Spectral index of diffuse flux
         LF (string, optional, default=&#34;SC&#34;): Luminosity function, choose 
             between standard candle (SC), LogNormal (LG)
         sigma (float, optional, default=1.0): Width of lognormal distribution

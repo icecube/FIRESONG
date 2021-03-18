@@ -43,19 +43,34 @@ or:
     python -m unittest test_FluxPDF
 &#34;&#34;&#34;
 
+import os
 import unittest
+import numpy as np
 import FluxPDF
 
 
-class TestFiresongSimulation(unittest.TestCase):
-    &#34;&#34;&#34; Tests get_evolution function, Evolution class and
-        all implemented Evolutions.
+class TestFluxPDFSimulation(unittest.TestCase):
+    &#34;&#34;&#34; Tests flux pdf, which integrates the redshift
+        and luminosity distributions and returns a 
+        PDF of number vs. flux
     &#34;&#34;&#34;
 
     @classmethod
     def setUpClass(cls):
         &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-        pass
+        cls.sc_flux_pdf = FluxPDF.flux_pdf(None,
+            filename=None,
+            LF=&#39;SC&#39;,
+            Evolution=&#34;MD2014SFR&#34;,
+            verbose=False,
+            logFMin=-20)
+        cls.lg_flux_pdf = FluxPDF.flux_pdf(None,
+            filename=None,
+            LF=&#39;LG&#39;,
+            sigma = 0.01,
+            Evolution=&#34;MD2014SFR&#34;,
+            verbose=False,
+            logFMin=-20)
 
     @classmethod
     def tearDownClass(cls):
@@ -72,8 +87,73 @@ class TestFiresongSimulation(unittest.TestCase):
 
     ### tests start here ###
 
-    def test_flux_pdf(self):
+    def test_sc_flux_pdf(self):
+        num_sources = np.sum(self.sc_flux_pdf[1])
+        expectation = 13295.051834264095
+        diff = (num_sources - expectation) / expectation
+        self.assertTrue(diff &lt; 0.1)
+
+    def test_lg_flux_pdf(self):
+        num_sources = np.sum(self.lg_flux_pdf[1])
+        expectation = 13295.051834264095
+        diff = (num_sources - expectation) / expectation
+        self.assertTrue(np.abs(diff) &lt; 0.1)
+
+    def test_lg_sc_consistency(self):
+        # Narrow LG should act similar to SC
+        msk1 = (~np.isnan(np.array(self.sc_flux_pdf[1]))) &amp; \
+            (np.array(self.sc_flux_pdf[1]) != 0.)
+        msk2 = (~np.isnan(np.array(self.lg_flux_pdf[1]))) &amp; \
+            (np.array(self.lg_flux_pdf[1]) != 0.)
+        msk = msk1 * msk2
+        ratio_arr = np.array(self.sc_flux_pdf[1])[msk] \
+            / np.array(self.lg_flux_pdf[1])[msk]
+        median_ratio = np.median(ratio_arr)
+        diff = np.abs(median_ratio - 1.)
+        self.assertTrue(diff &lt; 0.05)
+
+
+class TestTransientFluxPDFSimulation(unittest.TestCase):
+    &#34;&#34;&#34; Tests flux pdf, which integrates the redshift
+        and luminosity distributions and returns a 
+        PDF of number vs. flux
+    &#34;&#34;&#34;
+
+    @classmethod
+    def setUpClass(cls):
+        &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
+        cls.sc_flux_pdf = FluxPDF.flux_pdf(&#39;./&#39;,
+            filename=&#39;test_flux_pdf.out&#39;,
+            LF=&#39;SC&#39;,
+            Evolution=&#34;MD2014SFR&#34;,
+            verbose=False,
+            logFMin=-20,
+            Transient=True,
+            timescale=1000.,
+            LumMax=1e59)
+        cls.results = np.loadtxt(&#39;./test_flux_pdf.out&#39;).T
+
+    @classmethod
+    def tearDownClass(cls):
+        &#34;&#34;&#34; once after all tests &#34;&#34;&#34;
+        os.remove(&#39;./test_flux_pdf.out&#39;)
+
+    def setUp(self):
+        &#34;before each test&#34;
         pass
+
+    def tearDown(self):
+        &#34;after each test&#34;
+        pass
+
+    ### tests start here ###
+
+    def test_total_num(self):
+        num_sources = np.sum(self.results[1])
+        expectation = 3936.511006153128
+        diff = (num_sources - expectation) / expectation
+        self.assertTrue(diff &lt; 0.01)
+
 
 if __name__ == &#34;__main__&#34;:
     unittest.main()</code></pre>
@@ -88,13 +168,14 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation"><code class="flex name class">
-<span>class <span class="ident">TestFiresongSimulation</span></span>
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation"><code class="flex name class">
+<span>class <span class="ident">TestFluxPDFSimulation</span></span>
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Tests get_evolution function, Evolution class and
-all implemented Evolutions.</p>
+<div class="desc"><p>Tests flux pdf, which integrates the redshift
+and luminosity distributions and returns a
+PDF of number vs. flux</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
 not have a method with the specified name.</p></div>
@@ -102,15 +183,28 @@ not have a method with the specified name.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TestFiresongSimulation(unittest.TestCase):
-    &#34;&#34;&#34; Tests get_evolution function, Evolution class and
-        all implemented Evolutions.
+<pre><code class="python">class TestFluxPDFSimulation(unittest.TestCase):
+    &#34;&#34;&#34; Tests flux pdf, which integrates the redshift
+        and luminosity distributions and returns a 
+        PDF of number vs. flux
     &#34;&#34;&#34;
 
     @classmethod
     def setUpClass(cls):
         &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-        pass
+        cls.sc_flux_pdf = FluxPDF.flux_pdf(None,
+            filename=None,
+            LF=&#39;SC&#39;,
+            Evolution=&#34;MD2014SFR&#34;,
+            verbose=False,
+            logFMin=-20)
+        cls.lg_flux_pdf = FluxPDF.flux_pdf(None,
+            filename=None,
+            LF=&#39;LG&#39;,
+            sigma = 0.01,
+            Evolution=&#34;MD2014SFR&#34;,
+            verbose=False,
+            logFMin=-20)
 
     @classmethod
     def tearDownClass(cls):
@@ -127,8 +221,30 @@ not have a method with the specified name.</p></div>
 
     ### tests start here ###
 
-    def test_flux_pdf(self):
-        pass</code></pre>
+    def test_sc_flux_pdf(self):
+        num_sources = np.sum(self.sc_flux_pdf[1])
+        expectation = 13295.051834264095
+        diff = (num_sources - expectation) / expectation
+        self.assertTrue(diff &lt; 0.1)
+
+    def test_lg_flux_pdf(self):
+        num_sources = np.sum(self.lg_flux_pdf[1])
+        expectation = 13295.051834264095
+        diff = (num_sources - expectation) / expectation
+        self.assertTrue(np.abs(diff) &lt; 0.1)
+
+    def test_lg_sc_consistency(self):
+        # Narrow LG should act similar to SC
+        msk1 = (~np.isnan(np.array(self.sc_flux_pdf[1]))) &amp; \
+            (np.array(self.sc_flux_pdf[1]) != 0.)
+        msk2 = (~np.isnan(np.array(self.lg_flux_pdf[1]))) &amp; \
+            (np.array(self.lg_flux_pdf[1]) != 0.)
+        msk = msk1 * msk2
+        ratio_arr = np.array(self.sc_flux_pdf[1])[msk] \
+            / np.array(self.lg_flux_pdf[1])[msk]
+        median_ratio = np.median(ratio_arr)
+        diff = np.abs(median_ratio - 1.)
+        self.assertTrue(diff &lt; 0.05)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -136,7 +252,7 @@ not have a method with the specified name.</p></div>
 </ul>
 <h3>Static methods</h3>
 <dl>
-<dt id="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.setUpClass"><code class="name flex">
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.setUpClass"><code class="name flex">
 <span>def <span class="ident">setUpClass</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -148,10 +264,22 @@ not have a method with the specified name.</p></div>
 <pre><code class="python">@classmethod
 def setUpClass(cls):
     &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-    pass</code></pre>
+    cls.sc_flux_pdf = FluxPDF.flux_pdf(None,
+        filename=None,
+        LF=&#39;SC&#39;,
+        Evolution=&#34;MD2014SFR&#34;,
+        verbose=False,
+        logFMin=-20)
+    cls.lg_flux_pdf = FluxPDF.flux_pdf(None,
+        filename=None,
+        LF=&#39;LG&#39;,
+        sigma = 0.01,
+        Evolution=&#34;MD2014SFR&#34;,
+        verbose=False,
+        logFMin=-20)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.tearDownClass"><code class="name flex">
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.tearDownClass"><code class="name flex">
 <span>def <span class="ident">tearDownClass</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -169,7 +297,7 @@ def tearDownClass(cls):
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.setUp"><code class="name flex">
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.setUp"><code class="name flex">
 <span>def <span class="ident">setUp</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -183,7 +311,7 @@ def tearDownClass(cls):
     pass</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.tearDown"><code class="name flex">
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.tearDown"><code class="name flex">
 <span>def <span class="ident">tearDown</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -197,8 +325,8 @@ def tearDownClass(cls):
     pass</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.test_flux_pdf"><code class="name flex">
-<span>def <span class="ident">test_flux_pdf</span></span>(<span>self)</span>
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_lg_flux_pdf"><code class="name flex">
+<span>def <span class="ident">test_lg_flux_pdf</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -206,8 +334,200 @@ def tearDownClass(cls):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def test_flux_pdf(self):
+<pre><code class="python">def test_lg_flux_pdf(self):
+    num_sources = np.sum(self.lg_flux_pdf[1])
+    expectation = 13295.051834264095
+    diff = (num_sources - expectation) / expectation
+    self.assertTrue(np.abs(diff) &lt; 0.1)</code></pre>
+</details>
+</dd>
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_lg_sc_consistency"><code class="name flex">
+<span>def <span class="ident">test_lg_sc_consistency</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_lg_sc_consistency(self):
+    # Narrow LG should act similar to SC
+    msk1 = (~np.isnan(np.array(self.sc_flux_pdf[1]))) &amp; \
+        (np.array(self.sc_flux_pdf[1]) != 0.)
+    msk2 = (~np.isnan(np.array(self.lg_flux_pdf[1]))) &amp; \
+        (np.array(self.lg_flux_pdf[1]) != 0.)
+    msk = msk1 * msk2
+    ratio_arr = np.array(self.sc_flux_pdf[1])[msk] \
+        / np.array(self.lg_flux_pdf[1])[msk]
+    median_ratio = np.median(ratio_arr)
+    diff = np.abs(median_ratio - 1.)
+    self.assertTrue(diff &lt; 0.05)</code></pre>
+</details>
+</dd>
+<dt id="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_sc_flux_pdf"><code class="name flex">
+<span>def <span class="ident">test_sc_flux_pdf</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_sc_flux_pdf(self):
+    num_sources = np.sum(self.sc_flux_pdf[1])
+    expectation = 13295.051834264095
+    diff = (num_sources - expectation) / expectation
+    self.assertTrue(diff &lt; 0.1)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation"><code class="flex name class">
+<span>class <span class="ident">TestTransientFluxPDFSimulation</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tests flux pdf, which integrates the redshift
+and luminosity distributions and returns a
+PDF of number vs. flux</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestTransientFluxPDFSimulation(unittest.TestCase):
+    &#34;&#34;&#34; Tests flux pdf, which integrates the redshift
+        and luminosity distributions and returns a 
+        PDF of number vs. flux
+    &#34;&#34;&#34;
+
+    @classmethod
+    def setUpClass(cls):
+        &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
+        cls.sc_flux_pdf = FluxPDF.flux_pdf(&#39;./&#39;,
+            filename=&#39;test_flux_pdf.out&#39;,
+            LF=&#39;SC&#39;,
+            Evolution=&#34;MD2014SFR&#34;,
+            verbose=False,
+            logFMin=-20,
+            Transient=True,
+            timescale=1000.,
+            LumMax=1e59)
+        cls.results = np.loadtxt(&#39;./test_flux_pdf.out&#39;).T
+
+    @classmethod
+    def tearDownClass(cls):
+        &#34;&#34;&#34; once after all tests &#34;&#34;&#34;
+        os.remove(&#39;./test_flux_pdf.out&#39;)
+
+    def setUp(self):
+        &#34;before each test&#34;
+        pass
+
+    def tearDown(self):
+        &#34;after each test&#34;
+        pass
+
+    ### tests start here ###
+
+    def test_total_num(self):
+        num_sources = np.sum(self.results[1])
+        expectation = 3936.511006153128
+        diff = (num_sources - expectation) / expectation
+        self.assertTrue(diff &lt; 0.01)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.setUpClass"><code class="name flex">
+<span>def <span class="ident">setUpClass</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>once before all tests</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def setUpClass(cls):
+    &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
+    cls.sc_flux_pdf = FluxPDF.flux_pdf(&#39;./&#39;,
+        filename=&#39;test_flux_pdf.out&#39;,
+        LF=&#39;SC&#39;,
+        Evolution=&#34;MD2014SFR&#34;,
+        verbose=False,
+        logFMin=-20,
+        Transient=True,
+        timescale=1000.,
+        LumMax=1e59)
+    cls.results = np.loadtxt(&#39;./test_flux_pdf.out&#39;).T</code></pre>
+</details>
+</dd>
+<dt id="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.tearDownClass"><code class="name flex">
+<span>def <span class="ident">tearDownClass</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>once after all tests</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def tearDownClass(cls):
+    &#34;&#34;&#34; once after all tests &#34;&#34;&#34;
+    os.remove(&#39;./test_flux_pdf.out&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.setUp"><code class="name flex">
+<span>def <span class="ident">setUp</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>before each test</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def setUp(self):
+    &#34;before each test&#34;
     pass</code></pre>
+</details>
+</dd>
+<dt id="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.tearDown"><code class="name flex">
+<span>def <span class="ident">tearDown</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>after each test</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tearDown(self):
+    &#34;after each test&#34;
+    pass</code></pre>
+</details>
+</dd>
+<dt id="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.test_total_num"><code class="name flex">
+<span>def <span class="ident">test_total_num</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_total_num(self):
+    num_sources = np.sum(self.results[1])
+    expectation = 3936.511006153128
+    diff = (num_sources - expectation) / expectation
+    self.assertTrue(diff &lt; 0.01)</code></pre>
 </details>
 </dd>
 </dl>
@@ -229,13 +549,25 @@ def tearDownClass(cls):
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation" href="#FIRESONG.tests.test_FluxPDF.TestFiresongSimulation">TestFiresongSimulation</a></code></h4>
+<h4><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation">TestFluxPDFSimulation</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.setUp" href="#FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.setUp">setUp</a></code></li>
-<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.setUpClass" href="#FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.setUpClass">setUpClass</a></code></li>
-<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.tearDown" href="#FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.tearDown">tearDown</a></code></li>
-<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.tearDownClass" href="#FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.tearDownClass">tearDownClass</a></code></li>
-<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.test_flux_pdf" href="#FIRESONG.tests.test_FluxPDF.TestFiresongSimulation.test_flux_pdf">test_flux_pdf</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.setUp" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.setUp">setUp</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.setUpClass" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.setUpClass">setUpClass</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.tearDown" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.tearDown">tearDown</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.tearDownClass" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.tearDownClass">tearDownClass</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_lg_flux_pdf" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_lg_flux_pdf">test_lg_flux_pdf</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_lg_sc_consistency" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_lg_sc_consistency">test_lg_sc_consistency</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_sc_flux_pdf" href="#FIRESONG.tests.test_FluxPDF.TestFluxPDFSimulation.test_sc_flux_pdf">test_sc_flux_pdf</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation" href="#FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation">TestTransientFluxPDFSimulation</a></code></h4>
+<ul class="">
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.setUp" href="#FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.setUp">setUp</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.setUpClass" href="#FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.setUpClass">setUpClass</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.tearDown" href="#FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.tearDown">tearDown</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.tearDownClass" href="#FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.tearDownClass">tearDownClass</a></code></li>
+<li><code><a title="FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.test_total_num" href="#FIRESONG.tests.test_FluxPDF.TestTransientFluxPDFSimulation.test_total_num">test_total_num</a></code></li>
 </ul>
 </li>
 </ul>

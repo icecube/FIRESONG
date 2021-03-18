@@ -55,7 +55,11 @@ class TestEvolution(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-        pass
+        cls.evol1 = Evolution.get_evolution(&#34;NoEvolution&#34;)
+        cls.evol2 = Evolution.get_evolution(&#34;HB2006SFR&#34;)
+        cls.evol3 = Evolution.get_evolution(&#34;MD2014SFR&#34;)
+        cls.evol4 = Evolution.get_evolution(&#34;YMKBH2008SFR&#34;)
+        cls.evol5 = Evolution.get_evolution(&#34;CC2015SNR&#34;)
 
     @classmethod
     def tearDownClass(cls):
@@ -64,8 +68,7 @@ class TestEvolution(unittest.TestCase):
 
     def setUp(self):
         &#34;before each test&#34;
-        self.evol1 = Evolution.get_evolution(&#34;NoEvolution&#34;)
-        self.evol2 = Evolution.get_evolution(&#34;HB2006SFR&#34;)
+        pass
 
     def tearDown(self):
         &#34;after each test&#34;
@@ -78,22 +81,42 @@ class TestEvolution(unittest.TestCase):
             Evolution.get_evolution(&#34;Test&#34;)
 
     def test_EvolutionBaseClass(self):
-        pass
+        evol = Evolution.Evolution()
+        with self.assertRaises(NotImplementedError):
+            evol(1.)
 
     def test_NoEvolution(self):
         self.assertEqual(self.evol1(1.), self.evol1(2.))
+        self.assertEqual(str(self.evol1), 
+            &#34;No Evolution&#34;)
 
     def test_HopkinsBeacom2006StarFormationRate(self):
-        pass
+        self.assertAlmostEqual(self.evol2(1.),
+            0.14702066600558594,
+            3)
+        self.assertEqual(str(self.evol2), 
+            &#34;Hopkins and Beacom (2006)&#34;)
 
     def test_YukselEtAl2008StarFormationRate(self):
-        pass
+        self.assertAlmostEqual(self.evol4(1.),
+            0.19698310613518824,
+            3)
+        self.assertEqual(str(self.evol4), 
+            &#34;Yuksel et al. (2008)&#34;)
 
     def test_CandelsClash2015SNRate(self):
-        pass
+        self.assertAlmostEqual(self.evol5(1.),
+            0.0707688850689447,
+            3)
+        self.assertEqual(str(self.evol5), 
+            &#34;Strolger et al. (2015)&#34;)
 
     def test_MadauDickinson2014CSFH(self):
-        pass
+        self.assertAlmostEqual(self.evol3(1.),
+            0.08665290222624604,
+            3)
+        self.assertEqual(str(self.evol3), 
+            &#34;Madau and Dickinson (2014)&#34;)
 
 
 class TestSourcePopulation(unittest.TestCase):
@@ -123,7 +146,7 @@ class TestSourcePopulation(unittest.TestCase):
 
     def test_Nsources(self):
         self.assertEqual(self.pop.Nsources(1e-9, zmax=10.),
-                         3769.7731306195333)
+                         3745.1796382799967)
 
     def test_Flux_Lumi(self):
         L = self.pop.Lumi2Flux(1e50, 2.0, 1e3, 1e7, z=1)
@@ -139,7 +162,7 @@ class TestSourcePopulation(unittest.TestCase):
                                                         1e-9,
                                                         zmax=10.,
                                                         index=2.0),
-                         9.2911752992097727e-11)
+                         9.244753729666578e-11)
 
 
 class TestTransientSourcePopulation(unittest.TestCase):
@@ -148,7 +171,14 @@ class TestTransientSourcePopulation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-        pass
+        evol = Evolution.get_evolution(&#34;NoEvolution&#34;)
+        cls.transient_pop = Evolution.TransientSourcePopulation(
+            Evolution.cosmology,
+            evol,
+            1000.)
+        cls.pop = Evolution.SourcePopulation(
+            Evolution.cosmology,
+            evol)
 
     @classmethod
     def tearDownClass(cls):
@@ -165,8 +195,11 @@ class TestTransientSourcePopulation(unittest.TestCase):
 
     ### tests start here ###
 
-    def test_0(self):
-        pass
+    def test_redshift_dist(self):
+        self.assertEqual(
+            self.transient_pop.RedshiftDistribution(2.) * (1.+2.),
+            self.pop.RedshiftDistribution(2.)
+        )
 
 
 if __name__ == &#34;__main__&#34;:
@@ -204,7 +237,11 @@ not have a method with the specified name.</p></div>
     @classmethod
     def setUpClass(cls):
         &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-        pass
+        cls.evol1 = Evolution.get_evolution(&#34;NoEvolution&#34;)
+        cls.evol2 = Evolution.get_evolution(&#34;HB2006SFR&#34;)
+        cls.evol3 = Evolution.get_evolution(&#34;MD2014SFR&#34;)
+        cls.evol4 = Evolution.get_evolution(&#34;YMKBH2008SFR&#34;)
+        cls.evol5 = Evolution.get_evolution(&#34;CC2015SNR&#34;)
 
     @classmethod
     def tearDownClass(cls):
@@ -213,8 +250,7 @@ not have a method with the specified name.</p></div>
 
     def setUp(self):
         &#34;before each test&#34;
-        self.evol1 = Evolution.get_evolution(&#34;NoEvolution&#34;)
-        self.evol2 = Evolution.get_evolution(&#34;HB2006SFR&#34;)
+        pass
 
     def tearDown(self):
         &#34;after each test&#34;
@@ -227,22 +263,42 @@ not have a method with the specified name.</p></div>
             Evolution.get_evolution(&#34;Test&#34;)
 
     def test_EvolutionBaseClass(self):
-        pass
+        evol = Evolution.Evolution()
+        with self.assertRaises(NotImplementedError):
+            evol(1.)
 
     def test_NoEvolution(self):
         self.assertEqual(self.evol1(1.), self.evol1(2.))
+        self.assertEqual(str(self.evol1), 
+            &#34;No Evolution&#34;)
 
     def test_HopkinsBeacom2006StarFormationRate(self):
-        pass
+        self.assertAlmostEqual(self.evol2(1.),
+            0.14702066600558594,
+            3)
+        self.assertEqual(str(self.evol2), 
+            &#34;Hopkins and Beacom (2006)&#34;)
 
     def test_YukselEtAl2008StarFormationRate(self):
-        pass
+        self.assertAlmostEqual(self.evol4(1.),
+            0.19698310613518824,
+            3)
+        self.assertEqual(str(self.evol4), 
+            &#34;Yuksel et al. (2008)&#34;)
 
     def test_CandelsClash2015SNRate(self):
-        pass
+        self.assertAlmostEqual(self.evol5(1.),
+            0.0707688850689447,
+            3)
+        self.assertEqual(str(self.evol5), 
+            &#34;Strolger et al. (2015)&#34;)
 
     def test_MadauDickinson2014CSFH(self):
-        pass</code></pre>
+        self.assertAlmostEqual(self.evol3(1.),
+            0.08665290222624604,
+            3)
+        self.assertEqual(str(self.evol3), 
+            &#34;Madau and Dickinson (2014)&#34;)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -262,7 +318,11 @@ not have a method with the specified name.</p></div>
 <pre><code class="python">@classmethod
 def setUpClass(cls):
     &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-    pass</code></pre>
+    cls.evol1 = Evolution.get_evolution(&#34;NoEvolution&#34;)
+    cls.evol2 = Evolution.get_evolution(&#34;HB2006SFR&#34;)
+    cls.evol3 = Evolution.get_evolution(&#34;MD2014SFR&#34;)
+    cls.evol4 = Evolution.get_evolution(&#34;YMKBH2008SFR&#34;)
+    cls.evol5 = Evolution.get_evolution(&#34;CC2015SNR&#34;)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.tearDownClass"><code class="name flex">
@@ -294,8 +354,7 @@ def tearDownClass(cls):
 </summary>
 <pre><code class="python">def setUp(self):
     &#34;before each test&#34;
-    self.evol1 = Evolution.get_evolution(&#34;NoEvolution&#34;)
-    self.evol2 = Evolution.get_evolution(&#34;HB2006SFR&#34;)</code></pre>
+    pass</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.tearDown"><code class="name flex">
@@ -322,7 +381,11 @@ def tearDownClass(cls):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_CandelsClash2015SNRate(self):
-    pass</code></pre>
+    self.assertAlmostEqual(self.evol5(1.),
+        0.0707688850689447,
+        3)
+    self.assertEqual(str(self.evol5), 
+        &#34;Strolger et al. (2015)&#34;)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.test_EvolutionBaseClass"><code class="name flex">
@@ -335,7 +398,9 @@ def tearDownClass(cls):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_EvolutionBaseClass(self):
-    pass</code></pre>
+    evol = Evolution.Evolution()
+    with self.assertRaises(NotImplementedError):
+        evol(1.)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.test_HopkinsBeacom2006StarFormationRate"><code class="name flex">
@@ -348,7 +413,11 @@ def tearDownClass(cls):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_HopkinsBeacom2006StarFormationRate(self):
-    pass</code></pre>
+    self.assertAlmostEqual(self.evol2(1.),
+        0.14702066600558594,
+        3)
+    self.assertEqual(str(self.evol2), 
+        &#34;Hopkins and Beacom (2006)&#34;)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.test_MadauDickinson2014CSFH"><code class="name flex">
@@ -361,7 +430,11 @@ def tearDownClass(cls):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_MadauDickinson2014CSFH(self):
-    pass</code></pre>
+    self.assertAlmostEqual(self.evol3(1.),
+        0.08665290222624604,
+        3)
+    self.assertEqual(str(self.evol3), 
+        &#34;Madau and Dickinson (2014)&#34;)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.test_NoEvolution"><code class="name flex">
@@ -374,7 +447,9 @@ def tearDownClass(cls):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_NoEvolution(self):
-    self.assertEqual(self.evol1(1.), self.evol1(2.))</code></pre>
+    self.assertEqual(self.evol1(1.), self.evol1(2.))
+    self.assertEqual(str(self.evol1), 
+        &#34;No Evolution&#34;)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.test_YukselEtAl2008StarFormationRate"><code class="name flex">
@@ -387,7 +462,11 @@ def tearDownClass(cls):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_YukselEtAl2008StarFormationRate(self):
-    pass</code></pre>
+    self.assertAlmostEqual(self.evol4(1.),
+        0.19698310613518824,
+        3)
+    self.assertEqual(str(self.evol4), 
+        &#34;Yuksel et al. (2008)&#34;)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestEvolution.test_get_evolution"><code class="name flex">
@@ -446,7 +525,7 @@ not have a method with the specified name.</p></div>
 
     def test_Nsources(self):
         self.assertEqual(self.pop.Nsources(1e-9, zmax=10.),
-                         3769.7731306195333)
+                         3745.1796382799967)
 
     def test_Flux_Lumi(self):
         L = self.pop.Lumi2Flux(1e50, 2.0, 1e3, 1e7, z=1)
@@ -462,7 +541,7 @@ not have a method with the specified name.</p></div>
                                                         1e-9,
                                                         zmax=10.,
                                                         index=2.0),
-                         9.2911752992097727e-11)</code></pre>
+                         9.244753729666578e-11)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -547,7 +626,7 @@ def tearDownClass(cls):
                                                     1e-9,
                                                     zmax=10.,
                                                     index=2.0),
-                     9.2911752992097727e-11)</code></pre>
+                     9.244753729666578e-11)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestSourcePopulation.test_Flux_Lumi"><code class="name flex">
@@ -580,7 +659,7 @@ def tearDownClass(cls):
 </summary>
 <pre><code class="python">def test_Nsources(self):
     self.assertEqual(self.pop.Nsources(1e-9, zmax=10.),
-                     3769.7731306195333)</code></pre>
+                     3745.1796382799967)</code></pre>
 </details>
 </dd>
 </dl>
@@ -604,7 +683,14 @@ not have a method with the specified name.</p></div>
     @classmethod
     def setUpClass(cls):
         &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-        pass
+        evol = Evolution.get_evolution(&#34;NoEvolution&#34;)
+        cls.transient_pop = Evolution.TransientSourcePopulation(
+            Evolution.cosmology,
+            evol,
+            1000.)
+        cls.pop = Evolution.SourcePopulation(
+            Evolution.cosmology,
+            evol)
 
     @classmethod
     def tearDownClass(cls):
@@ -621,8 +707,11 @@ not have a method with the specified name.</p></div>
 
     ### tests start here ###
 
-    def test_0(self):
-        pass</code></pre>
+    def test_redshift_dist(self):
+        self.assertEqual(
+            self.transient_pop.RedshiftDistribution(2.) * (1.+2.),
+            self.pop.RedshiftDistribution(2.)
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -642,7 +731,14 @@ not have a method with the specified name.</p></div>
 <pre><code class="python">@classmethod
 def setUpClass(cls):
     &#34;&#34;&#34; once before all tests &#34;&#34;&#34;
-    pass</code></pre>
+    evol = Evolution.get_evolution(&#34;NoEvolution&#34;)
+    cls.transient_pop = Evolution.TransientSourcePopulation(
+        Evolution.cosmology,
+        evol,
+        1000.)
+    cls.pop = Evolution.SourcePopulation(
+        Evolution.cosmology,
+        evol)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.tearDownClass"><code class="name flex">
@@ -691,8 +787,8 @@ def tearDownClass(cls):
     pass</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.test_0"><code class="name flex">
-<span>def <span class="ident">test_0</span></span>(<span>self)</span>
+<dt id="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.test_redshift_dist"><code class="name flex">
+<span>def <span class="ident">test_redshift_dist</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -700,8 +796,11 @@ def tearDownClass(cls):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def test_0(self):
-    pass</code></pre>
+<pre><code class="python">def test_redshift_dist(self):
+    self.assertEqual(
+        self.transient_pop.RedshiftDistribution(2.) * (1.+2.),
+        self.pop.RedshiftDistribution(2.)
+    )</code></pre>
 </details>
 </dd>
 </dl>
@@ -757,7 +856,7 @@ def tearDownClass(cls):
 <li><code><a title="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.setUpClass" href="#FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.setUpClass">setUpClass</a></code></li>
 <li><code><a title="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.tearDown" href="#FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.tearDown">tearDown</a></code></li>
 <li><code><a title="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.tearDownClass" href="#FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.tearDownClass">tearDownClass</a></code></li>
-<li><code><a title="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.test_0" href="#FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.test_0">test_0</a></code></li>
+<li><code><a title="FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.test_redshift_dist" href="#FIRESONG.tests.test_Evolution.TestTransientSourcePopulation.test_redshift_dist">test_redshift_dist</a></code></li>
 </ul>
 </li>
 </ul>

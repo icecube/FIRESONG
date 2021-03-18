@@ -55,14 +55,13 @@ def legend_simulation(outputdir,
                       zmin=0.0005,
                       zmax=10.,
                       bins=10000,
-                      fluxnorm=0.9e-8,
                       index=2.13,
                       emin=1e4,
                       emax=1e7,
                       lmin=38,
                       lmax=48,
                       seed=None,
-                      zNEAR=-1):
+                      verbose=True):
     &#34;&#34;&#34;
     Simulate a universe of neutrino sources with luminosity distribution 
         dependent on redshift
@@ -81,8 +80,8 @@ def legend_simulation(outputdir,
         index (float, optional, default=2.13): Spectral index of diffuse flux
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
-        lmin (float, optional, default=38): Minimum log10 luminosity in UNITS
-        lmax (float, optional, default=38): Maximum log10 luminosity in UNITS
+        lmin (float, optional, default=38): Minimum log10 luminosity in erg/s
+        lmax (float, optional, default=38): Maximum log10 luminosity in erg/s
         seed (int or None, optional, default=None): random number seed
         verbose (bool, optional, default=True): print simulation paramaters
             if True else suppress printed output
@@ -114,8 +113,11 @@ def legend_simulation(outputdir,
     # Prepare a luminosity CDF as a function of redshift
     luminosity_bins = np.arange(lmin, lmax, (lmax - lmin) / 1000.)
     LE_model.L_CDF(redshift_bins, luminosity_bins)
-
-    out = output_writer(outputdir, filename)
+    
+    if filename is not None:
+        out = output_writer(outputdir, filename)
+    else:
+        results = {}
 
     # Generate redshift
     zs = invCDF(rng.uniform(low=0.0, high=1.0, size=N_sample))
@@ -131,12 +133,22 @@ def legend_simulation(outputdir,
     TotalFlux = np.sum(fluxes)
 
     # Write out
-    out.write(declins, zs, fluxes)
-    out.finish(TotalFlux)
+    if filename is not None:
+        out.write(declins, zs, fluxes)
+        out.finish(TotalFlux)
+    else:
+        results[&#39;dec&#39;] = declins
+        results[&#39;z&#39;] = zs
+        results[&#39;flux&#39;] = fluxes
 
-    print(&#34;Actual diffuse flux simulated :&#34;)
-    log = &#34;E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]&#34;
-    print(log.format(**locals()))
+    # print before finish
+    if verbose:
+        print(&#34;Actual diffuse flux simulated :&#34;)
+        log = &#34;E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]&#34;
+        print(log.format(**locals()))
+
+    if filename is None:
+        return results
 
 
 if __name__ == &#34;__main__&#34;:
@@ -149,31 +161,27 @@ if __name__ == &#34;__main__&#34;:
     parser.add_argument(&#34;--Levolution&#34;, action=&#34;store&#34;,
                         dest=&#34;Evolution&#34;, default=&#39;HA2014BL&#39;,
                         help=&#34;Source evolution options:  HA2014BL&#34;)
-    parser.add_argument(&#34;--timescale&#34;, action=&#39;store&#39;,
-                        dest=&#39;timescale&#39;, type=float,
-                        default=1000.,
-                        help=&#39;time scale of transient sources, default is 1000sec.&#39;)
     parser.add_argument(&#34;--zmax&#34;, action=&#34;store&#34;, type=float,
                         dest=&#34;zmax&#34;, default=10.,
                         help=&#34;Highest redshift to be simulated&#34;)
-    parser.add_argument(&#34;--fluxnorm&#34;, action=&#34;store&#34;, dest=&#39;fluxnorm&#39;,
-                        type=float, default=1.01e-8,
-                        help=&#34;Astrophysical neutrino flux normalization A on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr&#34;)
     parser.add_argument(&#34;--index&#34;, action=&#34;store&#34;, dest=&#39;index&#39;,
                         type=float, default=2.19,
-                        help=&#34;Astrophysical neutrino spectral index on E^2 dN/dE = A (E/100 TeV)^(-index+2) GeV/cm^2.s.sr&#34;)
-    parser.add_argument(&#34;--zNEAR&#34;, action=&#34;store&#34;, dest=&#34;zNEAR&#34;,
-                        type=float, default=-1,
-                        help=&#34;Write down a sepaarate file for sources closer than specified redshift. If nothing is specfied, no file is written.&#34;)
+                        help=&#34;Spectral index of the outputflux&#34;)
+    parser.add_argument(&#34;--lmin&#34;, action=&#34;store&#34;, dest=&#34;lmin&#34;,
+                        type=float, default=41.5,
+                        help=&#34;log10 of the minimum luminosity in erg/s&#34;)
+    parser.add_argument(&#34;--lmax&#34;, action=&#34;store&#34;, dest=&#34;lmax&#34;,
+                        type=float, default=41.5,
+                        help=&#34;log10 of the maximum luminosity in erg/s&#34;)
     options = parser.parse_args()
 
     legend_simulation(outputdir,
                       filename=options.filename,
                       L_Evolution=options.Evolution,
                       zmax=options.zmax,
-                      fluxnorm=options.fluxnorm,
                       index=options.index,
-                      zNEAR=options.zNEAR)</code></pre>
+                      lmin=options.lmin,
+                      lmax=options.lmax)</code></pre>
 </details>
 </section>
 <section>
@@ -184,7 +192,7 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="FIRESONG.Legend.legend_simulation"><code class="name flex">
-<span>def <span class="ident">legend_simulation</span></span>(<span>outputdir, filename='LEGEND.out', L_Evolution='HA2014BL', zmin=0.0005, zmax=10.0, bins=10000, fluxnorm=9e-09, index=2.13, emin=10000.0, emax=10000000.0, lmin=38, lmax=48, seed=None, zNEAR=-1)</span>
+<span>def <span class="ident">legend_simulation</span></span>(<span>outputdir, filename='LEGEND.out', L_Evolution='HA2014BL', zmin=0.0005, zmax=10.0, bins=10000, index=2.13, emin=10000.0, emax=10000000.0, lmin=38, lmax=48, seed=None, verbose=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Simulate a universe of neutrino sources with luminosity distribution
@@ -215,9 +223,9 @@ astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1</dd>
 <dt><strong><code>emax</code></strong> :&ensp;<code>float</code>, optional, default=<code>1e7</code></dt>
 <dd>Maximum neutrino energy in GeV</dd>
 <dt><strong><code>lmin</code></strong> :&ensp;<code>float</code>, optional, default=<code>38</code></dt>
-<dd>Minimum log10 luminosity in UNITS</dd>
+<dd>Minimum log10 luminosity in erg/s</dd>
 <dt><strong><code>lmax</code></strong> :&ensp;<code>float</code>, optional, default=<code>38</code></dt>
-<dd>Maximum log10 luminosity in UNITS</dd>
+<dd>Maximum log10 luminosity in erg/s</dd>
 <dt><strong><code>seed</code></strong> :&ensp;<code>int</code> or <code>None</code>, optional, default=<code>None</code></dt>
 <dd>random number seed</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional, default=<code>True</code></dt>
@@ -240,14 +248,13 @@ as well as the sources. Only returned if filename is None</dd>
                       zmin=0.0005,
                       zmax=10.,
                       bins=10000,
-                      fluxnorm=0.9e-8,
                       index=2.13,
                       emin=1e4,
                       emax=1e7,
                       lmin=38,
                       lmax=48,
                       seed=None,
-                      zNEAR=-1):
+                      verbose=True):
     &#34;&#34;&#34;
     Simulate a universe of neutrino sources with luminosity distribution 
         dependent on redshift
@@ -266,8 +273,8 @@ as well as the sources. Only returned if filename is None</dd>
         index (float, optional, default=2.13): Spectral index of diffuse flux
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
-        lmin (float, optional, default=38): Minimum log10 luminosity in UNITS
-        lmax (float, optional, default=38): Maximum log10 luminosity in UNITS
+        lmin (float, optional, default=38): Minimum log10 luminosity in erg/s
+        lmax (float, optional, default=38): Maximum log10 luminosity in erg/s
         seed (int or None, optional, default=None): random number seed
         verbose (bool, optional, default=True): print simulation paramaters
             if True else suppress printed output
@@ -299,8 +306,11 @@ as well as the sources. Only returned if filename is None</dd>
     # Prepare a luminosity CDF as a function of redshift
     luminosity_bins = np.arange(lmin, lmax, (lmax - lmin) / 1000.)
     LE_model.L_CDF(redshift_bins, luminosity_bins)
-
-    out = output_writer(outputdir, filename)
+    
+    if filename is not None:
+        out = output_writer(outputdir, filename)
+    else:
+        results = {}
 
     # Generate redshift
     zs = invCDF(rng.uniform(low=0.0, high=1.0, size=N_sample))
@@ -316,12 +326,22 @@ as well as the sources. Only returned if filename is None</dd>
     TotalFlux = np.sum(fluxes)
 
     # Write out
-    out.write(declins, zs, fluxes)
-    out.finish(TotalFlux)
+    if filename is not None:
+        out.write(declins, zs, fluxes)
+        out.finish(TotalFlux)
+    else:
+        results[&#39;dec&#39;] = declins
+        results[&#39;z&#39;] = zs
+        results[&#39;flux&#39;] = fluxes
 
-    print(&#34;Actual diffuse flux simulated :&#34;)
-    log = &#34;E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]&#34;
-    print(log.format(**locals()))</code></pre>
+    # print before finish
+    if verbose:
+        print(&#34;Actual diffuse flux simulated :&#34;)
+        log = &#34;E^2 dNdE = {TotalFlux} (E/100 TeV)^({delta_gamma}) [GeV/cm^2.s.sr]&#34;
+        print(log.format(**locals()))
+
+    if filename is None:
+        return results</code></pre>
 </details>
 </dd>
 </dl>

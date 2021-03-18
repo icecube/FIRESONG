@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>FIRESONG.Evolution API documentation</title>
-<meta name="description" content="Calculates features of various cosmic evolution models" />
+<meta name="description" content="Calculates features of various cosmic evolution models …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -24,19 +24,33 @@
 </header>
 <section id="section-intro">
 <p>Calculates features of various cosmic evolution models</p>
+<p>Cosmological parameters are hardcoded to Planck (2018) results:
+<span><span class="MathJax_Preview">\Omega_{M} = 0.315</span><script type="math/tex">\Omega_{M} = 0.315</script></span>, <span><span class="MathJax_Preview">\Omega_{L} = 1 - \Omega_{M}</span><script type="math/tex">\Omega_{L} = 1 - \Omega_{M}</script></span>, <span><span class="MathJax_Preview">h = 0.674 </span><script type="math/tex">h = 0.674 </script></span></p>
+<p>Planck Collaboration A&amp;A 641, A6 (2020)
+arXiv:1807.06209</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">#!/usr/bin/python
 
-&#34;&#34;&#34;Calculates features of various cosmic evolution models&#34;&#34;&#34;
+&#34;&#34;&#34;
+Calculates features of various cosmic evolution models
+
+Cosmological parameters are hardcoded to Planck (2018) results: 
+\(\Omega_{M} = 0.315\), \(\Omega_{L} = 1 - \Omega_{M}\), \(h = 0.674 \)
+
+Planck Collaboration A&amp;A 641, A6 (2020)
+arXiv:1807.06209
+
+&#34;&#34;&#34;
 
 import numpy as np
 import scipy
 import cosmolopy
-cosmology = {&#39;omega_M_0&#39;: 0.308, &#39;omega_lambda_0&#39;: 0.692, &#39;h&#39;: 0.678}
-
+# These are Planck 2015 values
+#cosmology = {&#39;omega_M_0&#39;: 0.308, &#39;omega_lambda_0&#39;: 0.692, &#39;h&#39;: 0.678}
+cosmology = {&#39;omega_M_0&#39;: 0.315, &#39;omega_lambda_0&#39;: 0.685, &#39;h&#39;: 0.674}
 
 def get_evolution(evol):
     &#34;&#34;&#34;
@@ -83,6 +97,9 @@ class NoEvolution(Evolution):
     def parametrization(self, x):
         return 1.
 
+    def __str__(self):
+        return &#34;No Evolution&#34;
+
 
 class HopkinsBeacom2006StarFormationRate(Evolution):
     &#34;&#34;&#34; 
@@ -125,9 +142,12 @@ class HopkinsBeacom2006StarFormationRate(Evolution):
             return result.item()
         return result
 
+    def __str__(self):
+        return &#34;Hopkins and Beacom (2006)&#34;
+
 class YukselEtAl2008StarFormationRate(Evolution):
     r&#34;&#34;&#34; 
-    Star Formation Rate in units of $\frac{M_{sun}}{yr Mpc^3}$
+    Star Formation Rate in units of \(\frac{M_{sun}}{yr Mpc^3}\)
 
     Model is a continuous broken power law,
     $$ \dot{\rho}_{*}(z)=\dot{\rho}_{0}\left[(1+z)^{a \eta}
@@ -135,7 +155,7 @@ class YukselEtAl2008StarFormationRate(Evolution):
     +\left(\frac{1+z}{C}\right)^{c \eta}\right]^{1 / \eta} $$
 
     with a = 3.4, b=-0.3, c=-3.5, B=5160.63662037,
-    C=9.06337604231, $\dot{\rho}$=0.02, eta=10
+    C=9.06337604231, \(\dot{\rho}\)=0.02, eta=10
 
     The given function results in breaks around z=1,4
 
@@ -168,6 +188,9 @@ class YukselEtAl2008StarFormationRate(Evolution):
         r0 = 0.02
         return r0 * (x**(a*eta) + (x/B)**(b*eta) +
                      (x/C)**(c*eta))**(1./eta)
+
+    def __str__(self):
+            return &#34;Yuksel et al. (2008)&#34;
 
 class CandelsClash2015SNRate(Evolution):
     r&#34;&#34;&#34;
@@ -202,6 +225,9 @@ class CandelsClash2015SNRate(Evolution):
         d = 6.1
         density = a*(x**c) / (1. + ( x / b)**d )
         return density
+    
+    def __str__(self):
+        return &#34;Strolger et al. (2015)&#34;
 
 
 class MadauDickinson2014CSFH(Evolution):
@@ -235,6 +261,9 @@ class MadauDickinson2014CSFH(Evolution):
         d = 5.6
         density = a*(x**b) / (1. + (x/c)**d ) 
         return density
+
+    def __str__(self):
+        return &#34;Madau and Dickinson (2014)&#34;
 
 
 class SourcePopulation(object):
@@ -270,7 +299,7 @@ class SourcePopulation(object):
     def RedshiftDistribution(self, z):
         r&#34;&#34;&#34; 
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\)
         Note: can remove 4*pi becaue we just use this in a normalized way 
 
         Args:
@@ -322,7 +351,7 @@ class SourcePopulation(object):
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def Nsources(self, density, zmax):
-        r&#34;&#34;&#34; Total number of sources within $z_{\mathrm{max}}$:
+        r&#34;&#34;&#34; Total number of sources within \(z_{\mathrm{max}}\):
 
         $$ N_\mathrm{tot} = \rho\cdot V_c(z=0.01)
         \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
@@ -514,7 +543,7 @@ class TransientSourcePopulation(SourcePopulation):
     def RedshiftDistribution(self, z):
         r&#34;&#34;&#34;
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$. Corrects for 
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\). Corrects for 
         time-dilation with extra factor of 1/1+z
 
         Args:
@@ -655,8 +684,8 @@ def get_LEvolution(le_model, lmin, lmax):
     Args:
         le_model (str): Name of luminosity-evolution model, only supported
             optioin is &#34;HA2014BL&#34;
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
 
     Returns:
         LuminosityEvolution: relevant luminosity-evolution object
@@ -673,15 +702,15 @@ class LuminosityEvolution(object):
     Abstract class for the a Luminosity Distribution that depends on z
 
     Args:
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
         cosmology (dict, optional, default=cosmology): kwargs to pass 
             to cosmolopy, defaults are &#39;omega_M_0&#39;: 0.308, 
             &#39;omega_lambda_0&#39;: 0.692, &#39;h&#39;: 0.678
 
     Attributes:
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
         _zlocal (float): Describes limit of nearby sources
         Mpc2cm (float): Conversion factor
         GeV_per_sec_2_ergs_per_year (float): Conversion factor
@@ -729,7 +758,7 @@ class LuminosityEvolution(object):
     def RedshiftDistribution(self, z):
         r&#34;&#34;&#34;
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$, 
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\), 
         accounting for the luminosity dependence on z
 
         $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
@@ -784,12 +813,14 @@ class LuminosityEvolution(object):
         Returns:
             array or float: Sampled luminosities
         &#34;&#34;&#34;
+        lumi = []
         z = np.atleast_1d(z)
         test = np.random.rand(z.shape[0])
         index_1 = np.searchsorted(self.redshift_bins, z)
         for test, index in zip(test, index_1):
             index_2 = np.searchsorted(self.Lcdf[index], test)
-        return self.luminosity_bins[index_2]
+            lumi.append(self.luminosity_bins[index_2])
+        return np.array(lumi)
 
     def Nsources(self, zmax):
         r&#34;&#34;&#34;
@@ -853,7 +884,7 @@ class LuminosityEvolution(object):
         &#34;&#34;&#34;
         if index != 2.0:
             denom = (1+z)**(index-2)
-            integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
+            integral = denom * (emax**(2-index)-emin**(2-index)) / (2-index)
         else:
             integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral
@@ -866,13 +897,18 @@ class HardingAbazajian(LuminosityEvolution):
     See also: :class:`LuminosityEvolution`
 
     Reference: arXiv:1206.4734
+               arXiv:1012.1247
+               arXiv:0308140
     &#34;&#34;&#34;
+    def __str__(self):
+        return &#34;Harding and Abazajian (2012)&#34;
+        
     def LF(self, L, z):
         &#34;&#34;&#34;
         Luminosity function based on X-ray AGN
 
         Args:
-            L (float): luminosity in UNITS
+            L (float): log10 of luminosity in erg/s
             z (float): redshift
 
         Returns:
@@ -895,13 +931,18 @@ class HardingAbazajian(LuminosityEvolution):
         z = np.atleast_1d(z)
         zc = np.zeros_like(L)
         LF_F = np.zeros_like(L)
+        # luminosity distribution at z=0
         LF_L = A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
+        # density indices 1 and 2 --&gt; constant in this model
         p1 = p10 + beta1 * (L-44.0)
         p2 = p20 + beta2 * (L-44.0)
+        # zc, where peak evolution happens
         zc[L&gt;=La] = zc0
         zc[L&lt;La] = zc0*10**((L[L&lt;La]-La)*alpha)
-        LF_F[z-zc&lt;=0] = (1+z[z-zc&lt;=0])**p1[z-zc&lt;=0]
-        LF_F[z-zc&gt;0] = (1+zc[z-zc&gt;0])**p1[z-zc&gt;0]*((1+z[z-zc&gt;0])/(1+zc[z-zc&gt;0]))**p2[z-zc&gt;0]
+        # density evolution
+        LF_F[z&lt;zc] = (1+z[z&lt;zc])**p1[z&lt;zc]
+        LF_F[z&gt;=zc] = (1+zc[z&gt;=zc])**p1[z&gt;=zc]*((1+z[z&gt;=zc])/(1+zc[z&gt;=zc]))**p2[z&gt;=zc]
+        # total evolution
         return LF_L*LF_F
 
     def Nsources(self, zmax):
@@ -914,7 +955,7 @@ class HardingAbazajian(LuminosityEvolution):
         Returns:
             float: Total number of sources
         &#34;&#34;&#34;
-        kappa = 9.54e-6
+        kappa = 9.54e-6         #model specific
         nsource = super(HardingAbazajian, self).Nsources(zmax)
         return nsource*kappa
 
@@ -929,7 +970,7 @@ class HardingAbazajian(LuminosityEvolution):
         Returns:
             array or float: Sampled luminosities
         &#34;&#34;&#34;
-        L_x_to_rad = 4.21
+        L_x_to_rad = 4.21           #model specific
         L = super(HardingAbazajian, self).Luminosity_Sampling(z)
         return 10**(L+L_x_to_rad)</code></pre>
 </details>
@@ -953,9 +994,9 @@ that is a function of z)</p>
 <dd>Name of luminosity-evolution model, only supported
 optioin is "HA2014BL"</dd>
 <dt><strong><code>lmin</code></strong> :&ensp;<code>float</code></dt>
-<dd>Minimum luminosity considered in UNITS</dd>
+<dd>log10 of Minimum luminosity considered in erg/s</dd>
 <dt><strong><code>lmax</code></strong> :&ensp;<code>float</code></dt>
-<dd>Maximum luminosity considered in UNITS</dd>
+<dd>log10 of Maximum luminosity considered in erg/s</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -974,8 +1015,8 @@ optioin is "HA2014BL"</dd>
     Args:
         le_model (str): Name of luminosity-evolution model, only supported
             optioin is &#34;HA2014BL&#34;
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
 
     Returns:
         LuminosityEvolution: relevant luminosity-evolution object
@@ -1087,7 +1128,10 @@ with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1</p>
         c = 5.0
         d = 6.1
         density = a*(x**c) / (1. + ( x / b)**d )
-        return density</code></pre>
+        return density
+    
+    def __str__(self):
+        return &#34;Strolger et al. (2015)&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -1183,13 +1227,15 @@ with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1</p>
 </dd>
 <dt id="FIRESONG.Evolution.HardingAbazajian"><code class="flex name class">
 <span>class <span class="ident">HardingAbazajian</span></span>
-<span>(</span><span>lmin, lmax, cosmology={'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678})</span>
+<span>(</span><span>lmin, lmax, cosmology={'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674})</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Luminosity dependent density evolution for gamma-ray blazars based
 on X-ray AGN luminosity function</p>
 <p>See also: :class:<code><a title="FIRESONG.Evolution.LuminosityEvolution" href="#FIRESONG.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></p>
-<p>Reference: arXiv:1206.4734</p>
+<p>Reference: arXiv:1206.4734
+arXiv:1012.1247
+arXiv:0308140</p>
 <p>Constructor</p></div>
 <details class="source">
 <summary>
@@ -1203,13 +1249,18 @@ on X-ray AGN luminosity function</p>
     See also: :class:`LuminosityEvolution`
 
     Reference: arXiv:1206.4734
+               arXiv:1012.1247
+               arXiv:0308140
     &#34;&#34;&#34;
+    def __str__(self):
+        return &#34;Harding and Abazajian (2012)&#34;
+        
     def LF(self, L, z):
         &#34;&#34;&#34;
         Luminosity function based on X-ray AGN
 
         Args:
-            L (float): luminosity in UNITS
+            L (float): log10 of luminosity in erg/s
             z (float): redshift
 
         Returns:
@@ -1232,13 +1283,18 @@ on X-ray AGN luminosity function</p>
         z = np.atleast_1d(z)
         zc = np.zeros_like(L)
         LF_F = np.zeros_like(L)
+        # luminosity distribution at z=0
         LF_L = A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
+        # density indices 1 and 2 --&gt; constant in this model
         p1 = p10 + beta1 * (L-44.0)
         p2 = p20 + beta2 * (L-44.0)
+        # zc, where peak evolution happens
         zc[L&gt;=La] = zc0
         zc[L&lt;La] = zc0*10**((L[L&lt;La]-La)*alpha)
-        LF_F[z-zc&lt;=0] = (1+z[z-zc&lt;=0])**p1[z-zc&lt;=0]
-        LF_F[z-zc&gt;0] = (1+zc[z-zc&gt;0])**p1[z-zc&gt;0]*((1+z[z-zc&gt;0])/(1+zc[z-zc&gt;0]))**p2[z-zc&gt;0]
+        # density evolution
+        LF_F[z&lt;zc] = (1+z[z&lt;zc])**p1[z&lt;zc]
+        LF_F[z&gt;=zc] = (1+zc[z&gt;=zc])**p1[z&gt;=zc]*((1+z[z&gt;=zc])/(1+zc[z&gt;=zc]))**p2[z&gt;=zc]
+        # total evolution
         return LF_L*LF_F
 
     def Nsources(self, zmax):
@@ -1251,7 +1307,7 @@ on X-ray AGN luminosity function</p>
         Returns:
             float: Total number of sources
         &#34;&#34;&#34;
-        kappa = 9.54e-6
+        kappa = 9.54e-6         #model specific
         nsource = super(HardingAbazajian, self).Nsources(zmax)
         return nsource*kappa
 
@@ -1266,7 +1322,7 @@ on X-ray AGN luminosity function</p>
         Returns:
             array or float: Sampled luminosities
         &#34;&#34;&#34;
-        L_x_to_rad = 4.21
+        L_x_to_rad = 4.21           #model specific
         L = super(HardingAbazajian, self).Luminosity_Sampling(z)
         return 10**(L+L_x_to_rad)</code></pre>
 </details>
@@ -1284,7 +1340,7 @@ on X-ray AGN luminosity function</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>L</code></strong> :&ensp;<code>float</code></dt>
-<dd>luminosity in UNITS</dd>
+<dd>log10 of luminosity in erg/s</dd>
 <dt><strong><code>z</code></strong> :&ensp;<code>float</code></dt>
 <dd>redshift</dd>
 </dl>
@@ -1303,7 +1359,7 @@ and redshift</dd>
     Luminosity function based on X-ray AGN
 
     Args:
-        L (float): luminosity in UNITS
+        L (float): log10 of luminosity in erg/s
         z (float): redshift
 
     Returns:
@@ -1326,13 +1382,18 @@ and redshift</dd>
     z = np.atleast_1d(z)
     zc = np.zeros_like(L)
     LF_F = np.zeros_like(L)
+    # luminosity distribution at z=0
     LF_L = A*((10**L/L0)**gamma1 + (10**L/L0)**gamma2)**-1
+    # density indices 1 and 2 --&gt; constant in this model
     p1 = p10 + beta1 * (L-44.0)
     p2 = p20 + beta2 * (L-44.0)
+    # zc, where peak evolution happens
     zc[L&gt;=La] = zc0
     zc[L&lt;La] = zc0*10**((L[L&lt;La]-La)*alpha)
-    LF_F[z-zc&lt;=0] = (1+z[z-zc&lt;=0])**p1[z-zc&lt;=0]
-    LF_F[z-zc&gt;0] = (1+zc[z-zc&gt;0])**p1[z-zc&gt;0]*((1+z[z-zc&gt;0])/(1+zc[z-zc&gt;0]))**p2[z-zc&gt;0]
+    # density evolution
+    LF_F[z&lt;zc] = (1+z[z&lt;zc])**p1[z&lt;zc]
+    LF_F[z&gt;=zc] = (1+zc[z&gt;=zc])**p1[z&gt;=zc]*((1+z[z&gt;=zc])/(1+zc[z&gt;=zc]))**p2[z&gt;=zc]
+    # total evolution
     return LF_L*LF_F</code></pre>
 </details>
 </dd>
@@ -1367,7 +1428,7 @@ appropriately applied unit conversion</p>
     Returns:
         array or float: Sampled luminosities
     &#34;&#34;&#34;
-    L_x_to_rad = 4.21
+    L_x_to_rad = 4.21           #model specific
     L = super(HardingAbazajian, self).Luminosity_Sampling(z)
     return 10**(L+L_x_to_rad)</code></pre>
 </details>
@@ -1401,7 +1462,7 @@ appropriately applied unit conversion</p>
     Returns:
         float: Total number of sources
     &#34;&#34;&#34;
-    kappa = 9.54e-6
+    kappa = 9.54e-6         #model specific
     nsource = super(HardingAbazajian, self).Nsources(zmax)
     return nsource*kappa</code></pre>
 </details>
@@ -1476,7 +1537,10 @@ log10(1+z) - log10(rho) space:</p>
         result[m2] = np.power(10, -8.0*x[m2]+4.99)
         if len(result) == 1:
             return result.item()
-        return result</code></pre>
+        return result
+
+    def __str__(self):
+        return &#34;Hopkins and Beacom (2006)&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -1530,16 +1594,16 @@ log10(1+z) - log10(rho) space:</p>
 </dd>
 <dt id="FIRESONG.Evolution.LuminosityEvolution"><code class="flex name class">
 <span>class <span class="ident">LuminosityEvolution</span></span>
-<span>(</span><span>lmin, lmax, cosmology={'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678})</span>
+<span>(</span><span>lmin, lmax, cosmology={'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674})</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Abstract class for the a Luminosity Distribution that depends on z</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>lmin</code></strong> :&ensp;<code>float</code></dt>
-<dd>Minimum luminosity considered in UNITS</dd>
+<dd>log10 of Minimum luminosity considered in erg/s</dd>
 <dt><strong><code>lmax</code></strong> :&ensp;<code>float</code></dt>
-<dd>Maximum luminosity considered in UNITS</dd>
+<dd>log10 of Maximum luminosity considered in erg/s</dd>
 <dt><strong><code>cosmology</code></strong> :&ensp;<code>dict</code>, optional, default=<code>cosmology</code></dt>
 <dd>kwargs to pass
 to cosmolopy, defaults are 'omega_M_0': 0.308,
@@ -1548,9 +1612,9 @@ to cosmolopy, defaults are 'omega_M_0': 0.308,
 <h2 id="attributes">Attributes</h2>
 <dl>
 <dt><strong><code>lmin</code></strong> :&ensp;<code>float</code></dt>
-<dd>Minimum luminosity considered in UNITS</dd>
+<dd>log10 of Minimum luminosity considered in erg/s</dd>
 <dt><strong><code>lmax</code></strong> :&ensp;<code>float</code></dt>
-<dd>Maximum luminosity considered in UNITS</dd>
+<dd>log10 of Maximum luminosity considered in erg/s</dd>
 <dt><strong><code>_zlocal</code></strong> :&ensp;<code>float</code></dt>
 <dd>Describes limit of nearby sources</dd>
 <dt><strong><code>Mpc2cm</code></strong> :&ensp;<code>float</code></dt>
@@ -1569,15 +1633,15 @@ Constructor</p></div>
     Abstract class for the a Luminosity Distribution that depends on z
 
     Args:
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
         cosmology (dict, optional, default=cosmology): kwargs to pass 
             to cosmolopy, defaults are &#39;omega_M_0&#39;: 0.308, 
             &#39;omega_lambda_0&#39;: 0.692, &#39;h&#39;: 0.678
 
     Attributes:
-        lmin (float): Minimum luminosity considered in UNITS
-        lmax (float): Maximum luminosity considered in UNITS
+        lmin (float): log10 of Minimum luminosity considered in erg/s
+        lmax (float): log10 of Maximum luminosity considered in erg/s
         _zlocal (float): Describes limit of nearby sources
         Mpc2cm (float): Conversion factor
         GeV_per_sec_2_ergs_per_year (float): Conversion factor
@@ -1625,7 +1689,7 @@ Constructor</p></div>
     def RedshiftDistribution(self, z):
         r&#34;&#34;&#34;
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$, 
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\), 
         accounting for the luminosity dependence on z
 
         $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
@@ -1680,12 +1744,14 @@ Constructor</p></div>
         Returns:
             array or float: Sampled luminosities
         &#34;&#34;&#34;
+        lumi = []
         z = np.atleast_1d(z)
         test = np.random.rand(z.shape[0])
         index_1 = np.searchsorted(self.redshift_bins, z)
         for test, index in zip(test, index_1):
             index_2 = np.searchsorted(self.Lcdf[index], test)
-        return self.luminosity_bins[index_2]
+            lumi.append(self.luminosity_bins[index_2])
+        return np.array(lumi)
 
     def Nsources(self, zmax):
         r&#34;&#34;&#34;
@@ -1749,7 +1815,7 @@ Constructor</p></div>
         &#34;&#34;&#34;
         if index != 2.0:
             denom = (1+z)**(index-2)
-            integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
+            integral = denom * (emax**(2-index)-emin**(2-index)) / (2-index)
         else:
             integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral</code></pre>
@@ -1806,7 +1872,7 @@ Constructor</p></div>
     &#34;&#34;&#34;
     if index != 2.0:
         denom = (1+z)**(index-2)
-        integral = denom * (emin**(2-index)-emax**(2-index)) / (2-index)
+        integral = denom * (emax**(2-index)-emin**(2-index)) / (2-index)
     else:
         integral = np.ones_like(z) * np.log(emax/emin)
     return E0**index * integral</code></pre>
@@ -2029,12 +2095,14 @@ If passing many redshifts, a 1d spline is used as cosmolopy can be slow</p>
     Returns:
         array or float: Sampled luminosities
     &#34;&#34;&#34;
+    lumi = []
     z = np.atleast_1d(z)
     test = np.random.rand(z.shape[0])
     index_1 = np.searchsorted(self.redshift_bins, z)
     for test, index in zip(test, index_1):
         index_2 = np.searchsorted(self.Lcdf[index], test)
-    return self.luminosity_bins[index_2]</code></pre>
+        lumi.append(self.luminosity_bins[index_2])
+    return np.array(lumi)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.Evolution.LuminosityEvolution.Nsources"><code class="name flex">
@@ -2079,7 +2147,7 @@ redshift and luminosity</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Provides the unnormalized PDF of number of sources vs. redshift
-by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$,
+by multiplying the <span><span class="MathJax_Preview">\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}</span><script type="math/tex">\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}</script></span>,
 accounting for the luminosity dependence on z</p>
 <p><span><span class="MathJax_Preview"> P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi </span><script type="math/tex; mode=display"> P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi </script></span> </p>
 <h2 id="args">Args</h2>
@@ -2096,7 +2164,7 @@ Array of float: Unnormalized PDF of number vs. redshift</p></div>
 <pre><code class="python">def RedshiftDistribution(self, z):
     r&#34;&#34;&#34;
     Provides the unnormalized PDF of number of sources vs. redshift
-    by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$, 
+    by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\), 
     accounting for the luminosity dependence on z
 
     $$ P(z) = \int_{Lmin}^{Lmax} LF(L,z) \,dL \,dV_c(z) \,4\pi $$ 
@@ -2158,7 +2226,10 @@ but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6</p>
         c = 2.9
         d = 5.6
         density = a*(x**b) / (1. + (x/c)**d ) 
-        return density</code></pre>
+        return density
+
+    def __str__(self):
+        return &#34;Madau and Dickinson (2014)&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -2219,7 +2290,10 @@ but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6</p>
     Evolution model that is flat over cosmic history
     &#34;&#34;&#34;
     def parametrization(self, x):
-        return 1.</code></pre>
+        return 1.
+
+    def __str__(self):
+        return &#34;No Evolution&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -2307,7 +2381,7 @@ source population</dd>
     def RedshiftDistribution(self, z):
         r&#34;&#34;&#34; 
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\)
         Note: can remove 4*pi becaue we just use this in a normalized way 
 
         Args:
@@ -2359,7 +2433,7 @@ source population</dd>
         return cosmolopy.distance.luminosity_distance(z, **self.cosmology)
 
     def Nsources(self, density, zmax):
-        r&#34;&#34;&#34; Total number of sources within $z_{\mathrm{max}}$:
+        r&#34;&#34;&#34; Total number of sources within \(z_{\mathrm{max}}\):
 
         $$ N_\mathrm{tot} = \rho\cdot V_c(z=0.01)
         \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
@@ -2758,7 +2832,7 @@ If passing many redshifts, a 1d spline is used as cosmolopy can be slow</p>
 <span>def <span class="ident">Nsources</span></span>(<span>self, density, zmax)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Total number of sources within $z_{\mathrm{max}}$:</p>
+<div class="desc"><p>Total number of sources within <span><span class="MathJax_Preview">z_{\mathrm{max}}</span><script type="math/tex">z_{\mathrm{max}}</script></span>:</p>
 <p><span><span class="MathJax_Preview"> N_\mathrm{tot} = \rho\cdot V_c(z=0.01)
 \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
 V_c(z) \,\mathrm{d}z}{\int_0^{0.01}
@@ -2783,7 +2857,7 @@ V_c(z) \,\mathrm{d}z}{\int_0^{0.01}
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def Nsources(self, density, zmax):
-    r&#34;&#34;&#34; Total number of sources within $z_{\mathrm{max}}$:
+    r&#34;&#34;&#34; Total number of sources within \(z_{\mathrm{max}}\):
 
     $$ N_\mathrm{tot} = \rho\cdot V_c(z=0.01)
     \frac{\int_0^{z_\mathrm{max}} \frac{\mathrm{d}N}{\mathrm{d}z}
@@ -2810,7 +2884,7 @@ V_c(z) \,\mathrm{d}z}{\int_0^{0.01}
 </code></dt>
 <dd>
 <div class="desc"><p>Provides the unnormalized PDF of number of sources vs. redshift
-by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$
+by multiplying the <span><span class="MathJax_Preview">\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}</span><script type="math/tex">\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}</script></span>
 Note: can remove 4*pi becaue we just use this in a normalized way </p>
 <h2 id="args">Args</h2>
 <dl>
@@ -2826,7 +2900,7 @@ Array of float: Unnormalized PDF of number vs. redshift</p></div>
 <pre><code class="python">def RedshiftDistribution(self, z):
     r&#34;&#34;&#34; 
     Provides the unnormalized PDF of number of sources vs. redshift
-    by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$
+    by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\)
     Note: can remove 4*pi becaue we just use this in a normalized way 
 
     Args:
@@ -3076,7 +3150,7 @@ source population</dd>
     def RedshiftDistribution(self, z):
         r&#34;&#34;&#34;
         Provides the unnormalized PDF of number of sources vs. redshift
-        by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$. Corrects for 
+        by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\). Corrects for 
         time-dilation with extra factor of 1/1+z
 
         Args:
@@ -3360,7 +3434,7 @@ fluence units are [UNITS]</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Provides the unnormalized PDF of number of sources vs. redshift
-by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$. Corrects for
+by multiplying the <span><span class="MathJax_Preview">\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}</span><script type="math/tex">\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}</script></span>. Corrects for
 time-dilation with extra factor of 1/1+z</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -3376,7 +3450,7 @@ Array of float: Unnormalized PDF of number vs. redshift</p></div>
 <pre><code class="python">def RedshiftDistribution(self, z):
     r&#34;&#34;&#34;
     Provides the unnormalized PDF of number of sources vs. redshift
-    by multiplying the $\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}$. Corrects for 
+    by multiplying the \(\frac{dN}{dz} = \frac{d\rho}{dz} \times \frac{dV}{dz}\). Corrects for 
     time-dilation with extra factor of 1/1+z
 
     Args:
@@ -3525,7 +3599,7 @@ divided by (1+z)*timescale</p>
 <span>class <span class="ident">YukselEtAl2008StarFormationRate</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Star Formation Rate in units of $\frac{M_{sun}}{yr Mpc^3}$</p>
+<div class="desc"><p>Star Formation Rate in units of <span><span class="MathJax_Preview">\frac{M_{sun}}{yr Mpc^3}</span><script type="math/tex">\frac{M_{sun}}{yr Mpc^3}</script></span></p>
 <p>Model is a continuous broken power law,
 <span><span class="MathJax_Preview"> \dot{\rho}_{*}(z)=\dot{\rho}_{0}\left[(1+z)^{a \eta}
 +\left(\frac{1+z}{B}\right)^{b \eta}
@@ -3533,7 +3607,7 @@ divided by (1+z)*timescale</p>
 +\left(\frac{1+z}{B}\right)^{b \eta}
 +\left(\frac{1+z}{C}\right)^{c \eta}\right]^{1 / \eta} </script></span></p>
 <p>with a = 3.4, b=-0.3, c=-3.5, B=5160.63662037,
-C=9.06337604231, $\dot{\rho}$=0.02, eta=10</p>
+C=9.06337604231, <span><span class="MathJax_Preview">\dot{\rho}</span><script type="math/tex">\dot{\rho}</script></span>=0.02, eta=10</p>
 <p>The given function results in breaks around z=1,4</p>
 <p>Reference: arXiv:0804.4008
 Eq.5</p></div>
@@ -3543,7 +3617,7 @@ Eq.5</p></div>
 </summary>
 <pre><code class="python">class YukselEtAl2008StarFormationRate(Evolution):
     r&#34;&#34;&#34; 
-    Star Formation Rate in units of $\frac{M_{sun}}{yr Mpc^3}$
+    Star Formation Rate in units of \(\frac{M_{sun}}{yr Mpc^3}\)
 
     Model is a continuous broken power law,
     $$ \dot{\rho}_{*}(z)=\dot{\rho}_{0}\left[(1+z)^{a \eta}
@@ -3551,7 +3625,7 @@ Eq.5</p></div>
     +\left(\frac{1+z}{C}\right)^{c \eta}\right]^{1 / \eta} $$
 
     with a = 3.4, b=-0.3, c=-3.5, B=5160.63662037,
-    C=9.06337604231, $\dot{\rho}$=0.02, eta=10
+    C=9.06337604231, \(\dot{\rho}\)=0.02, eta=10
 
     The given function results in breaks around z=1,4
 
@@ -3583,7 +3657,10 @@ Eq.5</p></div>
         eta = -10
         r0 = 0.02
         return r0 * (x**(a*eta) + (x/B)**(b*eta) +
-                     (x/C)**(c*eta))**(1./eta)</code></pre>
+                     (x/C)**(c*eta))**(1./eta)
+
+    def __str__(self):
+            return &#34;Yuksel et al. (2008)&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

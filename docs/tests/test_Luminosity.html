@@ -49,8 +49,8 @@ import numpy as np
 
 
 class TestLuminosity(unittest.TestCase):
-    &#34;&#34;&#34; Tests get_evolution function, Evolution class and
-        all implemented Evolutions.
+    &#34;&#34;&#34; Tests Luminosity classes, with focus on standard
+        candles and lognormal distributions
     &#34;&#34;&#34;
 
     @classmethod
@@ -118,7 +118,7 @@ class TestLuminosity(unittest.TestCase):
 
     def test_LG_LuminosityFunction_PDF(self):
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
-        self.assertEqual(lf.pdf(1e49), 0.12090143428762441)
+        self.assertEqual(lf.pdf(1e49), 1.712868408774468e-50)
 
     def test_LG_LuminosityFunction_CDF(self):
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
@@ -146,8 +146,8 @@ if __name__ == &#34;__main__&#34;:
 <span>(</span><span>methodName='runTest')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Tests get_evolution function, Evolution class and
-all implemented Evolutions.</p>
+<div class="desc"><p>Tests Luminosity classes, with focus on standard
+candles and lognormal distributions</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
 not have a method with the specified name.</p></div>
@@ -156,8 +156,8 @@ not have a method with the specified name.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TestLuminosity(unittest.TestCase):
-    &#34;&#34;&#34; Tests get_evolution function, Evolution class and
-        all implemented Evolutions.
+    &#34;&#34;&#34; Tests Luminosity classes, with focus on standard
+        candles and lognormal distributions
     &#34;&#34;&#34;
 
     @classmethod
@@ -225,7 +225,7 @@ not have a method with the specified name.</p></div>
 
     def test_LG_LuminosityFunction_PDF(self):
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
-        self.assertEqual(lf.pdf(1e49), 0.12090143428762441)
+        self.assertEqual(lf.pdf(1e49), 1.712868408774468e-50)
 
     def test_LG_LuminosityFunction_CDF(self):
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
@@ -328,7 +328,7 @@ def tearDownClass(cls):
 </summary>
 <pre><code class="python">def test_LG_LuminosityFunction_PDF(self):
     lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
-    self.assertEqual(lf.pdf(1e49), 0.12090143428762441)</code></pre>
+    self.assertEqual(lf.pdf(1e49), 1.712868408774468e-50)</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.tests.test_Luminosity.TestLuminosity.test_LG_LuminosityFunction_sample_distribution"><code class="name flex">

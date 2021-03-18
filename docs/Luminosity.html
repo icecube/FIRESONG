@@ -119,7 +119,7 @@ class LG_LuminosityFunction(LuminosityFunction):
         &#34;&#34;&#34; Log Normal Luminosity function.
 
         Args:
-            - mean luminosity (Not not median and not log(mean))
+            - mean luminosity (Not median and not log(mean))
             - width in dex (width in log10)
 
         Note:
@@ -156,8 +156,7 @@ class LG_LuminosityFunction(LuminosityFunction):
             $$ \frac{1}{x\sigma \sqrt{2\pi}} \times 
             \exp{-\frac{(\ln(x)-\mu)^2}{2\sigma^1}}$$
         &#34;&#34;&#34;
-        return np.exp(self.mu) * \
-            lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
+        return lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf(self, lumi):
         r&#34;&#34;&#34; Gives the value of the CDF at lumi.
@@ -357,7 +356,7 @@ Raises 'NotImplementedError' for unknown abbreviation.</li>
 <p>Log Normal Luminosity function.</p>
 <h2 id="args">Args</h2>
 <ul>
-<li>mean luminosity (Not not median and not log(mean))</li>
+<li>mean luminosity (Not median and not log(mean))</li>
 <li>width in dex (width in log10)</li>
 </ul>
 <h2 id="note">Note</h2>
@@ -375,7 +374,7 @@ sigma = log(10^width)</p></div>
         &#34;&#34;&#34; Log Normal Luminosity function.
 
         Args:
-            - mean luminosity (Not not median and not log(mean))
+            - mean luminosity (Not median and not log(mean))
             - width in dex (width in log10)
 
         Note:
@@ -412,8 +411,7 @@ sigma = log(10^width)</p></div>
             $$ \frac{1}{x\sigma \sqrt{2\pi}} \times 
             \exp{-\frac{(\ln(x)-\mu)^2}{2\sigma^1}}$$
         &#34;&#34;&#34;
-        return np.exp(self.mu) * \
-            lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
+        return lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))
 
     def cdf(self, lumi):
         r&#34;&#34;&#34; Gives the value of the CDF at lumi.
@@ -500,8 +498,7 @@ sigma = log(10^width)</p></div>
         $$ \frac{1}{x\sigma \sqrt{2\pi}} \times 
         \exp{-\frac{(\ln(x)-\mu)^2}{2\sigma^1}}$$
     &#34;&#34;&#34;
-    return np.exp(self.mu) * \
-        lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))</code></pre>
+    return lognorm.pdf(lumi, s=self.sigma, scale=np.exp(self.mu))</code></pre>
 </details>
 </dd>
 <dt id="FIRESONG.Luminosity.LG_LuminosityFunction.sample_distribution"><code class="name flex">
