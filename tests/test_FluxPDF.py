@@ -12,7 +12,7 @@ or:
 import os
 import unittest
 import numpy as np
-import FluxPDF
+import firesong.FluxPDF as FluxPDF
 
 
 class TestFluxPDFSimulation(unittest.TestCase):

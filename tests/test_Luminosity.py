@@ -10,7 +10,7 @@ or:
 """
 
 import unittest
-import Luminosity
+import firesong.Luminosity as Luminosity
 import numpy as np
 
 
