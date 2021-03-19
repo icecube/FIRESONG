@@ -55,7 +55,7 @@ to explain measured astrophysical neutrinos.
 
 # Background
 
-The IceCube neutrino observatory has discoved an all-sky neutrino flux
+The IceCube Neutrino Observatory has discoved an all-sky neutrino flux
 in the 10 TeV to 10 PeV energy range
 [@IceCube:2019a;@IceCube:2019b;@IceCube:2020a]. IceCube
 finds that a power law in energy is a good description of the flux,
