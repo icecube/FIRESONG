@@ -57,9 +57,7 @@ class TestLegendSimulation(unittest.TestCase):
             places=1)
 
     def test_total_flux(self):
-        self.assertAlmostEqual(np.log10(np.sum(self.legend_uni['flux'])/7.117604312572643e-06) + 1.,
-            1.0,
-            places=1)
+        self.assertTrue(np.abs(np.log10(np.sum(self.legend_uni['flux'])/7.117604312572643e-06)) < 0.1)
 
 if __name__ == "__main__":
     unittest.main()

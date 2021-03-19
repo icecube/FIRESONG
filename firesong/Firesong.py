@@ -11,11 +11,11 @@ import argparse
 import numpy as np
 
 # Firesong code
-from Evolution import get_evolution, SourcePopulation
-from Evolution import TransientSourcePopulation, cosmology
-from Luminosity import get_LuminosityFunction
-from input_output import output_writer, print_config, get_outputdir
-from sampling import InverseCDF
+from firesong.Evolution import get_evolution, SourcePopulation
+from firesong.Evolution import TransientSourcePopulation, cosmology
+from firesong.Luminosity import get_LuminosityFunction
+from firesong.input_output import output_writer, print_config, get_outputdir
+from firesong.sampling import InverseCDF
 
 def firesong_simulation(outputdir,
                         filename='Firesong.out',
