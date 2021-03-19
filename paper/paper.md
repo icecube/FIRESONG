@@ -12,6 +12,7 @@ authors:
     orcid: 0000-0001-6920-7841
     affiliation: 1
   - name: Theo Glauch
+    orcid: 0000-0003-1804-4055
     affiliation: 2
   - name: Michael Larson
     orcid: 0000-0002-6996-1155
@@ -28,7 +29,7 @@ authors:
 affiliations:
   - name: School of Physics. Georgia Institute of Technology. Atlanta, GA 30332, USA
     index: 1
-  - name: TUM
+  - name: Technische Universität München, Physik-Department, James-Frank-Str. 1, D-85748 Garching bei München, Germany
     index: 2
   - name: Dept. of Physics, University of Maryland, College Park, MD 20742, USA
     index: 3
