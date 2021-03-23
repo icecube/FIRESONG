@@ -1,6 +1,8 @@
 # Firesong
 FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays.
 
+[See the Docs](https://icecube.github.io/FIRESONG/)
+
 Documentation for the astrophysics and cosmology of neutrino sources
 can be found on:
 - [René Rieman's PhD thesis](http://publications.rwth-aachen.de/record/773297),
@@ -10,18 +12,23 @@ can be found on:
 - Chun Fai Tung PhD thesis (upcoming)
 
 # Set up
-FIRESONG depends on cosmolopy, numpy and scipy. Set up the enviromental variable FIRESONG. In bash: `export FIRESONG=/location/of/firesong/`.
+This package can be installed via pip:
+```
+python -m pip install --editable FIRESONG
+```
+
+You can also specify where you would like the output of simulations to go, by default. In bash: `export FIRESONG=/location/of/FIRESONG/`.
 
 # Basic usage
 Several scripts are provided:
-* Firesong.py - Generates an instance of all neutrino sources in
+* `firesong/Firesong.py` - Generates an instance of all neutrino sources in
   the Universe according to the parameters provided (e.g. local
   neutrino source density). Both the flux and the redshift of neutrino
   sources are calculated.
-* FluxPDF.py - Generated the flux probability density distribution of a 
+* `firsong/FluxPDF.py` - Generated the flux probability density distribution of a 
 source. It complements FIRESONG.py because is it much faster for large
 source densities. Only the flux of neutrino sources is calculated.
-* Legend.py - Generates an instance of gamma-ray sources in the universe
+* `firesong/Legend.py` - Generates an instance of gamma-ray sources in the universe
   according to a luminosity denpendent density evolution (LDDE). Both the 
   redshift and the gamma-ray flux (without attenuation) are calculated.
 
@@ -52,7 +59,7 @@ python Firesong.py -d 1e-6 --evolution MD2016SFR --zmax 8.0
 --index 2.28 --LF SC -L 1e51
 ```
 
-wlll simulate neutrino sources with a local density of 10^-6 Mpc^-3
+will simulate neutrino sources with a local density of 10^-6 Mpc^-3
 with a source denstiy evolution that folows the Madau and Dickinson 2016
 Star Formation Rate History (MD2014SFR). The simulation will be done up to a
 redshift of 8.0.  The neutrino power law spectral index is -2.28. Neutrino
@@ -70,7 +77,7 @@ All unittest could be run by
 python -m unittest discover tests/
 ```
 
-If you want to run a test for a certain file seperatly user either
+If you would like to suppress the printed output, you may add a `-b` flag to this command. If you want to run a test for a certain file seperatly use either
 
 ```
 python -m unittest tests/test_<...>
