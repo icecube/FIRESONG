@@ -762,7 +762,7 @@ class LuminosityEvolution(object):
         l, z = np.meshgrid(luminosity_bins, redshift_bins)
         L_PDF = self.LF(l, z)
         L_CDF = np.cumsum(L_PDF, axis=1)
-        norm = L_CDF[:,-1].reshape((10000,1))
+        norm = L_CDF[:,-1].reshape((len(redshift_bins),1))
         L_CDF = (1/norm) * L_CDF
 
         self.redshift_bins = redshift_bins
