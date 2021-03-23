@@ -31,7 +31,8 @@ class TestLegendSimulation(unittest.TestCase):
         verbose=False,
         lmin=40,
         lmax=48,
-        seed=1234)
+        seed=1234,
+        bins=1000)
 
     @classmethod
     def tearDownClass(cls):
