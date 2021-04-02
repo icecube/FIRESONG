@@ -1,4 +1,21 @@
 # Tagged Versions
+
+v1.6 - March 20, 2021
+
+Release needed to support an IceCube code review.
+
+Multiple quality of life improvements.
+* Improved documentation, including an action to show docs on github-pages.
+* Firesong can now be imported to produce a dictionary of neutrino
+sources
+* Speed improvements. Good for high density settings
+* Updated default values for diffuse muon neutrino flux, Planck 2018
+  cosmological parameters, Madau and Dickinson 2016 is the default
+  evolution.
+* Expanded unit testing
+* Removed NeutrinoAlert.py
+* Removed non-FIRESONG code related to CTA
+
 v1.5 - March 28, 2018
 
 Rewritten, added new model, new mode
