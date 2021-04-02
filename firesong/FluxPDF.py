@@ -9,10 +9,10 @@ import argparse
 # Numpy / Scipy
 import numpy as np
 # Firesong code
-from Evolution import get_evolution, SourcePopulation, cosmology
-from Evolution import TransientSourcePopulation
-from Luminosity import get_LuminosityFunction
-from input_output import output_writer_PDF, get_outputdir, print_config
+from firesong.Evolution import get_evolution, SourcePopulation, cosmology
+from firesong.Evolution import TransientSourcePopulation
+from firesong.Luminosity import get_LuminosityFunction
+from firesong.input_output import output_writer_PDF, get_outputdir, print_config
 
 
 def flux_pdf(outputdir,

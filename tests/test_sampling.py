@@ -10,7 +10,7 @@ or:
 """
 
 import unittest
-import sampling
+import firesong.sampling as sampling
 import numpy as np
 
 from scipy.stats import truncnorm

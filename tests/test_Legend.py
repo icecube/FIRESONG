@@ -11,7 +11,8 @@ or:
 
 import os
 import unittest
-import Legend, Evolution
+import firesong.Legend as Legend
+import firesong.Evolution as Evolution
 import numpy as np
 
 class TestLegendSimulation(unittest.TestCase):
@@ -30,7 +31,8 @@ class TestLegendSimulation(unittest.TestCase):
         verbose=False,
         lmin=40,
         lmax=48,
-        seed=1234)
+        seed=1234,
+        bins=1000)
 
     @classmethod
     def tearDownClass(cls):
@@ -56,9 +58,7 @@ class TestLegendSimulation(unittest.TestCase):
             places=1)
 
     def test_total_flux(self):
-        self.assertAlmostEqual(np.log10(np.sum(self.legend_uni['flux'])/7.117604312572643e-06),
-            0.0,
-            places=1)
+        self.assertTrue(np.abs(np.log10(np.sum(self.legend_uni['flux'])/7.117604312572643e-06)) < 0.1)
 
 if __name__ == "__main__":
     unittest.main()

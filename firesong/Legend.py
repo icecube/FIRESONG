@@ -12,9 +12,9 @@ import argparse
 # Numpy / Scipy
 import numpy as np
 # Firesong code
-from Evolution import get_LEvolution
-from input_output import output_writer, print_config_LEGEND, get_outputdir
-from sampling import InverseCDF
+from firesong.Evolution import get_LEvolution
+from firesong.input_output import output_writer, print_config_LEGEND, get_outputdir
+from firesong.sampling import InverseCDF
 
 
 def legend_simulation(outputdir,
@@ -64,7 +64,8 @@ def legend_simulation(outputdir,
     N_sample = int(LE_model.Nsources(zmax))
 
     delta_gamma = 2 - index
-    print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
+    if verbose:
+        print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
 
     ##################################################
     #        Simulation starts here
