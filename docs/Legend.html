@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>FIRESONG.Legend API documentation</title>
+<title>firesong.Legend API documentation</title>
 <meta name="description" content="Example script that simulates a population of sources with a luminosity
 distribution that is dependent on redshift" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -21,7 +21,7 @@ distribution that is dependent on redshift" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>FIRESONG.Legend</code></h1>
+<h1 class="title">Module <code>firesong.Legend</code></h1>
 </header>
 <section id="section-intro">
 <p>Example script that simulates a population of sources with a luminosity
@@ -44,9 +44,9 @@ import argparse
 # Numpy / Scipy
 import numpy as np
 # Firesong code
-from Evolution import get_LEvolution
-from input_output import output_writer, print_config_LEGEND, get_outputdir
-from sampling import InverseCDF
+from firesong.Evolution import get_LEvolution
+from firesong.input_output import output_writer, print_config_LEGEND, get_outputdir
+from firesong.sampling import InverseCDF
 
 
 def legend_simulation(outputdir,
@@ -96,7 +96,8 @@ def legend_simulation(outputdir,
     N_sample = int(LE_model.Nsources(zmax))
 
     delta_gamma = 2 - index
-    print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
+    if verbose:
+        print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
 
     ##################################################
     #        Simulation starts here
@@ -191,7 +192,7 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="FIRESONG.Legend.legend_simulation"><code class="name flex">
+<dt id="firesong.Legend.legend_simulation"><code class="name flex">
 <span>def <span class="ident">legend_simulation</span></span>(<span>outputdir, filename='LEGEND.out', L_Evolution='HA2014BL', zmin=0.0005, zmax=10.0, bins=10000, index=2.13, emin=10000.0, emax=10000000.0, lmin=38, lmax=48, seed=None, verbose=True)</span>
 </code></dt>
 <dd>
@@ -289,7 +290,8 @@ as well as the sources. Only returned if filename is None</dd>
     N_sample = int(LE_model.Nsources(zmax))
 
     delta_gamma = 2 - index
-    print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
+    if verbose:
+        print_config_LEGEND(L_Evolution, lmin, lmax, N_sample)
 
     ##################################################
     #        Simulation starts here
@@ -357,12 +359,12 @@ as well as the sources. Only returned if filename is None</dd>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="FIRESONG" href="index.html">FIRESONG</a></code></li>
+<li><code><a title="firesong" href="index.html">firesong</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="FIRESONG.Legend.legend_simulation" href="#FIRESONG.Legend.legend_simulation">legend_simulation</a></code></li>
+<li><code><a title="firesong.Legend.legend_simulation" href="#firesong.Legend.legend_simulation">legend_simulation</a></code></li>
 </ul>
 </li>
 </ul>
