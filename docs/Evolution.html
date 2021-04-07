@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>FIRESONG.Evolution API documentation</title>
+<title>firesong.Evolution API documentation</title>
 <meta name="description" content="Calculates features of various cosmic evolution models …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,7 +20,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>FIRESONG.Evolution</code></h1>
+<h1 class="title">Module <code>firesong.Evolution</code></h1>
 </header>
 <section id="section-intro">
 <p>Calculates features of various cosmic evolution models</p>
@@ -796,7 +796,7 @@ class LuminosityEvolution(object):
         l, z = np.meshgrid(luminosity_bins, redshift_bins)
         L_PDF = self.LF(l, z)
         L_CDF = np.cumsum(L_PDF, axis=1)
-        norm = L_CDF[:,-1].reshape((10000,1))
+        norm = L_CDF[:,-1].reshape((len(redshift_bins),1))
         L_CDF = (1/norm) * L_CDF
 
         self.redshift_bins = redshift_bins
@@ -982,7 +982,7 @@ class HardingAbazajian(LuminosityEvolution):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="FIRESONG.Evolution.get_LEvolution"><code class="name flex">
+<dt id="firesong.Evolution.get_LEvolution"><code class="name flex">
 <span>def <span class="ident">get_LEvolution</span></span>(<span>le_model, lmin, lmax)</span>
 </code></dt>
 <dd>
@@ -1000,7 +1000,7 @@ optioin is "HA2014BL"</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="FIRESONG.Evolution.LuminosityEvolution" href="#FIRESONG.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></dt>
+<dt><code><a title="firesong.Evolution.LuminosityEvolution" href="#firesong.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></dt>
 <dd>relevant luminosity-evolution object</dd>
 </dl></div>
 <details class="source">
@@ -1029,7 +1029,7 @@ optioin is "HA2014BL"</dd>
     return evolutions[le_model]</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.get_evolution"><code class="name flex">
+<dt id="firesong.Evolution.get_evolution"><code class="name flex">
 <span>def <span class="ident">get_evolution</span></span>(<span>evol)</span>
 </code></dt>
 <dd>
@@ -1043,7 +1043,7 @@ classes for more details of each model</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></code></dt>
+<dt><code><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></code></dt>
 <dd>relevant Evolution object</dd>
 </dl></div>
 <details class="source">
@@ -1080,7 +1080,7 @@ classes for more details of each model</dd>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="FIRESONG.Evolution.CandelsClash2015SNRate"><code class="flex name class">
+<dt id="firesong.Evolution.CandelsClash2015SNRate"><code class="flex name class">
 <span>class <span class="ident">CandelsClash2015SNRate</span></span>
 </code></dt>
 <dd>
@@ -1135,11 +1135,11 @@ with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1</p>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></li>
+<li><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.CandelsClash2015SNRate.parametrization"><code class="name flex">
+<dt id="firesong.Evolution.CandelsClash2015SNRate.parametrization"><code class="name flex">
 <span>def <span class="ident">parametrization</span></span>(<span>self, x)</span>
 </code></dt>
 <dd>
@@ -1178,7 +1178,7 @@ with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1</p>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.Evolution"><code class="flex name class">
+<dt id="firesong.Evolution.Evolution"><code class="flex name class">
 <span>class <span class="ident">Evolution</span></span>
 </code></dt>
 <dd>
@@ -1202,15 +1202,15 @@ with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1</p>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.CandelsClash2015SNRate" href="#FIRESONG.Evolution.CandelsClash2015SNRate">CandelsClash2015SNRate</a></li>
-<li><a title="FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate" href="#FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate">HopkinsBeacom2006StarFormationRate</a></li>
-<li><a title="FIRESONG.Evolution.MadauDickinson2014CSFH" href="#FIRESONG.Evolution.MadauDickinson2014CSFH">MadauDickinson2014CSFH</a></li>
-<li><a title="FIRESONG.Evolution.NoEvolution" href="#FIRESONG.Evolution.NoEvolution">NoEvolution</a></li>
-<li><a title="FIRESONG.Evolution.YukselEtAl2008StarFormationRate" href="#FIRESONG.Evolution.YukselEtAl2008StarFormationRate">YukselEtAl2008StarFormationRate</a></li>
+<li><a title="firesong.Evolution.CandelsClash2015SNRate" href="#firesong.Evolution.CandelsClash2015SNRate">CandelsClash2015SNRate</a></li>
+<li><a title="firesong.Evolution.HopkinsBeacom2006StarFormationRate" href="#firesong.Evolution.HopkinsBeacom2006StarFormationRate">HopkinsBeacom2006StarFormationRate</a></li>
+<li><a title="firesong.Evolution.MadauDickinson2014CSFH" href="#firesong.Evolution.MadauDickinson2014CSFH">MadauDickinson2014CSFH</a></li>
+<li><a title="firesong.Evolution.NoEvolution" href="#firesong.Evolution.NoEvolution">NoEvolution</a></li>
+<li><a title="firesong.Evolution.YukselEtAl2008StarFormationRate" href="#firesong.Evolution.YukselEtAl2008StarFormationRate">YukselEtAl2008StarFormationRate</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.Evolution.parametrization"><code class="name flex">
+<dt id="firesong.Evolution.Evolution.parametrization"><code class="name flex">
 <span>def <span class="ident">parametrization</span></span>(<span>self, x)</span>
 </code></dt>
 <dd>
@@ -1225,14 +1225,14 @@ with best-fit values A = 0.015, B = 1.5, C = 5.0, D = 6.1</p>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.HardingAbazajian"><code class="flex name class">
+<dt id="firesong.Evolution.HardingAbazajian"><code class="flex name class">
 <span>class <span class="ident">HardingAbazajian</span></span>
 <span>(</span><span>lmin, lmax, cosmology={'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674})</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Luminosity dependent density evolution for gamma-ray blazars based
 on X-ray AGN luminosity function</p>
-<p>See also: :class:<code><a title="FIRESONG.Evolution.LuminosityEvolution" href="#FIRESONG.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></p>
+<p>See also: :class:<code><a title="firesong.Evolution.LuminosityEvolution" href="#firesong.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></p>
 <p>Reference: arXiv:1206.4734
 arXiv:1012.1247
 arXiv:0308140</p>
@@ -1328,11 +1328,11 @@ arXiv:0308140</p>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.LuminosityEvolution" href="#FIRESONG.Evolution.LuminosityEvolution">LuminosityEvolution</a></li>
+<li><a title="firesong.Evolution.LuminosityEvolution" href="#firesong.Evolution.LuminosityEvolution">LuminosityEvolution</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.HardingAbazajian.LF"><code class="name flex">
+<dt id="firesong.Evolution.HardingAbazajian.LF"><code class="name flex">
 <span>def <span class="ident">LF</span></span>(<span>self, L, z)</span>
 </code></dt>
 <dd>
@@ -1397,7 +1397,7 @@ and redshift</dd>
     return LF_L*LF_F</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.HardingAbazajian.Luminosity_Sampling"><code class="name flex">
+<dt id="firesong.Evolution.HardingAbazajian.Luminosity_Sampling"><code class="name flex">
 <span>def <span class="ident">Luminosity_Sampling</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -1433,7 +1433,7 @@ appropriately applied unit conversion</p>
     return 10**(L+L_x_to_rad)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.HardingAbazajian.Nsources"><code class="name flex">
+<dt id="firesong.Evolution.HardingAbazajian.Nsources"><code class="name flex">
 <span>def <span class="ident">Nsources</span></span>(<span>self, zmax)</span>
 </code></dt>
 <dd>
@@ -1470,18 +1470,18 @@ appropriately applied unit conversion</p>
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="FIRESONG.Evolution.LuminosityEvolution" href="#FIRESONG.Evolution.LuminosityEvolution">LuminosityEvolution</a></b></code>:
+<li><code><b><a title="firesong.Evolution.LuminosityEvolution" href="#firesong.Evolution.LuminosityEvolution">LuminosityEvolution</a></b></code>:
 <ul class="hlist">
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.EnergyIntegral" href="#FIRESONG.Evolution.LuminosityEvolution.EnergyIntegral">EnergyIntegral</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.L_CDF" href="#FIRESONG.Evolution.LuminosityEvolution.L_CDF">L_CDF</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.Lumi2Flux" href="#FIRESONG.Evolution.LuminosityEvolution.Lumi2Flux">Lumi2Flux</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.LuminosityDistance" href="#FIRESONG.Evolution.LuminosityEvolution.LuminosityDistance">LuminosityDistance</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.RedshiftDistribution" href="#FIRESONG.Evolution.LuminosityEvolution.RedshiftDistribution">RedshiftDistribution</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.EnergyIntegral" href="#firesong.Evolution.LuminosityEvolution.EnergyIntegral">EnergyIntegral</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.L_CDF" href="#firesong.Evolution.LuminosityEvolution.L_CDF">L_CDF</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.Lumi2Flux" href="#firesong.Evolution.LuminosityEvolution.Lumi2Flux">Lumi2Flux</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.LuminosityDistance" href="#firesong.Evolution.LuminosityEvolution.LuminosityDistance">LuminosityDistance</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.RedshiftDistribution" href="#firesong.Evolution.LuminosityEvolution.RedshiftDistribution">RedshiftDistribution</a></code></li>
 </ul>
 </li>
 </ul>
 </dd>
-<dt id="FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate"><code class="flex name class">
+<dt id="firesong.Evolution.HopkinsBeacom2006StarFormationRate"><code class="flex name class">
 <span>class <span class="ident">HopkinsBeacom2006StarFormationRate</span></span>
 </code></dt>
 <dd>
@@ -1544,11 +1544,11 @@ log10(1+z) - log10(rho) space:</p>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></li>
+<li><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate.parametrization"><code class="name flex">
+<dt id="firesong.Evolution.HopkinsBeacom2006StarFormationRate.parametrization"><code class="name flex">
 <span>def <span class="ident">parametrization</span></span>(<span>self, x)</span>
 </code></dt>
 <dd>
@@ -1592,7 +1592,7 @@ log10(1+z) - log10(rho) space:</p>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution"><code class="flex name class">
+<dt id="firesong.Evolution.LuminosityEvolution"><code class="flex name class">
 <span>class <span class="ident">LuminosityEvolution</span></span>
 <span>(</span><span>lmin, lmax, cosmology={'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674})</span>
 </code></dt>
@@ -1727,7 +1727,7 @@ Constructor</p></div>
         l, z = np.meshgrid(luminosity_bins, redshift_bins)
         L_PDF = self.LF(l, z)
         L_CDF = np.cumsum(L_PDF, axis=1)
-        norm = L_CDF[:,-1].reshape((10000,1))
+        norm = L_CDF[:,-1].reshape((len(redshift_bins),1))
         L_CDF = (1/norm) * L_CDF
 
         self.redshift_bins = redshift_bins
@@ -1822,11 +1822,11 @@ Constructor</p></div>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.HardingAbazajian" href="#FIRESONG.Evolution.HardingAbazajian">HardingAbazajian</a></li>
+<li><a title="firesong.Evolution.HardingAbazajian" href="#firesong.Evolution.HardingAbazajian">HardingAbazajian</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.EnergyIntegral"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.EnergyIntegral"><code class="name flex">
 <span>def <span class="ident">EnergyIntegral</span></span>(<span>self, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -1878,7 +1878,7 @@ Constructor</p></div>
     return E0**index * integral</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.LF"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.LF"><code class="name flex">
 <span>def <span class="ident">LF</span></span>(<span>self, L, z)</span>
 </code></dt>
 <dd>
@@ -1894,7 +1894,7 @@ Constructor</p></div>
     raise NotImplementedError(&#34;Please Specify Model&#34;)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.L_CDF"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.L_CDF"><code class="name flex">
 <span>def <span class="ident">L_CDF</span></span>(<span>self, redshift_bins, luminosity_bins)</span>
 </code></dt>
 <dd>
@@ -1948,7 +1948,7 @@ luminosity</dd>
     l, z = np.meshgrid(luminosity_bins, redshift_bins)
     L_PDF = self.LF(l, z)
     L_CDF = np.cumsum(L_PDF, axis=1)
-    norm = L_CDF[:,-1].reshape((10000,1))
+    norm = L_CDF[:,-1].reshape((len(redshift_bins),1))
     L_CDF = (1/norm) * L_CDF
 
     self.redshift_bins = redshift_bins
@@ -1956,7 +1956,7 @@ luminosity</dd>
     self.Lcdf = L_CDF</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.Lumi2Flux"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.Lumi2Flux"><code class="name flex">
 <span>def <span class="ident">Lumi2Flux</span></span>(<span>self, luminosity, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -2024,7 +2024,7 @@ fluence units are [UNITS]</p>
     return fluxnorm</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.LuminosityDistance"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.LuminosityDistance"><code class="name flex">
 <span>def <span class="ident">LuminosityDistance</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -2066,7 +2066,7 @@ If passing many redshifts, a 1d spline is used as cosmolopy can be slow</p>
     return cosmolopy.distance.luminosity_distance(z, **self.cosmology)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.Luminosity_Sampling"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.Luminosity_Sampling"><code class="name flex">
 <span>def <span class="ident">Luminosity_Sampling</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -2105,7 +2105,7 @@ If passing many redshifts, a 1d spline is used as cosmolopy can be slow</p>
     return np.array(lumi)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.Nsources"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.Nsources"><code class="name flex">
 <span>def <span class="ident">Nsources</span></span>(<span>self, zmax)</span>
 </code></dt>
 <dd>
@@ -2142,7 +2142,7 @@ redshift and luminosity</p>
     return scipy.integrate.quad(lambda z: self.RedshiftDistribution(z), 0, zmax)[0]</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.LuminosityEvolution.RedshiftDistribution"><code class="name flex">
+<dt id="firesong.Evolution.LuminosityEvolution.RedshiftDistribution"><code class="name flex">
 <span>def <span class="ident">RedshiftDistribution</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -2182,7 +2182,7 @@ Array of float: Unnormalized PDF of number vs. redshift</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.MadauDickinson2014CSFH"><code class="flex name class">
+<dt id="firesong.Evolution.MadauDickinson2014CSFH"><code class="flex name class">
 <span>class <span class="ident">MadauDickinson2014CSFH</span></span>
 </code></dt>
 <dd>
@@ -2233,11 +2233,11 @@ but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6</p>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></li>
+<li><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.MadauDickinson2014CSFH.parametrization"><code class="name flex">
+<dt id="firesong.Evolution.MadauDickinson2014CSFH.parametrization"><code class="name flex">
 <span>def <span class="ident">parametrization</span></span>(<span>self, x)</span>
 </code></dt>
 <dd>
@@ -2276,7 +2276,7 @@ but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6</p>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.NoEvolution"><code class="flex name class">
+<dt id="firesong.Evolution.NoEvolution"><code class="flex name class">
 <span>class <span class="ident">NoEvolution</span></span>
 </code></dt>
 <dd>
@@ -2297,11 +2297,11 @@ but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6</p>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></li>
+<li><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.NoEvolution.parametrization"><code class="name flex">
+<dt id="firesong.Evolution.NoEvolution.parametrization"><code class="name flex">
 <span>def <span class="ident">parametrization</span></span>(<span>self, x)</span>
 </code></dt>
 <dd>
@@ -2316,7 +2316,7 @@ but with best-fit parameters A = 0.015, B = 2.7, C = 2.9, D = 5.6</p>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation"><code class="flex name class">
+<dt id="firesong.Evolution.SourcePopulation"><code class="flex name class">
 <span>class <span class="ident">SourcePopulation</span></span>
 <span>(</span><span>cosmology, evolution)</span>
 </code></dt>
@@ -2328,7 +2328,7 @@ of neutrino sources</p>
 <dt><strong><code>cosmology</code></strong> :&ensp;<code>dict</code></dt>
 <dd>kwargs to pass to cosmolopy, defaults are
 'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678</dd>
-<dt><strong><code>evolution</code></strong> :&ensp;<code><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a> instance</code></dt>
+<dt><strong><code>evolution</code></strong> :&ensp;<code><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a> instance</code></dt>
 <dd>Evolution model for neutrino
 source population</dd>
 </dl>
@@ -2340,7 +2340,7 @@ source population</dd>
 <dd>Conversion factor</dd>
 <dt><strong><code>GeV_per_sec_2_ergs_per_year</code></strong> :&ensp;<code>float</code></dt>
 <dd>Conversion factor</dd>
-<dt><strong><code>evolution</code></strong> :&ensp;<code><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></code></dt>
+<dt><strong><code>evolution</code></strong> :&ensp;<code><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></code></dt>
 <dd>Evolution model for neutrino source population</dd>
 </dl>
 <p>cosmology (cosmolopy instance)</p></div>
@@ -2597,11 +2597,11 @@ source population</dd>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.TransientSourcePopulation" href="#FIRESONG.Evolution.TransientSourcePopulation">TransientSourcePopulation</a></li>
+<li><a title="firesong.Evolution.TransientSourcePopulation" href="#firesong.Evolution.TransientSourcePopulation">TransientSourcePopulation</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.SourcePopulation.EnergyIntegral"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.EnergyIntegral"><code class="name flex">
 <span>def <span class="ident">EnergyIntegral</span></span>(<span>self, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -2653,7 +2653,7 @@ source population</dd>
     return E0**index * integral</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.Flux2Lumi"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.Flux2Lumi"><code class="name flex">
 <span>def <span class="ident">Flux2Lumi</span></span>(<span>self, fluxnorm, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -2721,7 +2721,7 @@ fluxnorm units are [UNITS]</p>
     return luminosity</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.Lumi2Flux"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.Lumi2Flux"><code class="name flex">
 <span>def <span class="ident">Lumi2Flux</span></span>(<span>self, luminosity, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -2786,7 +2786,7 @@ fluxnorm units are [UNITS]</p>
     return fluxnorm</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.LuminosityDistance"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.LuminosityDistance"><code class="name flex">
 <span>def <span class="ident">LuminosityDistance</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -2828,7 +2828,7 @@ If passing many redshifts, a 1d spline is used as cosmolopy can be slow</p>
     return cosmolopy.distance.luminosity_distance(z, **self.cosmology)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.Nsources"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.Nsources"><code class="name flex">
 <span>def <span class="ident">Nsources</span></span>(<span>self, density, zmax)</span>
 </code></dt>
 <dd>
@@ -2879,7 +2879,7 @@ V_c(z) \,\mathrm{d}z}{\int_0^{0.01}
     return Ntotal</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.RedshiftDistribution"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.RedshiftDistribution"><code class="name flex">
 <span>def <span class="ident">RedshiftDistribution</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -2913,7 +2913,7 @@ Array of float: Unnormalized PDF of number vs. redshift</p></div>
         cosmolopy.distance.diff_comoving_volume(z, **self.cosmology)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.RedshiftIntegral"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.RedshiftIntegral"><code class="name flex">
 <span>def <span class="ident">RedshiftIntegral</span></span>(<span>self, zmax)</span>
 </code></dt>
 <dd>
@@ -2955,7 +2955,7 @@ number of sources (before accounting for density) out to zmax</p>
     return scipy.integrate.quad(integrand, 0, zmax)[0]</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.StandardCandleLuminosity"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.StandardCandleLuminosity"><code class="name flex">
 <span>def <span class="ident">StandardCandleLuminosity</span></span>(<span>self, fluxnorm, density, zmax, index, emin, emax, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -3011,7 +3011,7 @@ population of sources which have a fixed total flux</p>
     return luminosity</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.SourcePopulation.StandardCandleSources"><code class="name flex">
+<dt id="firesong.Evolution.SourcePopulation.StandardCandleSources"><code class="name flex">
 <span>def <span class="ident">StandardCandleSources</span></span>(<span>self, fluxnorm, density, zmax, index, z0=1.0)</span>
 </code></dt>
 <dd>
@@ -3091,20 +3091,20 @@ question</dd>
 </dd>
 </dl>
 </dd>
-<dt id="FIRESONG.Evolution.TransientSourcePopulation"><code class="flex name class">
+<dt id="firesong.Evolution.TransientSourcePopulation"><code class="flex name class">
 <span>class <span class="ident">TransientSourcePopulation</span></span>
 <span>(</span><span>cosmology, evolution, timescale)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given an evolution to follow, create a population
 of neutrino sources that only emit for a finite period of time</p>
-<p>See also: :class:<code><a title="FIRESONG.Evolution.SourcePopulation" href="#FIRESONG.Evolution.SourcePopulation">SourcePopulation</a></code></p>
+<p>See also: :class:<code><a title="firesong.Evolution.SourcePopulation" href="#firesong.Evolution.SourcePopulation">SourcePopulation</a></code></p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cosmology</code></strong> :&ensp;<code>dict</code></dt>
 <dd>kwargs to pass to cosmolopy, defaults are
 'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678</dd>
-<dt><strong><code>evolution</code></strong> :&ensp;<code><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a> instance</code></dt>
+<dt><strong><code>evolution</code></strong> :&ensp;<code><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a> instance</code></dt>
 <dd>Evolution model for neutrino
 source population</dd>
 <dt><strong><code>timescale</code></strong> :&ensp;<code>float</code></dt>
@@ -3281,11 +3281,11 @@ source population</dd>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.SourcePopulation" href="#FIRESONG.Evolution.SourcePopulation">SourcePopulation</a></li>
+<li><a title="firesong.Evolution.SourcePopulation" href="#firesong.Evolution.SourcePopulation">SourcePopulation</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.TransientSourcePopulation.Flux2Lumi"><code class="name flex">
+<dt id="firesong.Evolution.TransientSourcePopulation.Flux2Lumi"><code class="name flex">
 <span>def <span class="ident">Flux2Lumi</span></span>(<span>self, fluxnorm, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -3359,7 +3359,7 @@ fluxnorm units are [UNITS]</p>
     return luminosity / self.timescale</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.TransientSourcePopulation.Lumi2Flux"><code class="name flex">
+<dt id="firesong.Evolution.TransientSourcePopulation.Lumi2Flux"><code class="name flex">
 <span>def <span class="ident">Lumi2Flux</span></span>(<span>self, luminosity, index, emin, emax, z=1, E0=100000.0)</span>
 </code></dt>
 <dd>
@@ -3429,7 +3429,7 @@ fluence units are [UNITS]</p>
     return flux * self.timescale</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.TransientSourcePopulation.RedshiftDistribution"><code class="name flex">
+<dt id="firesong.Evolution.TransientSourcePopulation.RedshiftDistribution"><code class="name flex">
 <span>def <span class="ident">RedshiftDistribution</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
@@ -3462,7 +3462,7 @@ Array of float: Unnormalized PDF of number vs. redshift</p></div>
     return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.TransientSourcePopulation.StandardCandleSources"><code class="name flex">
+<dt id="firesong.Evolution.TransientSourcePopulation.StandardCandleSources"><code class="name flex">
 <span>def <span class="ident">StandardCandleSources</span></span>(<span>self, fluxnorm, density, zmax, index, z0=1.0)</span>
 </code></dt>
 <dd>
@@ -3541,7 +3541,7 @@ question</dd>
     return fluence</code></pre>
 </details>
 </dd>
-<dt id="FIRESONG.Evolution.TransientSourcePopulation.fluence2flux"><code class="name flex">
+<dt id="firesong.Evolution.TransientSourcePopulation.fluence2flux"><code class="name flex">
 <span>def <span class="ident">fluence2flux</span></span>(<span>self, fluence, z)</span>
 </code></dt>
 <dd>
@@ -3584,18 +3584,18 @@ divided by (1+z)*timescale</p>
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="FIRESONG.Evolution.SourcePopulation" href="#FIRESONG.Evolution.SourcePopulation">SourcePopulation</a></b></code>:
+<li><code><b><a title="firesong.Evolution.SourcePopulation" href="#firesong.Evolution.SourcePopulation">SourcePopulation</a></b></code>:
 <ul class="hlist">
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.EnergyIntegral" href="#FIRESONG.Evolution.SourcePopulation.EnergyIntegral">EnergyIntegral</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.LuminosityDistance" href="#FIRESONG.Evolution.SourcePopulation.LuminosityDistance">LuminosityDistance</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.Nsources" href="#FIRESONG.Evolution.SourcePopulation.Nsources">Nsources</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.RedshiftIntegral" href="#FIRESONG.Evolution.SourcePopulation.RedshiftIntegral">RedshiftIntegral</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.StandardCandleLuminosity" href="#FIRESONG.Evolution.SourcePopulation.StandardCandleLuminosity">StandardCandleLuminosity</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.EnergyIntegral" href="#firesong.Evolution.SourcePopulation.EnergyIntegral">EnergyIntegral</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.LuminosityDistance" href="#firesong.Evolution.SourcePopulation.LuminosityDistance">LuminosityDistance</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.Nsources" href="#firesong.Evolution.SourcePopulation.Nsources">Nsources</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.RedshiftIntegral" href="#firesong.Evolution.SourcePopulation.RedshiftIntegral">RedshiftIntegral</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.StandardCandleLuminosity" href="#firesong.Evolution.SourcePopulation.StandardCandleLuminosity">StandardCandleLuminosity</a></code></li>
 </ul>
 </li>
 </ul>
 </dd>
-<dt id="FIRESONG.Evolution.YukselEtAl2008StarFormationRate"><code class="flex name class">
+<dt id="firesong.Evolution.YukselEtAl2008StarFormationRate"><code class="flex name class">
 <span>class <span class="ident">YukselEtAl2008StarFormationRate</span></span>
 </code></dt>
 <dd>
@@ -3664,11 +3664,11 @@ Eq.5</p></div>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></li>
+<li><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="FIRESONG.Evolution.YukselEtAl2008StarFormationRate.parametrization"><code class="name flex">
+<dt id="firesong.Evolution.YukselEtAl2008StarFormationRate.parametrization"><code class="name flex">
 <span>def <span class="ident">parametrization</span></span>(<span>self, x)</span>
 </code></dt>
 <dd>
@@ -3725,96 +3725,96 @@ Eq.5</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="FIRESONG" href="index.html">FIRESONG</a></code></li>
+<li><code><a title="firesong" href="index.html">firesong</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.get_LEvolution" href="#FIRESONG.Evolution.get_LEvolution">get_LEvolution</a></code></li>
-<li><code><a title="FIRESONG.Evolution.get_evolution" href="#FIRESONG.Evolution.get_evolution">get_evolution</a></code></li>
+<li><code><a title="firesong.Evolution.get_LEvolution" href="#firesong.Evolution.get_LEvolution">get_LEvolution</a></code></li>
+<li><code><a title="firesong.Evolution.get_evolution" href="#firesong.Evolution.get_evolution">get_evolution</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="FIRESONG.Evolution.CandelsClash2015SNRate" href="#FIRESONG.Evolution.CandelsClash2015SNRate">CandelsClash2015SNRate</a></code></h4>
+<h4><code><a title="firesong.Evolution.CandelsClash2015SNRate" href="#firesong.Evolution.CandelsClash2015SNRate">CandelsClash2015SNRate</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.CandelsClash2015SNRate.parametrization" href="#FIRESONG.Evolution.CandelsClash2015SNRate.parametrization">parametrization</a></code></li>
+<li><code><a title="firesong.Evolution.CandelsClash2015SNRate.parametrization" href="#firesong.Evolution.CandelsClash2015SNRate.parametrization">parametrization</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.Evolution" href="#FIRESONG.Evolution.Evolution">Evolution</a></code></h4>
+<h4><code><a title="firesong.Evolution.Evolution" href="#firesong.Evolution.Evolution">Evolution</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.Evolution.parametrization" href="#FIRESONG.Evolution.Evolution.parametrization">parametrization</a></code></li>
+<li><code><a title="firesong.Evolution.Evolution.parametrization" href="#firesong.Evolution.Evolution.parametrization">parametrization</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.HardingAbazajian" href="#FIRESONG.Evolution.HardingAbazajian">HardingAbazajian</a></code></h4>
+<h4><code><a title="firesong.Evolution.HardingAbazajian" href="#firesong.Evolution.HardingAbazajian">HardingAbazajian</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.HardingAbazajian.LF" href="#FIRESONG.Evolution.HardingAbazajian.LF">LF</a></code></li>
-<li><code><a title="FIRESONG.Evolution.HardingAbazajian.Luminosity_Sampling" href="#FIRESONG.Evolution.HardingAbazajian.Luminosity_Sampling">Luminosity_Sampling</a></code></li>
-<li><code><a title="FIRESONG.Evolution.HardingAbazajian.Nsources" href="#FIRESONG.Evolution.HardingAbazajian.Nsources">Nsources</a></code></li>
+<li><code><a title="firesong.Evolution.HardingAbazajian.LF" href="#firesong.Evolution.HardingAbazajian.LF">LF</a></code></li>
+<li><code><a title="firesong.Evolution.HardingAbazajian.Luminosity_Sampling" href="#firesong.Evolution.HardingAbazajian.Luminosity_Sampling">Luminosity_Sampling</a></code></li>
+<li><code><a title="firesong.Evolution.HardingAbazajian.Nsources" href="#firesong.Evolution.HardingAbazajian.Nsources">Nsources</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate" href="#FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate">HopkinsBeacom2006StarFormationRate</a></code></h4>
+<h4><code><a title="firesong.Evolution.HopkinsBeacom2006StarFormationRate" href="#firesong.Evolution.HopkinsBeacom2006StarFormationRate">HopkinsBeacom2006StarFormationRate</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate.parametrization" href="#FIRESONG.Evolution.HopkinsBeacom2006StarFormationRate.parametrization">parametrization</a></code></li>
+<li><code><a title="firesong.Evolution.HopkinsBeacom2006StarFormationRate.parametrization" href="#firesong.Evolution.HopkinsBeacom2006StarFormationRate.parametrization">parametrization</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.LuminosityEvolution" href="#FIRESONG.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></h4>
+<h4><code><a title="firesong.Evolution.LuminosityEvolution" href="#firesong.Evolution.LuminosityEvolution">LuminosityEvolution</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.EnergyIntegral" href="#FIRESONG.Evolution.LuminosityEvolution.EnergyIntegral">EnergyIntegral</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.LF" href="#FIRESONG.Evolution.LuminosityEvolution.LF">LF</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.L_CDF" href="#FIRESONG.Evolution.LuminosityEvolution.L_CDF">L_CDF</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.Lumi2Flux" href="#FIRESONG.Evolution.LuminosityEvolution.Lumi2Flux">Lumi2Flux</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.LuminosityDistance" href="#FIRESONG.Evolution.LuminosityEvolution.LuminosityDistance">LuminosityDistance</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.Luminosity_Sampling" href="#FIRESONG.Evolution.LuminosityEvolution.Luminosity_Sampling">Luminosity_Sampling</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.Nsources" href="#FIRESONG.Evolution.LuminosityEvolution.Nsources">Nsources</a></code></li>
-<li><code><a title="FIRESONG.Evolution.LuminosityEvolution.RedshiftDistribution" href="#FIRESONG.Evolution.LuminosityEvolution.RedshiftDistribution">RedshiftDistribution</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.EnergyIntegral" href="#firesong.Evolution.LuminosityEvolution.EnergyIntegral">EnergyIntegral</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.LF" href="#firesong.Evolution.LuminosityEvolution.LF">LF</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.L_CDF" href="#firesong.Evolution.LuminosityEvolution.L_CDF">L_CDF</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.Lumi2Flux" href="#firesong.Evolution.LuminosityEvolution.Lumi2Flux">Lumi2Flux</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.LuminosityDistance" href="#firesong.Evolution.LuminosityEvolution.LuminosityDistance">LuminosityDistance</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.Luminosity_Sampling" href="#firesong.Evolution.LuminosityEvolution.Luminosity_Sampling">Luminosity_Sampling</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.Nsources" href="#firesong.Evolution.LuminosityEvolution.Nsources">Nsources</a></code></li>
+<li><code><a title="firesong.Evolution.LuminosityEvolution.RedshiftDistribution" href="#firesong.Evolution.LuminosityEvolution.RedshiftDistribution">RedshiftDistribution</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.MadauDickinson2014CSFH" href="#FIRESONG.Evolution.MadauDickinson2014CSFH">MadauDickinson2014CSFH</a></code></h4>
+<h4><code><a title="firesong.Evolution.MadauDickinson2014CSFH" href="#firesong.Evolution.MadauDickinson2014CSFH">MadauDickinson2014CSFH</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.MadauDickinson2014CSFH.parametrization" href="#FIRESONG.Evolution.MadauDickinson2014CSFH.parametrization">parametrization</a></code></li>
+<li><code><a title="firesong.Evolution.MadauDickinson2014CSFH.parametrization" href="#firesong.Evolution.MadauDickinson2014CSFH.parametrization">parametrization</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.NoEvolution" href="#FIRESONG.Evolution.NoEvolution">NoEvolution</a></code></h4>
+<h4><code><a title="firesong.Evolution.NoEvolution" href="#firesong.Evolution.NoEvolution">NoEvolution</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.NoEvolution.parametrization" href="#FIRESONG.Evolution.NoEvolution.parametrization">parametrization</a></code></li>
+<li><code><a title="firesong.Evolution.NoEvolution.parametrization" href="#firesong.Evolution.NoEvolution.parametrization">parametrization</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.SourcePopulation" href="#FIRESONG.Evolution.SourcePopulation">SourcePopulation</a></code></h4>
+<h4><code><a title="firesong.Evolution.SourcePopulation" href="#firesong.Evolution.SourcePopulation">SourcePopulation</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.EnergyIntegral" href="#FIRESONG.Evolution.SourcePopulation.EnergyIntegral">EnergyIntegral</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.Flux2Lumi" href="#FIRESONG.Evolution.SourcePopulation.Flux2Lumi">Flux2Lumi</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.Lumi2Flux" href="#FIRESONG.Evolution.SourcePopulation.Lumi2Flux">Lumi2Flux</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.LuminosityDistance" href="#FIRESONG.Evolution.SourcePopulation.LuminosityDistance">LuminosityDistance</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.Nsources" href="#FIRESONG.Evolution.SourcePopulation.Nsources">Nsources</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.RedshiftDistribution" href="#FIRESONG.Evolution.SourcePopulation.RedshiftDistribution">RedshiftDistribution</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.RedshiftIntegral" href="#FIRESONG.Evolution.SourcePopulation.RedshiftIntegral">RedshiftIntegral</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.StandardCandleLuminosity" href="#FIRESONG.Evolution.SourcePopulation.StandardCandleLuminosity">StandardCandleLuminosity</a></code></li>
-<li><code><a title="FIRESONG.Evolution.SourcePopulation.StandardCandleSources" href="#FIRESONG.Evolution.SourcePopulation.StandardCandleSources">StandardCandleSources</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.EnergyIntegral" href="#firesong.Evolution.SourcePopulation.EnergyIntegral">EnergyIntegral</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.Flux2Lumi" href="#firesong.Evolution.SourcePopulation.Flux2Lumi">Flux2Lumi</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.Lumi2Flux" href="#firesong.Evolution.SourcePopulation.Lumi2Flux">Lumi2Flux</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.LuminosityDistance" href="#firesong.Evolution.SourcePopulation.LuminosityDistance">LuminosityDistance</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.Nsources" href="#firesong.Evolution.SourcePopulation.Nsources">Nsources</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.RedshiftDistribution" href="#firesong.Evolution.SourcePopulation.RedshiftDistribution">RedshiftDistribution</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.RedshiftIntegral" href="#firesong.Evolution.SourcePopulation.RedshiftIntegral">RedshiftIntegral</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.StandardCandleLuminosity" href="#firesong.Evolution.SourcePopulation.StandardCandleLuminosity">StandardCandleLuminosity</a></code></li>
+<li><code><a title="firesong.Evolution.SourcePopulation.StandardCandleSources" href="#firesong.Evolution.SourcePopulation.StandardCandleSources">StandardCandleSources</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.TransientSourcePopulation" href="#FIRESONG.Evolution.TransientSourcePopulation">TransientSourcePopulation</a></code></h4>
+<h4><code><a title="firesong.Evolution.TransientSourcePopulation" href="#firesong.Evolution.TransientSourcePopulation">TransientSourcePopulation</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.TransientSourcePopulation.Flux2Lumi" href="#FIRESONG.Evolution.TransientSourcePopulation.Flux2Lumi">Flux2Lumi</a></code></li>
-<li><code><a title="FIRESONG.Evolution.TransientSourcePopulation.Lumi2Flux" href="#FIRESONG.Evolution.TransientSourcePopulation.Lumi2Flux">Lumi2Flux</a></code></li>
-<li><code><a title="FIRESONG.Evolution.TransientSourcePopulation.RedshiftDistribution" href="#FIRESONG.Evolution.TransientSourcePopulation.RedshiftDistribution">RedshiftDistribution</a></code></li>
-<li><code><a title="FIRESONG.Evolution.TransientSourcePopulation.StandardCandleSources" href="#FIRESONG.Evolution.TransientSourcePopulation.StandardCandleSources">StandardCandleSources</a></code></li>
-<li><code><a title="FIRESONG.Evolution.TransientSourcePopulation.fluence2flux" href="#FIRESONG.Evolution.TransientSourcePopulation.fluence2flux">fluence2flux</a></code></li>
+<li><code><a title="firesong.Evolution.TransientSourcePopulation.Flux2Lumi" href="#firesong.Evolution.TransientSourcePopulation.Flux2Lumi">Flux2Lumi</a></code></li>
+<li><code><a title="firesong.Evolution.TransientSourcePopulation.Lumi2Flux" href="#firesong.Evolution.TransientSourcePopulation.Lumi2Flux">Lumi2Flux</a></code></li>
+<li><code><a title="firesong.Evolution.TransientSourcePopulation.RedshiftDistribution" href="#firesong.Evolution.TransientSourcePopulation.RedshiftDistribution">RedshiftDistribution</a></code></li>
+<li><code><a title="firesong.Evolution.TransientSourcePopulation.StandardCandleSources" href="#firesong.Evolution.TransientSourcePopulation.StandardCandleSources">StandardCandleSources</a></code></li>
+<li><code><a title="firesong.Evolution.TransientSourcePopulation.fluence2flux" href="#firesong.Evolution.TransientSourcePopulation.fluence2flux">fluence2flux</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="FIRESONG.Evolution.YukselEtAl2008StarFormationRate" href="#FIRESONG.Evolution.YukselEtAl2008StarFormationRate">YukselEtAl2008StarFormationRate</a></code></h4>
+<h4><code><a title="firesong.Evolution.YukselEtAl2008StarFormationRate" href="#firesong.Evolution.YukselEtAl2008StarFormationRate">YukselEtAl2008StarFormationRate</a></code></h4>
 <ul class="">
-<li><code><a title="FIRESONG.Evolution.YukselEtAl2008StarFormationRate.parametrization" href="#FIRESONG.Evolution.YukselEtAl2008StarFormationRate.parametrization">parametrization</a></code></li>
+<li><code><a title="firesong.Evolution.YukselEtAl2008StarFormationRate.parametrization" href="#firesong.Evolution.YukselEtAl2008StarFormationRate.parametrization">parametrization</a></code></li>
 </ul>
 </li>
 </ul>

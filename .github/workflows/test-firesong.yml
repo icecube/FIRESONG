@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/pip-installable
+      - base
 
 jobs:
   unittest_and_coverage:
