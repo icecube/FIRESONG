@@ -70,6 +70,8 @@ spectral index should still be provided. This mode of operation allows
 the exploration of the luminosity vs. local density plane (aka
 Kowalski plot).
 
+More examples are included in the `notebooks` directory.
+
 # Tests
 All unittest could be run by
 

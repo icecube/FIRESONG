@@ -1,0 +1,25 @@
+text.usetex : True
+mathtext.rm : Times New Roman
+mathtext.it : Times New Roman:italic
+mathtext.bf : Times New Roman:bold
+mathtext.fontset: stix
+xtick.labelsize : 16
+ytick.labelsize : 16
+xtick.major.size : 4
+ytick.major.size : 4
+xtick.minor.size : 2
+ytick.minor.size : 1
+axes.labelsize : 16
+xtick.direction : in
+ytick.direction : in
+ytick.right : True
+xtick.top : True
+axes.grid : True
+axes.grid.which : major
+axes.linewidth: 1.2
+grid.color : lightgrey
+grid.alpha : 0.5
+grid.linewidth : 0.75
+lines.linewidth : 2.5
+font.size : 16
+image.cmap: PuBu
