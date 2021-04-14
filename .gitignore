@@ -2,5 +2,4 @@
 *.pyc
 .ipynb_checkpoints/
 *.pdf
-*.ipynb
 firesong.egg-info/
