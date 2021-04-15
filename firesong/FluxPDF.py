@@ -45,6 +45,9 @@ def flux_pdf(outputdir,
             results without writing a file
         density (float, optional, default=1e-9): local density of neutrino
             sources. Units of Mpc^-3 (Mpc^-3 yr^-1 if Transient=True)
+        Evolution (str, optional, default='MD2014SFR'): Redshift evolution model
+            assumed. Options include 'MD2014SFR', 'HB2006SFR', 'YMKBH2008SFR',
+            'CC2015SNR', and 'NoEvolution'
         Transient (bool, optional, default=False): If true, simulate 
             transient neutrino sources instead of steady sources
         timescale (bool, optional, default=1000): Timescale in seconds
