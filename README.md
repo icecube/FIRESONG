@@ -12,7 +12,7 @@ can be found on:
 - Chun Fai Tung PhD thesis (upcoming)
 
 # Set up
-This package can be installed via pip:
+This package is developed for Python3, and can be installed via pip:
 ```
 python -m pip install --editable FIRESONG
 ```

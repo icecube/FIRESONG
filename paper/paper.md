@@ -102,14 +102,14 @@ open research topic.
 ``FIRESONG`` is a python package to be used by researchers interested in
 simulating populations of neutrino sources in the universe and to put
 these simulations in the context of IceCube's observation of a diffuse
-neutrino flux. The calculations needed to conduct these simulations
-are well established 
-but also cumbersome and error prone. Indeed several authors have similar
-(usually private) code. ``FIRESONG`` provides an open source 
-maintained framework for these simulations.  ``FIRESONG`` depends on
-the ``cosmolopy`` package [@cosmolopy] 
-for cosmological calculations. ``FIRESONG`` also depends on ``numpy``
-and ``scipy``. ``FIRESONG`` has already been used on scientific
+neutrino flux. It can be used to generate the neutrino fluxes measured on Earth 
+under different source distribution models and luminosity constraints, with cosmological
+effects being considered. The calculations needed to conduct these simulations are well established but also cumbersome and error prone. Indeed several authors have 
+similar (usually private) code. ``FIRESONG`` provides an open source 
+maintained framework for these simulations. ``FIRESONG`` depends on
+the ``cosmolopy 0.4`` package [@cosmolopy] 
+for cosmological calculations. ``FIRESONG`` also requires ``numpy`` [@numpy]
+and ``scipy`` [@scipy]. ``FIRESONG`` has already been used on scientific
 publications by several observatories of neutrinos or gamma rays:
 IceCube [@IceCube:2019d], HAWC and IceCube [@HAWCIceCube:2021], 
 HAWC [@HAWC:2018] and CTA [@FiresongCTA:2019]. Though originally concieved
@@ -134,16 +134,19 @@ law distribution. Various models of Star Formation History are
 implemented as well as no evolution.
 
 ```Legend``` is motivated by Luminosity Dependent 
-Density Evolution (LDDE), the distribution of luminosities is decided by 
-the evolution model. ```Legend``` can also be invoked from the
-command line as ```Lengend.py``` and configured in a similar way as
-```Firesong.py```. It can also be executed in the Python console by
-importing the function  ```legend_simulation``` from ```Legend```. If
-invoked as a function, the output will be a dictionary if the filename
-option is set to ```None```. The output dictionary contains the
-declinations, redshifts, and fluxes  of the simulated
-sources. Simulation of transient sources is not supported  by
-```Legend```. 
+Density Evolution (LDDE), i.e. source distribution depends on both redshift 
+and luminosity. The distribution of luminosities is decided by the 
+evolution model. It should be used when user wants to simulate a class of 
+celestial objects that exhibit this kind of distribution (e.g. blazars).
+The model currently implemented allows user to generate gamma-ray fluxes.  
+```Legend``` can also be invoked from the command line as ```Lengend.py``` 
+and configured in a similar way as ```Firesong.py```. It can also be 
+executed in the Python console by importing the function 
+```legend_simulation``` from ```Legend```. If invoked as a function, the 
+output will be a dictionary if the filename option is set to ```None```. 
+The output dictionary contains the declinations, redshifts, and fluxes 
+of the simulated sources. Simulation of transient sources is currently 
+not supported by ```Legend```. 
 
 Luminosity functions provide the source density as a function of
 source luminosity and cosmological redshift. For observational
