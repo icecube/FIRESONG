@@ -137,7 +137,8 @@ implemented as well as no evolution.
 Density Evolution (LDDE), i.e. source distribution depends on both redshift 
 and luminosity. The distribution of luminosities is decided by the 
 evolution model. It should be used when user wants to simulate a class of 
-celestial objects that exhibit this kind of distribution (e.g. blazars). 
+celestial objects that exhibit this kind of distribution (e.g. blazars).
+The model currently implemented allows user to generate gamma-ray fluxes.  
 ```Legend``` can also be invoked from the command line as ```Lengend.py``` 
 and configured in a similar way as ```Firesong.py```. It can also be 
 executed in the Python console by importing the function 
