@@ -1,7 +1,7 @@
 import setuptools
 
 long_message = 'FIRESONG: the FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays'
-version = "0.0.1"
+version = "1.6"
 
 setuptools.setup(
     name="firesong", 
@@ -17,5 +17,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
     ],
-    python_requires='>=3.1',
+    python_requires='>=3.7',
 )
