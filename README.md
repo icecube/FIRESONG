@@ -14,9 +14,12 @@ can be found on:
 # Set up
 This package is developed for Python3, and can be installed via pip:
 ```
-python -m pip install --editable FIRESONG
+pip install firesong
 ```
-
+Or by downloading the repository and running:
+```
+python setup.py install
+```
 You can also specify where you would like the output of simulations to go, by default. In bash: `export FIRESONG=/location/of/FIRESONG/`.
 
 # Basic usage
