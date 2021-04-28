@@ -2,3 +2,5 @@ CosmoloPy==0.4
 coverage==5.4
 numpy==1.16.6
 scipy==1.2.3
+matplotlib==3.2.2
+jupyter==4.6.3
