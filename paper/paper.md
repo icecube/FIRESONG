@@ -106,9 +106,7 @@ neutrino flux. It can be used to generate the neutrino fluxes measured on Earth
 under different source distribution models and luminosity constraints, with cosmological
 effects being considered. The calculations needed to conduct these simulations are well established but also cumbersome and error prone. Indeed several authors have 
 similar (usually private) code. ``FIRESONG`` provides an open source 
-maintained framework for these simulations. ``FIRESONG`` depends on
-the ``cosmolopy 0.4`` package [@cosmolopy] 
-for cosmological calculations. ``FIRESONG`` also requires ``numpy`` [@numpy]
+maintained framework for these simulations. ``FIRESONG`` requires ``numpy`` [@numpy]
 and ``scipy`` [@scipy]. ``FIRESONG`` has already been used on scientific
 publications by several observatories of neutrinos or gamma rays:
 IceCube [@IceCube:2019d], HAWC and IceCube [@HAWCIceCube:2021], 
