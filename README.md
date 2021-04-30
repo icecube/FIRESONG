@@ -39,6 +39,14 @@ Examples:
 
 * A muon neutrino diffuse flux saturation example:
 
+If installed via pip
+```
+from firesong.Firesong import firesong_simulation
+firesong_simulation('.', density=1e-6, Evolution='CC2015SNR', zmax=4.0,
+                    fluxnorm=1.44e-8, index=2.28, LF='SC')
+```
+or with the repository downloaded
+
 ```
 python Firesong.py -d 1e-6 --evolution CC2015SNR --zmax 4.0
 --fluxnorm 1.44e-8 --index 2.28 --LF SC
@@ -56,6 +64,11 @@ luminosoty is distributed as a delta function, i.e., standard candle
 
 * An exploration of the luminosity vs. local density plane (aka
 Kowalski plot) example:
+```
+firesong_simulation('.', density=1e-6, Evolution='MD2016SFR', zmax=8.0,
+                    index=2.28, LF='SC', luminosity=1e51)
+```
+or
 
 ```
 python Firesong.py -d 1e-6 --evolution MD2016SFR --zmax 8.0
