@@ -23,6 +23,5 @@ setuptools.setup(
     'coverage>=5.4',
     'numpy>=1.16.6',
     'scipy>=1.2.3',
-    'matplotlib',
-    'jupyter>=3.0']
+    ]
 )
