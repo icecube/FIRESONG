@@ -1,7 +1,7 @@
 import setuptools
 
 long_message = 'FIRESONG: the FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays'
-version = "1.6"
+version = "1.6.1"
 
 setuptools.setup(
     name="firesong", 
@@ -19,7 +19,7 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=[
-    'CosmoloPy>=0.4',
+    #'CosmoloPy>=0.4',
     'coverage>=5.4',
     'numpy>=1.16.6',
     'scipy>=1.2.3',

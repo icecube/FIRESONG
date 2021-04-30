@@ -112,7 +112,7 @@ class TestSourcePopulation(unittest.TestCase):
 
     def test_Nsources(self):
         self.assertEqual(self.pop.Nsources(1e-9, zmax=10.),
-                         3745.1796382799967)
+                         3745.179638278482)
 
     def test_Flux_Lumi(self):
         L = self.pop.Lumi2Flux(1e50, 2.0, 1e3, 1e7, z=1)
@@ -128,7 +128,7 @@ class TestSourcePopulation(unittest.TestCase):
                                                         1e-9,
                                                         zmax=10.,
                                                         index=2.0),
-                         9.244753729666578e-11)
+                         9.244753729666597e-11)
 
 
 class TestTransientSourcePopulation(unittest.TestCase):
@@ -162,9 +162,10 @@ class TestTransientSourcePopulation(unittest.TestCase):
     ### tests start here ###
 
     def test_redshift_dist(self):
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.transient_pop.RedshiftDistribution(2.) * (1.+2.),
-            self.pop.RedshiftDistribution(2.)
+            self.pop.RedshiftDistribution(2.),
+            3
         )
 
 
