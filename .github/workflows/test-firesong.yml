@@ -4,6 +4,7 @@ on:
     branches:
       - feature/pip-installable
       - base
+      - update/update-cosmo
 
 jobs:
   unittest_and_coverage:

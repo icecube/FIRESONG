@@ -74,6 +74,7 @@ the exploration of the luminosity vs. local density plane (aka
 Kowalski plot).
 
 More examples are included in the `notebooks` directory.
+`Jupyter notebook` and `matplotlib` are required to run the examples.
 
 # Tests
 All unittest could be run by
