@@ -4,16 +4,25 @@
 Distance calculation substitute for cosmolopy
 All formula used are from 
 https://arxiv.org/pdf/astro-ph/9905116.pdf
-
-Default in all functions are using Planck15
 '''
 import numpy as np
 from scipy.integrate import quad
 
 class cosmo_distance(object):
     def __init__(self, **cosmology):
+        '''
+        To initiate, cosmological parameters must be supplied
+        in the form of a dictionary with the following keys
+        {'omega_M_0', 'omega_lambda_0', 'h'}
+
+        Input:
+        **kwargs = {'omega_M_0', 'omega_lambda_0', 'h'}
+        '''
         self.c = 299792458 # speed of light in ms^-1
         # initialize class
+        for k in ['omega_M_0', 'omega_lambda_0', 'h']:
+            if k not in cosmology.keys():
+                raise Exception('Cosmological parameter {} must be supplied'.format(k))
         self.load_param(**cosmology)
 
     def load_param(self, **cosmology):
@@ -22,10 +31,10 @@ class cosmo_distance(object):
         density of curvature is defined as 1-om0-ode
         unless otherwise specified.
         '''
-        self.om0 = cosmology.get('omega_M_0', 0.315)
-        self.ode = cosmology.get('omega_lambda_0', 0.685)
+        self.om0 = cosmology.get('omega_M_0')
+        self.ode = cosmology.get('omega_lambda_0')
         self.ok0 = cosmology.get('omega_k_0', 1-self.om0-self.ode)
-        self.h = cosmology.get('h', 0.674)
+        self.h = cosmology.get('h')
 
         # Hubble distance D_h (unit=Mpc)
         self.D_h = self.c/1000./100./self.h
@@ -64,6 +73,7 @@ class cosmo_distance(object):
 
         '''
         z = np.atleast_1d(z)
+        # epsabs can be tweaked to achieve higher precision
         D_c = np.array([self.D_h*quad(lambda x:1./self.E(x), 
                                  z_0, lim, epsabs=1.e-5)[0] for lim in z])
         # return a float if only one redshift
