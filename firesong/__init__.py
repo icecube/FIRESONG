@@ -3,3 +3,5 @@
 __author__ = 'C.F. Tung, T. Glauch, M. Larson, A. Pizzuto, R. Reimann, I. Taboada'
 __email__ = ''
 __version__ = '1.6.1'
+__all__ = ['Firesong', 'Evolution', 'distance', 'FluxPDF', 
+           'input_out', 'Luminosity', 'sampling', 'Legend']
