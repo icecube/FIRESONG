@@ -99,7 +99,7 @@ open research topic.
 
 # Statement of Need
 
-``FIRESONG`` is a python package to be used by researchers interested in
+``FIRESONG`` is a Python package to be used by researchers interested in
 simulating populations of neutrino sources in the universe and to put
 these simulations in the context of IceCube's observation of a diffuse
 neutrino flux. It can be used to generate the neutrino fluxes measured on Earth 
@@ -110,17 +110,17 @@ maintained framework for these simulations. ``FIRESONG`` requires ``numpy`` [@nu
 and ``scipy`` [@scipy]. ``FIRESONG`` has already been used on scientific
 publications by several observatories of neutrinos or gamma rays:
 IceCube [@IceCube:2019d], HAWC and IceCube [@HAWCIceCube:2021], 
-HAWC [@HAWC:2018] and CTA [@FiresongCTA:2019]. Though originally concieved
-as a stand alone project, maintanance of ``FIRESONG`` is currently
+HAWC [@HAWC:2018] and CTA [@FiresongCTA:2019]. Though originally conceived
+as a stand-alone project, maintenance of ``FIRESONG`` is currently
 provided by IceCube collaboration members.
 
 # Usage
 
 ``FIRESONG`` can be invoked from the command line as ``Firesong.py`` and
-configured via command line options outputing a file with a simulated list of
+configured via command line options outputting a file with a simulated list of
 neutrino sources each specified by a declination, redshift and muon
-neutrino flux. Alternatively ``FIRESONG`` can also be imported and 
-produce a python dictionary of the simulated neutrino
+neutrino flux. Alternatively, ``FIRESONG`` can also be imported and 
+produce a Python dictionary of the simulated neutrino
 sources. ``FIRESONG`` can be used to simulate steady or transient
 sources. If no luminosity (isotropic equivalent energy) is provided,
 ``FIRESONG`` calculates it, as a function of local density (density
@@ -128,21 +128,21 @@ rate) and other parameters, so that the IceCube neutrino diffuse flux is fully
 saturated. Lack of knowledge of the properties of neutrino sources
 motivate simple choices for implemented luminosity distributions: a
 delta function (standard candle), a lognormal distribution or a power
-law distribution. Various models of Star Formation History are
+law distribution. Various models of star formation history are
 implemented as well as no evolution.
 
 ```Legend``` is motivated by Luminosity Dependent 
 Density Evolution (LDDE), i.e. source distribution depends on both redshift 
 and luminosity. The distribution of luminosities is decided by the 
-evolution model. It should be used when user wants to simulate a class of 
+evolution model. It should be used when the user wants to simulate a class of 
 celestial objects that exhibit this kind of distribution (e.g. blazars).
-The model currently implemented allows user to generate gamma-ray fluxes.  
-```Legend``` can also be invoked from the command line as ```Lengend.py``` 
+The model currently implemented allows the user to generate gamma-ray fluxes.  
+```Legend``` can also be invoked from the command line as ```Legend.py``` 
 and configured in a similar way as ```Firesong.py```. It can also be 
 executed in the Python console by importing the function 
 ```legend_simulation``` from ```Legend```. If invoked as a function, the 
 output will be a dictionary if the filename option is set to ```None```. 
-The output dictionary contains the declinations, redshifts, and fluxes 
+The output dictionary contains the declinations, redshifts and fluxes 
 of the simulated sources. Simulation of transient sources is currently 
 not supported by ```Legend```. 
 
@@ -156,14 +156,14 @@ any luminosity function and summing up all the contributions after
 accounting for their distance. Once generated, this 1D distribution
 can be further used to generate specific realisations of the
 luminosity function. This is extremely fast, but doesn’t provide any
-information on the sources original redshifts. In that sense it is
+information on the sources' original redshifts. In that sense it is
 complementary to the sampling of ``Firesong.py`` and specifically
 useful for cases where the density of sources is extremely high, when
 ``Firesong.py`` is CPU intensive.
 
 # Acknowledgements
 
-We acknowldge comments, support and ideas by:  Markus Ahlers, George
+We acknowledge comments, support and ideas by:  Markus Ahlers, George
 Japaridze, Konstancja Satalecka and the IceCube collaboration. 
 CFT, ML, AP and IT acknowledge support by NSF grant PHY-1913607.
 
