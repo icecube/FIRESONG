@@ -20,7 +20,7 @@ Or by downloading the repository and running:
 ```
 python setup.py install
 ```
-You can also specify where you would like the output of simulations to go, by default. In bash: `export FIRESONG=/location/of/FIRESONG/`.
+If you want to execute scripts of FIRESONG directly via shell command, you can specify where you would like the output of simulations to go, by default. In bash: `export FIRESONG=/location/of/FIRESONG/`.
 
 # Basic usage
 Several scripts are provided:
@@ -42,7 +42,7 @@ Examples:
 If installed via pip, in in the python console,
 ```
 from firesong.Firesong import firesong_simulation
-firesong_simulation('.', density=1e-6, Evolution='CC2015SNR', zmax=4.0,
+firesong_simulation('./', density=1e-6, Evolution='CC2015SNR', zmax=4.0,
                     fluxnorm=1.44e-8, index=2.28, LF='SC')
 ```
 or with the repository downloaded
@@ -60,13 +60,14 @@ as an option, will be calculated internally to saturate a muon neutrino diffuse
 flux with a normalization, at 100 TeV, of E^2d\phi/dE = 1.44 x 10^-8
 GeV.cm^-2.s^-1.sr^-1 and with a spectral index of -2.28. Neutrino
 luminosity is distributed as a delta function, i.e., standard candle
-(SC).
+(SC). The result will be output as a text file `firesong.out` in the current 
+directoy, or in the directory of environment variable  `FIRESONG` if it is set.
 
 * An exploration of the luminosity vs. local density plane (aka
 Kowalski plot) example:
 in the console
 ```
-firesong_simulation('.', density=1e-6, Evolution='MD2016SFR', zmax=8.0,
+firesong_simulation('./', density=1e-6, Evolution='MD2016SFR', zmax=8.0,
                     index=2.28, LF='SC', luminosity=1e51)
 ```
 or

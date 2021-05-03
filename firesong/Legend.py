@@ -20,7 +20,6 @@ from firesong.sampling import InverseCDF
 def legend_simulation(outputdir,
                       filename='LEGEND.out',
                       L_Evolution="HA2014BL",
-                      zmin=0.0005,
                       zmax=10.,
                       bins=10000,
                       index=2.13,
@@ -39,7 +38,6 @@ def legend_simulation(outputdir,
             without writing a file
         filename (str): name of the output file. 
         L_Evolution (str): Name of luminosity evolution model
-        zmin (float, optional, default=0.0005): Closest redshift to consider
         zmax (float, optional, default=10.): Farthest redshift to consider
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
@@ -74,7 +72,7 @@ def legend_simulation(outputdir,
     rng = np.random.RandomState(seed)
 
     # Prepare CDF for redshift generation
-    redshift_bins = np.arange(zmin, zmax, zmax / float(bins))
+    redshift_bins = np.arange(0.0005, zmax, zmax / float(bins))
     RedshiftPDF = [LE_model.RedshiftDistribution(redshift_bins[i])
                    for i in range(0, len(redshift_bins))]
     invCDF = InverseCDF(redshift_bins, RedshiftPDF)
@@ -99,14 +97,17 @@ def legend_simulation(outputdir,
     # Random declination over the entire sky
     sinDecs = rng.uniform(-1, 1, size=N_sample)
     declins = np.degrees(np.arcsin(sinDecs))
+    # Random ra over the sky
+    ras = rng.uniform(0.,360., size=N_sample)
     TotalFlux = np.sum(fluxes)
 
     # Write out
     if filename is not None:
-        out.write(declins, zs, fluxes)
+        out.write(declins, ras, zs, fluxes)
         out.finish(TotalFlux)
     else:
         results['dec'] = declins
+        results['ra'] = ras
         results['z'] = zs
         results['flux'] = fluxes
 

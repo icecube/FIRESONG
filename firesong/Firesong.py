@@ -23,7 +23,6 @@ def firesong_simulation(outputdir,
                         Evolution="MD2014SFR",
                         Transient=False,
                         timescale=1000.,
-                        zmin=0.0005,
                         zmax=10.,
                         bins=10000,
                         fluxnorm=1.44e-8,
@@ -50,14 +49,13 @@ def firesong_simulation(outputdir,
             'CC2015SNR', and 'NoEvolution'
         Transient (bool, optional, default=False): If true, simulate 
             transient neutrino sources instead of steady sources
-        timescale (bool, optional, default=1000): Timescale in seconds
+        timescale (float, optional, default=1000): Timescale in seconds
             for transient sources
-        zmin (float, optional, default=0.0005): Closest redshift to consider
         zmax (float, optional, default=10.): Farthest redshift to consider
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
         fluxnorm (float, optional, default=1.44e-8): Normalization on the total
-            astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 sr^-1
+            astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 cm^-2 sr^-1
         index (float, optional, default=2.28): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose 
             between standard candle (SC), LogNormal (LG)
@@ -110,7 +108,7 @@ def firesong_simulation(outputdir,
 
     rng = np.random.RandomState(seed)
 
-    redshift_bins = np.arange(zmin, zmax, zmax/float(bins))
+    redshift_bins = np.arange(0.0005, zmax, zmax/float(bins))
     RedshiftPDF = [population.RedshiftDistribution(redshift_bins[i])
                    for i in range(0, len(redshift_bins))]
     invCDF = InverseCDF(redshift_bins, RedshiftPDF)
@@ -140,6 +138,8 @@ def firesong_simulation(outputdir,
     # Random declination over the entire sky
     sinDecs = rng.uniform(-1, 1, size=N_sample)
     declins = np.degrees(np.arcsin(sinDecs))
+    # Random ra over the sky
+    ras = rng.uniform(0.,360., size=N_sample)
 
     TotalFlux = np.sum(fluxes)
 
@@ -150,10 +150,11 @@ def firesong_simulation(outputdir,
 
     if filename is None:
         sources['dec'] = declins
+        sources['ra'] = ras
         sources['flux'] = fluxes
         sources['z'] = zs
     else:
-        out.write(declins, zs, fluxes)
+        out.write(declins, ras, zs, fluxes)
 
     # For transient sources, we calculate the total fluence from all sources,
     # then obtain the diffuse flux by doing a time average over a year

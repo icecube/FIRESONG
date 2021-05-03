@@ -111,7 +111,7 @@ class TestTransientFiresongSimulation(unittest.TestCase):
     def test_summed_fluxes(self):
         # Check that fluxes add up properly
         self.assertAlmostEqual(
-            np.sum(self.res.T[2] * (1.+self.res.T[1])) \
+            np.sum(self.res.T[3] * (1.+self.res.T[2])) \
                 / (86400. * 365.) / (4.*np.pi) * 1000.,
             float(self.header_info[-1].split()[-1]),
             5
