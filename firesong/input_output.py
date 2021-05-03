@@ -83,22 +83,24 @@ class output_writer(object):
         temp += "# Dec(deg) Redshift A\n"
         self.output.write(temp.format(**locals()))
 
-    def write(self, declin, redshift, flux):
+    def write(self, declin, ra, redshift, flux):
         """
         Write the sources to the output file
 
         Args:
             declin (array or float): source declination(s)
+            ra (array or float): source ra(s)
             redshift (array or float): source redshift(s)
             flux (array or float): source flux(es)
         """
-        for d, z, f in zip(np.atleast_1d(declin),
+        for d, r, z, f in zip(np.atleast_1d(declin),
+                           np.atleast_1d(ra),
                            np.atleast_1d(redshift),
                            np.atleast_1d(flux)):
-            self.output.write('{:.4f} {:.4f} {:.6e}\n'.format(d, z, f))
+            self.output.write('{:.4f} {:.4f} {:.4f} {:.6e}\n'.format(d, r, z, f))
             # CHECK why different order
             if z < self.z_near:
-                self.near_output.write('{:.4e} {:.4f} {:.4f}\n'.format(f, d, z))
+                self.near_output.write('{:.4e} {:.4f} {:.4f} {:.4f}\n'.format(f, d, r, z))
 
     def finish(self, tot_flux=None):
         """
@@ -143,7 +145,9 @@ def get_outputdir():
         print("Enviromental variable FIRESONG not set")
         print("set to ./")
         firesongdir = "./"
-    return os.path.join(firesongdir, "Results/")
+
+
+    return firesongidr
 
 
 def print_config(LF, Transient, timescale, Evolution, density,

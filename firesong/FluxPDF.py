@@ -21,7 +21,6 @@ def flux_pdf(outputdir,
              Evolution="MD2014SFR",
              Transient=False,
              timescale=1000.,
-             zmin=0.0005,
              zmax=10.,
              bins=10000,
              fluxnorm=1.44e-8,
@@ -50,14 +49,13 @@ def flux_pdf(outputdir,
             'CC2015SNR', and 'NoEvolution'
         Transient (bool, optional, default=False): If true, simulate 
             transient neutrino sources instead of steady sources
-        timescale (bool, optional, default=1000): Timescale in seconds
+        timescale (float, optional, default=1000): Timescale in seconds
             for transient sources
-        zmin (float, optional, default=0.0005): Closest redshift to consider
         zmax (float, optional, default=10.): Farthest redshift to consider
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
         fluxnorm (float, optional, default=0.9e-8): Normalization on the total
-            astrophysical diffuse flux, E^2d Phi/dE. Units of GeV s^-1 sr^-1
+            astrophysical diffuse flux, E^2d Phi/dE. Units of GeV s^-1 cm ^-2 sr^-1
         index (float, optional, default=2.13): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose
             between standard candle (SC), LogNormal (LG)
@@ -69,14 +67,14 @@ def flux_pdf(outputdir,
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
         LumMin (float, optional, default=1e45): Minimum luminosity considered
-            in UNITS
+            in erg/yr
         LumMax (float, optional, default=1e54): Max luminosity considered,
-            in UNITS
+            in erg/yr
         nLbins (int, optional, default=120): Number of luminosity bins
         logFMin (float, optional, default=-10.): minimum log10 of flux to 
-            consider, in UNITS
+            consider, flux should be in GeV s^-1 cm ^-2
         logFMax (float, optional, default=6.): max log10 of flux to 
-            consider, in UNITS
+            consider, flux should be in GeV s^-1 cm ^-2
         nFluxBins (int, optional, default=200): Number of flux bins
         with_dFdz (bool, optional, default=False): Include the derivative
             of the flux pdf vs. redshift
@@ -118,7 +116,8 @@ def flux_pdf(outputdir,
 
     # Setup Arrays
     int_norm = population.RedshiftIntegral(zmax)
-
+    
+    zmin=0.0005
     zs = np.linspace(zmin, zmax, bins)
     deltaz = float(zmax-zmin)/bins
 
@@ -254,7 +253,6 @@ if __name__ == "__main__":
                       luminosity=options.luminosity,
                       emin=options.eRange[0],
                       emax=options.eRange[1],
-                      zmin=options.zRange[0],
                       zmax=options.zRange[1],
                       bins=options.zBins,
                       LumMin=options.lRange[0],
