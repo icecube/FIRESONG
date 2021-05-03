@@ -5,6 +5,8 @@ on:
       - feature/pip-installable
       - base
       - update/update-cosmo
+  pull_request:
+    branches: [ base ]
 
 jobs:
   unittest_and_coverage:
