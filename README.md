@@ -109,3 +109,11 @@ or
 ```
 python tests/test_<...>.py
 ```
+
+# How to contribute
+
+Community contributions to Firesong are accepted and welcome. Issues
+can be reported by any user, even if not a member of IceCube. Pull
+requests can be requested by any user, even if not a member of
+IceCube.
+
