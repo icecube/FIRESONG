@@ -24,7 +24,7 @@ class TestLegendSimulation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ once before all tests """
-        cls.evol_name = 'HA2014BL'
+        cls.evol_name = 'HA2012BL'
         cls.legend_uni = Legend.legend_simulation(None,
         filename=None,
         L_Evolution=cls.evol_name,

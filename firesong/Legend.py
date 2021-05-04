@@ -19,7 +19,7 @@ from firesong.sampling import InverseCDF
 
 def legend_simulation(outputdir,
                       filename='LEGEND.out',
-                      L_Evolution="HA2014BL",
+                      L_Evolution="HA2012BL",
                       zmax=10.,
                       bins=10000,
                       index=2.13,
@@ -129,8 +129,8 @@ if __name__ == "__main__":
     parser.add_argument('-o', action='store', dest='filename',
                         default='Legend.out', help='Output filename')
     parser.add_argument("--Levolution", action="store",
-                        dest="Evolution", default='HA2014BL',
-                        help="Source evolution options:  HA2014BL")
+                        dest="Evolution", default='HA2012BL',
+                        help="Source evolution options:  HA2012BL")
     parser.add_argument("--zmax", action="store", type=float,
                         dest="zmax", default=10.,
                         help="Highest redshift to be simulated")

@@ -648,14 +648,14 @@ def get_LEvolution(le_model, lmin, lmax):
 
     Args:
         le_model (str): Name of luminosity-evolution model, only supported
-            option is "HA2014BL"
+            option is "HA2012BL"
         lmin (float): log10 of Minimum luminosity considered in erg/s
         lmax (float): log10 of Maximum luminosity considered in erg/s
 
     Returns:
         LuminosityEvolution: relevant luminosity-evolution object
     """
-    evolutions = {"HA2014BL": HardingAbazajian(lmin, lmax)
+    evolutions = {"HA2012BL": HardingAbazajian(lmin, lmax)
                   }
     if not le_model in list(evolutions.keys()):
         raise NotImplementedError("Luminosity Evolution " +
