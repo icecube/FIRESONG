@@ -44,9 +44,9 @@ class output_writer(object):
             file: File being written to
         """
         if re.search('.gz$', filename):
-            output = gzip.open(outputdir+str(filename), 'wb')
+            output = gzip.open(os.path.join(outputdir, str(filename)), 'wb')
         else:
-            output = open(outputdir+str(filename), "w")
+            output = open(os.path.join(outputdir, str(filename)), "w")
         return output
 
     def write_header(self, LF, Transient, timescale, fluxnorm,
@@ -80,7 +80,7 @@ class output_writer(object):
         temp += "# Standard Candle Luminosity: {luminosity:.4e} erg/yr \n"
         temp += "# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n"
         temp += "# is approximately 10^-9 in the units used for A\n"
-        temp += "# Dec(deg) Redshift A\n"
+        temp += "# Dec(deg) RA(deg) Redshift A\n"
         self.output.write(temp.format(**locals()))
 
     def write(self, declin, ra, redshift, flux):
@@ -147,7 +147,7 @@ def get_outputdir():
         firesongdir = "./"
 
 
-    return firesongidr
+    return firesongdir
 
 
 def print_config(LF, Transient, timescale, Evolution, density,
