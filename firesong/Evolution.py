@@ -648,7 +648,7 @@ def get_LEvolution(le_model, lmin, lmax):
 
     Args:
         le_model (str): Name of luminosity-evolution model, only supported
-            optioin is "HA2014BL"
+            option is "HA2014BL"
         lmin (float): log10 of Minimum luminosity considered in erg/s
         lmax (float): log10 of Maximum luminosity considered in erg/s
 
@@ -862,7 +862,7 @@ class HardingAbazajian(LuminosityEvolution):
 
     Reference: arXiv:1206.4734
                arXiv:1012.1247
-               arXiv:0308140
+               arXiv:astro-ph/0308140
     """
     def __str__(self):
         return "Harding and Abazajian (2012)"
