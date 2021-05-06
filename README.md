@@ -109,6 +109,10 @@ or
 ```
 python tests/test_<...>.py
 ```
+# How to request support
+
+Questions about support for FIRESONG can be sent to one of the
+development leads for FIRESONG. See AUTHORS.md
 
 # How to contribute
 
