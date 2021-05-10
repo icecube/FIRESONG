@@ -90,7 +90,7 @@ per-burst equivalent isotropic energy for transient sources)
 objects depends on, e.g., the redshift evolution of the density of
 sources; but more generally on the luminosity function of the
 objects. The existence of a diffuse extragalactic neutrino flux can be
-described as a inverse relationship between density (density-rate) and
+described as an inverse relationship between density (density-rate) and
 luminosity (isotropic equivalent energy) [@Kowalski:2014]. This relationship also
 depends on the evolution assumed.
 
@@ -132,7 +132,7 @@ law distribution. Various models of star formation history are
 implemented as well as no evolution.
 
 ```Legend``` is motivated by Luminosity Dependent 
-Density Evolution (LDDE), i.e. source distribution depends on both redshift 
+Density Evolution (LDDE), i.e. the source distribution depends on both redshift 
 and luminosity. The distribution of luminosities is decided by the 
 evolution model. It should be used when the user wants to simulate a class of 
 celestial objects that exhibit this kind of distribution (e.g. blazars).
