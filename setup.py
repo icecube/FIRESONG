@@ -1,7 +1,7 @@
 import setuptools
 
 long_message = 'FIRESONG: the FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays'
-version = "1.7"
+version = "1.8"
 
 setuptools.setup(
     name="firesong", 
