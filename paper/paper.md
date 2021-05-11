@@ -82,7 +82,7 @@ ruled out GRBs as contributing more than 1% of the diffuse flux
 
 The properties of various proposed extragalactic neutrino
 sources and/or cosmic ray reservoir classes, such as starburst galaxies,
-blazars, low luminosity GRBs, Flat Spectrum Radio Quasars, BL Lacs and
+blazars, low luminosity GRBs, Flat Spectrum Radio Quasars, BL Lacs, and
 galaxy clusters can be summarized in terms of the local density (or
 density rate for transient sources) as a function of luminosity (or
 per-burst equivalent isotropic energy for transient sources)
@@ -94,20 +94,20 @@ described as an inverse relationship between density (density-rate) and
 luminosity (isotropic equivalent energy) [@Kowalski:2014]. This relationship also
 depends on the evolution assumed.
 
-The identification of the main sources of the diffuse neutrino flux remains an
+Identification of the main sources of the diffuse neutrino flux remains an
 open research topic.
 
 # Statement of Need
 
 ``FIRESONG`` is a Python package to be used by researchers interested in
-simulating populations of neutrino sources in the universe and to put
+simulating populations of neutrino sources in the universe and placing
 these simulations in the context of IceCube's observation of a diffuse
 neutrino flux. It can be used to generate the neutrino fluxes measured on Earth 
 under different source distribution models and luminosity constraints, with cosmological
 effects being considered. The calculations needed to conduct these simulations are well established but also cumbersome and error prone. Indeed several authors have 
-similar (usually private) code. ``FIRESONG`` provides an open source 
+similar (usually private) codes. ``FIRESONG`` provides an open source 
 maintained framework for these simulations. ``FIRESONG`` requires ``numpy`` [@numpy]
-and ``scipy`` [@scipy]. ``FIRESONG`` has already been used on scientific
+and ``scipy`` [@scipy]. ``FIRESONG`` has already been used in scientific
 publications by several observatories of neutrinos or gamma rays:
 IceCube [@IceCube:2019d], HAWC and IceCube [@HAWCIceCube:2021], 
 HAWC [@HAWC:2018] and CTA [@FiresongCTA:2019]. Though originally conceived
@@ -118,7 +118,7 @@ provided by IceCube collaboration members.
 
 ``FIRESONG`` can be invoked from the command line as ``Firesong.py`` and
 configured via command line options outputting a file with a simulated list of
-neutrino sources each specified by a declination, redshift and muon
+neutrino sources each specified by a declination, redshift, and muon
 neutrino flux. Alternatively, ``FIRESONG`` can also be imported and 
 produce a Python dictionary of the simulated neutrino
 sources. ``FIRESONG`` can be used to simulate steady or transient
@@ -127,15 +127,15 @@ sources. If no luminosity (isotropic equivalent energy) is provided,
 rate) and other parameters, so that the IceCube neutrino diffuse flux is fully
 saturated. Lack of knowledge of the properties of neutrino sources
 motivate simple choices for implemented luminosity distributions: a
-delta function (standard candle), a lognormal distribution or a power
+delta function (standard candle), a lognormal distribution, or a power
 law distribution. Various models of star formation history are
 implemented as well as no evolution.
 
 ```Legend``` is motivated by Luminosity Dependent 
-Density Evolution (LDDE), i.e. the source distribution depends on both redshift 
+Density Evolution (LDDE), i.e., the source distribution depends on both redshift 
 and luminosity. The distribution of luminosities is decided by the 
 evolution model. It should be used when the user wants to simulate a class of 
-celestial objects that exhibit this kind of distribution (e.g. blazars).
+celestial objects that exhibit this kind of distribution (e.g., blazars.)
 The model currently implemented allows the user to generate gamma-ray fluxes.  
 ```Legend``` can also be invoked from the command line as ```Legend.py``` 
 and configured in a similar way as ```Firesong.py```. It can also be 
@@ -163,8 +163,8 @@ useful for cases where the density of sources is extremely high, when
 
 # Acknowledgements
 
-We acknowledge comments, support and ideas by:  Markus Ahlers, George
-Japaridze, Konstancja Satalecka and the IceCube collaboration. 
-CFT, ML, AP and IT acknowledge support by NSF grant PHY-1913607.
+We acknowledge comments, support and ideas by Markus Ahlers, George
+Japaridze, Konstancja Satalecka, and the IceCube collaboration. 
+CFT, ML, AP, and IT acknowledge support by NSF grant PHY-1913607.
 
 # References
