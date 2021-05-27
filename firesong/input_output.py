@@ -50,7 +50,7 @@ class output_writer(object):
         return output
 
     def write_header(self, LF, Transient, timescale, fluxnorm,
-                     delta_gamma, luminosity):
+                     delta_gamma, luminosity, Gammaflux, interaction):
         """
         Record relevant simulation parameters in the top of file
 
@@ -63,6 +63,8 @@ class output_writer(object):
             delta_gamma (float): Spectral index - 2.
             luminosity (float): Luminosity of sources, 0 if just saturating
                 diffuse flux
+            Gammaflux (bool): include gamma-ray flux
+            interaction (string): type of interaction used to calculate gamma-ray flux
         """
         temp = "# FIRESONG Output description\n"
         if LF == "SC":
@@ -80,7 +82,13 @@ class output_writer(object):
         temp += "# Standard Candle Luminosity: {luminosity:.4e} erg/yr \n"
         temp += "# Note that using 4 years, IceCube sensitivity in the northern hemisphere\n"
         temp += "# is approximately 10^-9 in the units used for A\n"
-        temp += "# Dec(deg) RA(deg) Redshift A\n"
+        if Gammaflux:
+            temp += "# Corresponding gamma-ray fluxes listed below are of \'B\' where the flux is:\n"
+            temp += "#      dN_PS/dE = B * (E_gamma/1 TeV)^({delta_gamma}-2) [1/TeV.cm^2.s]\n"
+            temp += "# Gamma-ray fluxes calculated assuming {interaction} interactions\n"
+            temp += "# Dec(deg) RA(deg) Redshift A(GeV/cm^2.s) B(1/TeV.cm^2.s)\n"
+        else:
+            temp += "# Dec(deg) RA(deg) Redshift A\n"
         self.output.write(temp.format(**locals()))
 
     def write(self, declin, ra, redshift, flux):
@@ -101,6 +109,26 @@ class output_writer(object):
             # CHECK why different order
             if z < self.z_near:
                 self.near_output.write('{:.4e} {:.4f} {:.4f} {:.4f}\n'.format(f, d, r, z))
+
+    def write_gamma(self, declin, ra, redshift, flux, gammaflux):
+        """
+        Write the sources to the output file, including the gamma-ray flux
+
+        Args:
+            declin (array or float): source declination(s)
+            ra (array or float): source ra(s)
+            redshift (array or float): source redshift(s)
+            flux (array or float): source flux(es)
+            gammaflux (array or float): equivalent gamma-ray flux(es)
+        """
+        for d, r, z, f, g in zip(np.atleast_1d(declin),
+                              np.atleast_1d(ra),
+                              np.atleast_1d(redshift),
+                              np.atleast_1d(flux),
+                              np.atleast_1d(gammaflux)):
+            self.output.write('{:.4f} {:.4f} {:.4f} {:.6e} {:.6e}\n'.format(d, r, z, f, g))
+            if z < self.z_near:
+                self.near_output.write('{:.4e} {:.4f} {:.4f} {:.4f} {.4f}\n'.format(f, d, r, z, g))
 
     def finish(self, tot_flux=None):
         """
@@ -152,7 +180,7 @@ def get_outputdir():
 
 def print_config(LF, Transient, timescale, Evolution, density,
                  N_sample, luminosity_default, fluxnorm, delta_gamma,
-                 zmax, luminosity, mode="", **kwargs):
+                 zmax, luminosity, Gammaflux, interaction, mode="", **kwargs):
     """
     Prints the configuration to the screen.
     """
@@ -171,6 +199,8 @@ def print_config(LF, Transient, timescale, Evolution, density,
     str += "Total number of neutrinos sources in the Universe: {N_sample}\n"
     if luminosity_default == 0.0:
         str += "Desired neutrino diffuse flux: E^2 dN/dE = {fluxnorm} (E/100 TeV)^({delta_gamma}) GeV/cm^2.s.sr\n"
+    if Gammaflux:
+        str += "Calculate gamma-ray flux, assuming {interaction} interactions\n"
     str += "Redshift range: 0 - {zmax}\n"
     str += "Standard Candle Luminosity: {luminosity:.4e} erg/yr\n"
     str += "##### FIRESONG initialization done #####\n"
