@@ -3,6 +3,8 @@ FIRst Extragalactic Simulation Of Neutrinos and Gamma-rays.
 
 [See the Docs](https://icecube.github.io/FIRESONG/)
 
+[See the FIRESONG paper](https://joss.theoj.org/papers/10.21105/joss.03194)
+
 Documentation for the astrophysics and cosmology of neutrino sources
 can be found on:
 - [René Rieman's PhD thesis](http://publications.rwth-aachen.de/record/773297),
