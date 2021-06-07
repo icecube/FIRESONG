@@ -16,6 +16,7 @@ from firesong.Evolution import TransientSourcePopulation, cosmology
 from firesong.Luminosity import get_LuminosityFunction
 from firesong.input_output import output_writer, print_config, get_outputdir
 from firesong.sampling import InverseCDF
+from firesong.ConvertFlux import nu_to_gamma
 
 def firesong_simulation(outputdir,
                         filename='Firesong.out',
@@ -30,6 +31,8 @@ def firesong_simulation(outputdir,
                         LF="SC",
                         sigma=1.0,
                         luminosity=0.0,
+                        Gammaflux=False,
+                        interaction="pgamma",
                         emin=1e4,
                         emax=1e7,
                         seed=None,
@@ -64,6 +67,11 @@ def firesong_simulation(outputdir,
         luminosity (float, optional, default=0.0): Manually fix the 
             luminosity of sources if not equal to 0. Overrides fluxnorm. 
             Units of erg/yr
+        Gammaflux (bool, optional, default="False"): If true, calculate the
+            gamma-ray flux based on the interaction type
+        interaction (string, optional, default="pgamma"): Calculate the gamma-ray
+            flux from the neutrino flux given an interaction type. Options are
+            pgamma and pp
         emin (float, optional, default=1e4): Minimum neutrino energy in GeV
         emax (float, optional, default=1e7): Maximum neutrino energy in GeV
         seed (int or None, optional, default=None): random number seed
@@ -99,8 +107,8 @@ def firesong_simulation(outputdir,
     delta_gamma = 2-index
     if verbose:
         print_config(LF, Transient, timescale, Evolution, density, N_sample,
-                    luminosity, fluxnorm, delta_gamma, zmax, luminosity,
-                    mode=" - Calculating Neutrino CDFs ")
+                    luminosity, fluxnorm, delta_gamma, zmax, luminosity, Gammaflux,
+                    interaction, mode=" - Calculating Neutrino CDFs ")
 
     ##################################################
     #        Simulation starts here
@@ -123,7 +131,7 @@ def firesong_simulation(outputdir,
     else:
         out = output_writer(outputdir, filename)
         out.write_header(LF, Transient, timescale, fluxnorm,
-                        delta_gamma, luminosity)
+                        delta_gamma, luminosity, Gammaflux, interaction)
 
     # IMPORTANT notice, in the following "flux" means fluence in
     # Transient mode, but flux in steady source mode,
@@ -148,13 +156,21 @@ def firesong_simulation(outputdir,
     if Transient:
         fluxes = population.fluence2flux(fluxes, zs)
 
+    if Gammaflux:
+        gammaFluxes = nu_to_gamma(fluxes, index, interaction)
+
     if filename is None:
         sources['dec'] = declins
         sources['ra'] = ras
         sources['flux'] = fluxes
         sources['z'] = zs
+        if Gammaflux:
+            sources['gammaFlux'] = gammaFluxes
     else:
-        out.write(declins, ras, zs, fluxes)
+        if Gammaflux:
+            out.write_gamma(declins, ras, zs, fluxes, gammaFluxes)
+        else:
+            out.write(declins, ras, zs, fluxes)
 
     # For transient sources, we calculate the total fluence from all sources,
     # then obtain the diffuse flux by doing a time average over a year
@@ -210,6 +226,12 @@ if __name__ == "__main__":
     parser.add_argument("--L", action="store",
                         dest="luminosity", type=float, default=0.0,
                         help="Set luminosity for each source [erg/year]. Resets fluxnorm option")
+    parser.add_argument("--gammaflux", action='store_true',
+                        dest="Gammaflux", default=False,
+                        help="Calculate the gamma-ray flux")
+    parser.add_argument("--interaction", action="store", dest='interaction',
+                        type=str, default="pgamma",
+                        help="Interaction type to calculate the gamma-ray flux. Options: pgamma, pp")
     options = parser.parse_args()
 
     firesong_simulation(outputdir,
@@ -223,4 +245,6 @@ if __name__ == "__main__":
                         index=options.index,
                         LF=options.LF,
                         sigma=options.sigma,
-                        luminosity=options.luminosity)
+                        luminosity=options.luminosity,
+                        Gammaflux=options.Gammaflux,
+                        interaction=options.interaction)
