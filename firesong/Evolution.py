@@ -347,10 +347,10 @@ class SourcePopulation(object):
         \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluxnorm units are [UNITS]
+        fluxnorm units are [GeV cm^-2 s^-1]
 
         Args:
-            fluxnorm (array or float): Flux of a source in UNITS
+            fluxnorm (array or float): Flux of a source in GeV cm^-2 s^-1
             index (float): Spectral index of the flux
             emin (float): Minimum neutrino energy in GeV
             emax (float): Maximum neutrino energy in GeV
@@ -376,7 +376,7 @@ class SourcePopulation(object):
         \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluxnorm units are [UNITS]
+        fluxnorm units are [GeV cm^-2 s^-1]
 
         Args:
             luminosity (array or float): luminosity of sources in ergs/yr
@@ -387,7 +387,7 @@ class SourcePopulation(object):
             E0 (float, optional, default=1): pivot energy in GeV
         
         Returns:
-            fluxnorm (array or float): flux of source(s) in UNITS
+            fluxnorm (array or float): flux of source(s) in GeV cm^-2 s^-1
         """
         flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         fluxnorm = luminosity / 4. / np.pi / \
@@ -431,7 +431,7 @@ class SourcePopulation(object):
         V_c(z') \,\mathrm{d}z'} \,\mathrm{d}z} $$
 
         Args:
-            fluxnorm (float): diffuse astrophysical neutrino flux in UNITS
+            fluxnorm (float): diffuse astrophysical neutrino flux in GeV cm^-2 s^-1
             density (float): local density of neutrino sources in Mpc^-3
             zmax (float): Maximum redshift considered
             index (float): Spectral index of the flux
@@ -462,7 +462,7 @@ class SourcePopulation(object):
         population of sources which have a fixed total flux
 
         Args:
-            fluxnorm (float): diffuse astrophysical neutrino flux in UNITS
+            fluxnorm (float): diffuse astrophysical neutrino flux in GeV cm^-2 s^-1
             density (float): local density of neutrino sources in Mpc^-3
             zmax (float): Maximum redshift considered
             index (float): Spectral index of the flux
@@ -533,7 +533,7 @@ class TransientSourcePopulation(SourcePopulation):
         V_c(z') \,\mathrm{d}z'} \,\mathrm{d}z} $$
 
         Args:
-            fluxnorm (float): diffuse astrophysical neutrino flux in UNITS
+            fluxnorm (float): diffuse astrophysical neutrino flux in GeV cm^-2 s^-1
             density (float): local density of neutrino sources in Mpc^-3
             zmax (float): Maximum redshift considered
             index (float): Spectral index of the flux
@@ -568,10 +568,10 @@ class TransientSourcePopulation(SourcePopulation):
         \mathrm{d}E\,4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluxnorm units are [UNITS]
+        fluxnorm units are [GeV cm^-2]
 
         Args:
-            fluxnorm (array or float): Flux of a source in UNITS
+            fluxnorm (array or float): Fluence of a source in GeV cm^-2
             index (float): Spectral index of the flux
             emin (float): Minimum neutrino energy in GeV
             emax (float): Maximum neutrino energy in GeV
@@ -579,7 +579,7 @@ class TransientSourcePopulation(SourcePopulation):
             E0 (float, optional, default=1): pivot energy in GeV
 
         Returns:
-            float: luminosity in UNITS
+            float: luminosity in ergs/yr
         """
         luminosity = super(TransientSourcePopulation, self).Flux2Lumi(fluxnorm,
                                                                       index,
@@ -599,7 +599,7 @@ class TransientSourcePopulation(SourcePopulation):
         \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluence units are [UNITS]
+        fluence units are [GeV cm^-2]
 
         Args:
             luminosity (array or float): luminosity of sources in ergs/yr
@@ -610,7 +610,7 @@ class TransientSourcePopulation(SourcePopulation):
             E0 (float, optional, default=1): pivot energy in GeV
         
         Returns:
-            array or float: fluence of source(s) in UNITS
+            array or float: fluence of source(s) in GeV cm^-2
         """
         flux = super(TransientSourcePopulation, self).Lumi2Flux(luminosity,
                                                                 index,
@@ -626,11 +626,11 @@ class TransientSourcePopulation(SourcePopulation):
         divided by (1+z)*timescale
 
         Args:
-            fluence (array or float): fluence of source(s) in UNITS
+            fluence (array or float): fluence of source(s) in GeV cm^-2
             z (array or float): redshift of source(s)
 
         Returns:
-            array or float: fluxes of the sources in UNITS
+            array or float: fluxes of the sources in GeV cm^-2 s^-1
         """
         # For transient sources, the flux measured on Earth will be
         # red-shifted-fluence/{(1+z)*burst duration}
@@ -803,7 +803,7 @@ class LuminosityEvolution(object):
 
     def Lumi2Flux(self, luminosity, index, emin, emax, z=1, E0=1e5):
         r"""
-        Converts a luminosity to a fluence
+        Converts a luminosity to a flux
 
         $$ L_\nu = \frac{ \Phi_{z=1}^{PS} }{E_0^2}
         \int_{E_\mathrm{min}}^{E_\mathrm{max}} E
@@ -811,7 +811,7 @@ class LuminosityEvolution(object):
         \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluence units are [UNITS]
+        fluence units are [GeV cm^-2 s^-1]
 
         Args:
             luminosity (array or float): luminosity of sources in ergs/yr
@@ -822,7 +822,7 @@ class LuminosityEvolution(object):
             E0 (float, optional, default=1): pivot energy in GeV
         
         Returns:
-            array or float: fluence of source(s) in UNITS
+            array or float: flux of source(s) in GeV cm^-2 s^-1
         """
         flux_integral = self.EnergyIntegral(index, emin, emax, z, E0)
         fluxnorm = luminosity / 4. / np.pi / \
