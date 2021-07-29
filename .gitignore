@@ -3,3 +3,4 @@
 .ipynb_checkpoints/
 *.pdf
 firesong.egg-info/
+.DS_Store

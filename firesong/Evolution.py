@@ -163,7 +163,10 @@ class SwiftGRBs(Evolution):
     r""" 
     Cosmic GRB rate model 
     
-    This is a GRB model from Lien et. al (2016) which assumes a simple broken power law. The cosmic GRB rate increases to redshift z1, and decreases afterward. The values for the paramters are taken from the best-fit values obtained by the authors in the paper.
+    This is a GRB model from Lien et. al (2016) which assumes a simple 
+    broken power law. The cosmic GRB rate increases to redshift z1, and
+    decreases afterward. The values for the paramters are taken from 
+    the best-fit values obtained by the authors in the paper.
     
     for z<=z1:
     
@@ -860,7 +863,7 @@ class LuminosityEvolution(object):
         \mathrm{d}E\ \times 4\pi d_L^2(z=1) $$
 
         Note fluxnorm is E0^2*fluxnorm
-        fluence units are [GeV cm^-2 s^-1]
+        flux units are [GeV cm^-2 s^-1]
 
         Args:
             luminosity (array or float): luminosity of sources in ergs/yr
