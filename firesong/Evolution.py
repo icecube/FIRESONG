@@ -159,6 +159,55 @@ class YukselEtAl2008StarFormationRate(Evolution):
     def __str__(self):
             return "Yuksel et al. (2008)"
 
+class SwiftGRBs(Evolution):
+    r""" 
+    Cosmic GRB rate model 
+    
+    This is a GRB model from Lien et. al (2016) which assumes a simple broken power law. The cosmic GRB rate increases to redshift z1, and decreases afterward. The values for the paramters are taken from the best-fit values obtained by the authors in the paper.
+    
+    for z<=z1:
+    
+    R(z) = R(z = 0)*{(1+z)^n1}
+    
+    for z>=z1:
+    
+    R(z) = R(z = 0)*{(1+z1)^(n1-n2)}*{(1+z)^(n2)}
+
+    Where:
+    
+    R(z = 0) = 0.42*1e-9 # per Mpc per year
+    z1 = 3.6
+    n1 = 2.07
+    n2 = -0.7
+    
+    Reference: arXiv:1311.4567v4, Eq. A1.
+    """
+    def __call__(self, z):
+        return self.parametrization(z)
+    
+    def parametrization(self, x):
+        x = np.atleast_1d(x)
+        result = np.zeros_like(x)
+        
+        # Based on paper 
+        R0 = 0.42*1e-9 # per Mpc per year
+        z1 = 3.6
+        n1 = 2.07
+        n2 = -0.7
+        #R = []
+        #for z_i in x:
+        #Edit here
+        m0 = x < z1
+        m1 = x >= z1
+        result[m0] = np.power(x[m0]+1,n1)
+        result[m1] = np.power(z1+1,n1-n2)*np.power(1+x[m1],n2)
+        if len(result) == 1:
+            return R0*result.item()
+        return R0*result
+    
+    def __str__(self):
+        return "Swift GRBs prediction (2016)"    
+
 class CandelsClash2015SNRate(Evolution):
     r"""
     This is the implied SFR from Goods/Candels/Clash (2015)
