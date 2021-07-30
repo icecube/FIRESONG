@@ -11,7 +11,8 @@ can be found on:
   section 10.
 - [Theo Glauch's Master thesis](https://www.institut3b.physik.rwth-aachen.de/global/show_document.asp?id=aaaaaaaaaavmddj),
   chapter 6.
-- Chun Fai Tung's PhD thesis (upcoming)
+- [Chun Fai Tung's PhD thesis](https://smartech.gatech.edu/handle/1853/64745),
+  chapter 4.
 
 # Set up
 This package is developed for Python 3, and can be installed via pip:
