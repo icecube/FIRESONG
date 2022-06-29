@@ -29,6 +29,7 @@ def firesong_simulation(outputdir,
                         fluxnorm=1.44e-8,
                         index=2.28,
                         LF="SC",
+                        LF_conf = {},
                         sigma=1.0,
                         luminosity=0.0,
                         Gammaflux=False,
@@ -102,7 +103,7 @@ def firesong_simulation(outputdir,
                                                          emax=emax)
 
     luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
-                                                 sigma=sigma)
+                                                 sigma=sigma, **LF_conf)
 
     delta_gamma = 2-index
     if verbose:
