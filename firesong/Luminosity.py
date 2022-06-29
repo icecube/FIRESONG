@@ -310,3 +310,25 @@ class BPL_LuminosityFunction(LuminosityFunction):
                 lambda F: self.PL2.inv_F(F - self.PL1.integral),
             ],
         )
+
+
+def get_LuminosityFunction(mean_luminosity, LF, **kwargs):
+    """Returns a Luminosity Function based on an abbreviation.
+    Known abbreviations are:
+        - SC - Standard Candle
+        - LG - Log-Normal
+        - PL - Power-Law
+    Args:
+        - options: Namespace with LF and needed parameters to
+                   construct luminosity function.
+        - mean_luminosity: mean luminosity.
+    Raises 'NotImplementedError' for unknown abbreviation.
+    """
+
+    if LF == "SC":
+        return SC_LuminosityFunction(mean_luminosity)
+    if LF == "LG":
+        return LG_LuminosityFunction(mean_luminosity, kwargs["sigma"])
+    if LF == "PL":
+        return PL_LuminosityFunction(mean_luminosity, kwargs["index"], kwargs["sigma"])
+    raise NotImplementedError("The luminosity function " + LF + " is not implemented.")
