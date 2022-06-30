@@ -19,7 +19,7 @@ from firesong.distance import cosmo_distance
 #cosmology = {'omega_M_0': 0.308, 'omega_lambda_0': 0.692, 'h': 0.678}
 cosmology = {'omega_M_0': 0.315, 'omega_lambda_0': 0.685, 'h': 0.674}
 
-def get_evolution(evol):
+def get_evolution(evol, **kwargs):
     """
     Get specific evolution model
 
@@ -35,13 +35,14 @@ def get_evolution(evol):
                   "HB2006SFR": HopkinsBeacom2006StarFormationRate,
                   "YMKBH2008SFR": YukselEtAl2008StarFormationRate,
                   "CC2015SNR": CandelsClash2015SNRate,
-                  "MD2014SFR": MadauDickinson2014CSFH
+                  "MD2014SFR": MadauDickinson2014CSFH,
+                  "PowerLaw": PowerLaw,
                   }
     if not evol in list(evolutions.keys()):
         raise NotImplementedError("Source evolution " +
                                   evol + " not implemented.")
+    return evolutions[evol](**kwargs)
 
-    return evolutions[evol]()
 
 class Evolution(object):
     """
@@ -55,6 +56,20 @@ class Evolution(object):
 
     def __call__(self, z):
         return self.parametrization(np.log10(1.+z))
+
+class PowerLaw(Evolution):
+    """
+    Power law with extinction term in the form (1 + z)^k * exp(z/xi)
+    """
+    def __init__(self, k, xi):
+        self.k = k
+        self.xi = xi
+
+    def parametrization(self, z):
+        return (1 + z)**self.k * np.exp(z/self.xi)
+
+    def __call__(self, z):
+        return self.parametrization(z)
 
 
 class NoEvolution(Evolution):
@@ -283,7 +298,6 @@ class MadauDickinson2014CSFH(Evolution):
 
     def __str__(self):
         return "Madau and Dickinson (2014)"
-
 
 class SourcePopulation(object):
     """
