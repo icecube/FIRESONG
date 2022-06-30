@@ -22,16 +22,14 @@ def firesong_simulation(outputdir,
                         filename='Firesong.out',
                         density=1e-9,
                         Evolution="MD2014SFR",
+                        Evolution_args={},
                         Transient=False,
                         timescale=1000.,
                         zmax=10.,
                         bins=10000,
                         fluxnorm=1.44e-8,
                         index=2.28,
-                        LF="SC",
-                        LF_conf = {},
-                        sigma=1.0,
-                        luminosity=0.0,
+                        LF="SC:0.0",
                         Gammaflux=False,
                         interaction="pgamma",
                         emin=1e4,
@@ -86,24 +84,29 @@ def firesong_simulation(outputdir,
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
-                                               get_evolution(Evolution),
+                                               get_evolution(Evolution, **Evolution_args),
                                                timescale=timescale)
     else:
-        population = SourcePopulation(cosmology, get_evolution(Evolution))
+        population = SourcePopulation(cosmology, get_evolution(Evolution, **Evolution_args))
 
     N_sample = int(population.Nsources(density, zmax))
 
-    if luminosity == 0.0:
-        ## If luminosity not specified calculate luminosity from diffuse flux
-        luminosity = population.StandardCandleLuminosity(fluxnorm,
+    # this works only for SC and LG
+    luminosity = 0.0
+
+    if LF in ["SC", "LG"]:
+        luminosity = float(LF.split(":")[1])
+
+        if luminosity == 0.0:
+            ## If luminosity not specified calculate luminosity from diffuse flux
+            luminosity = population.StandardCandleLuminosity(fluxnorm,
                                                          density,
                                                          zmax,
                                                          index,
                                                          emin=emin,
                                                          emax=emax)
 
-    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
-                                                 sigma=sigma, **LF_conf)
+    luminosity_function = get_LuminosityFunction(LF)
 
     delta_gamma = 2-index
     if verbose:
