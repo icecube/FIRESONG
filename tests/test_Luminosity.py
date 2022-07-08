@@ -84,7 +84,7 @@ class TestLuminosity(unittest.TestCase):
 
     def test_LG_LuminosityFunction_PDF(self):
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
-        self.assertEqual(lf.pdf(1e49), 1.7128684087744686e-50)
+        self.assertEqual(lf.pdf(1e49), 1.712868408774468e-50)
 
     def test_LG_LuminosityFunction_CDF(self):
         lf = Luminosity.LG_LuminosityFunction(1e50, 1.)
