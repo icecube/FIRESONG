@@ -29,14 +29,14 @@ def firesong_simulation(outputdir,
                         fluxnorm=1.44e-8,
                         index=2.28,
                         LF="SC",
-                        sigma=1.0,
                         luminosity=0.0,
                         Gammaflux=False,
                         interaction="pgamma",
                         emin=1e4,
                         emax=1e7,
                         seed=None,
-                        verbose=True):
+                        verbose=True, 
+                        **kwargs):
     """
     Simulate a universe of neutrino sources
 
@@ -61,9 +61,8 @@ def firesong_simulation(outputdir,
             astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 cm^-2 sr^-1
         index (float, optional, default=2.28): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose 
-            between standard candle (SC), LogNormal (LG)
-        sigma (float, optional, default=1.0): Width of lognormal distribution
-            if LF="LG"
+            between standard candle (SC), LogNormal (LG), PowerLaw(PL),
+            and Broken PowerLaw, (BPL)
         luminosity (float, optional, default=0.0): Manually fix the 
             luminosity of sources if not equal to 0. Overrides fluxnorm. 
             Units of erg/yr
@@ -77,6 +76,14 @@ def firesong_simulation(outputdir,
         seed (int or None, optional, default=None): random number seed
         verbose (bool, optional, default=True): print simulation paramaters
             if True else suppress printed output
+        **kwargs: the required arguments to be passed to evolution model and 
+             luminosity function. 
+             The currentyl implemented ones are:
+             Log-Normal: lg_width
+             Power-Law: pl_lmin, pl_lmax, pl_alpha
+             Broken Power-Law: bpl_lmin, bpl_lbreak, bpl_lmax, 
+                               bpl_alpha1, bpl_alpha2
+             Please refer to the doc strings in Luminosity.py for more details.
 
     Returns:
         dict: keys contain simulation results, including the input params
@@ -85,24 +92,23 @@ def firesong_simulation(outputdir,
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
-                                               get_evolution(Evolution),
+                                               get_evolution(Evolution, **kwargs),
                                                timescale=timescale)
     else:
-        population = SourcePopulation(cosmology, get_evolution(Evolution))
+        population = SourcePopulation(cosmology, get_evolution(Evolution, **kwargs))
 
     N_sample = int(population.Nsources(density, zmax))
 
     if luminosity == 0.0:
         ## If luminosity not specified calculate luminosity from diffuse flux
         luminosity = population.StandardCandleLuminosity(fluxnorm,
-                                                         density,
-                                                         zmax,
-                                                         index,
-                                                         emin=emin,
-                                                         emax=emax)
+                                                        density,
+                                                        zmax,
+                                                        index,
+                                                        emin=emin,
+                                                        emax=emax)
 
-    luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
-                                                 sigma=sigma)
+    luminosity_function = get_LuminosityFunction(luminosity, LF, **kwargs)
 
     delta_gamma = 2-index
     if verbose:

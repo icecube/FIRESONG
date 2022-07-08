@@ -26,14 +26,14 @@ def flux_pdf(outputdir,
              fluxnorm=1.44e-8,
              index=2.28,
              LF="SC",
-             sigma=1.0,
              luminosity=0.0,
              emin=1e4,
              emax=1e7,
              LumMin=1e45, LumMax=1e54, nLbins=500,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False,
-             verbose=True):
+             verbose=True,
+             **kwargs):
     """
     Simulate a universe of neutrino sources and calculate the PDF of fluxes
 
@@ -59,8 +59,6 @@ def flux_pdf(outputdir,
         index (float, optional, default=2.13): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose
             between standard candle (SC), LogNormal (LG)
-        sigma (float, optional, default=1.0): Width of lognormal distribution
-            if LF="LG"
         luminosity (float, optional, default=0.0): Manually fix the 
             luminosity of sources if not equal to 0. Overrides fluxnorm. 
             Units of erg/yr
@@ -80,6 +78,14 @@ def flux_pdf(outputdir,
             of the flux pdf vs. redshift
         verbose (bool, optional, default=True): print simulation paramaters
             if True else suppress printed output
+        **kwargs: the required arguments to be passed to evolution model and 
+             luminosity function. 
+             The currentyl implemented ones are:
+             Log-Normal: lg_width
+             Power-Law: pl_lmin, pl_lmax, pl_alpha
+             Broken Power-Law: bpl_lmin, bpl_lbreak, bpl_lmax, 
+                               bpl_alpha1, bpl_alpha2
+             Please refer to the doc strings in Luminosity.py for more details.
 
     Returns:
         tuple of arrays: Return lists of the fluxes and their counts,
@@ -106,7 +112,7 @@ def flux_pdf(outputdir,
                                                          emax=emax)
 
     luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
-                                                 sigma=sigma)
+                                                 **kwargs)
 
     delta_gamma = 2-index
     if verbose:
