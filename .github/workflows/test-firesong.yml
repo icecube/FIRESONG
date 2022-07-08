@@ -5,6 +5,7 @@ on:
       - feature/pip-installable
       - base
       - update/update-cosmo
+      - blazar-powerlaw-alt
   pull_request:
     branches: [ base ]
 

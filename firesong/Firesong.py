@@ -83,7 +83,7 @@ def firesong_simulation(outputdir,
              Power-Law: pl_lmin, pl_lmax, pl_alpha
              Broken Power-Law: bpl_lmin, bpl_lbreak, bpl_lmax, 
                                bpl_alpha1, bpl_alpha2
-             Please refer to the documentation of 
+             Please refer to the doc strings in Luminosity.py for more details.
 
     Returns:
         dict: keys contain simulation results, including the input params
