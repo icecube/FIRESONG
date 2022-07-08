@@ -10,8 +10,7 @@ from scipy.stats import lognorm
 class LuminosityFunction(object):
     """Luminosity Function class.
     """
-
-    def __init__(self):
+    def __init__(self, mean_luminosity):
         """Luminosity function.
         """
         pass
@@ -30,6 +29,8 @@ class SC_LuminosityFunction(LuminosityFunction):
     """ Standard Candle Luminosity functions.
     All sources have same luminosity.
     """
+    def __init__(self, mean_luminosity):
+        self.mean = mean_luminosity
 
     def sample_distribution(self, nsources=None, rng=None):
         """ Samples from the Luminosity Function nsource times
@@ -395,7 +396,7 @@ class BPL_LuminosityFunction(LuminosityFunction):
             ],
         )
 
-def get_LuminosityFunction(LF_conf):
+def get_LuminosityFunction(mean_luminosity, LF, **kwargs):
     """Returns a Luminosity Function based on a configuration string.
     Supported LFs are:
         - SC - Standard Candle
@@ -404,29 +405,37 @@ def get_LuminosityFunction(LF_conf):
         - BPL - Broken-Power-Law
 
     Args:
-        - LF_conf: string, configuration string for the Luminosity Function. The string contains the LF type and the numerical parameters separated by a semicolon (':').
+        - LF_conf: string, configuration string for the Luminosity Function. 
+          The string contains the LF type.
 
-    String formats:
-        - Standard Candle: 'SC:mean_luminosity'
-        - Log-Normal: 'LG:mean_luminosity:width'
-        - Power-Law: 'PL:Lmin:Lmax:alpha'
-        - Broken Power-Law: 'BPL:Lmin:Lbreak:Lmax:alpha1:alpha2' 
+        - kwargs: The specific arguments for each luminosity function
+          Log-Normal: lg_width
+          Power-Law: pl_lmin, pl_lmax, pl_alpha
+          Broken Power-Law: bpl_lmin, bpl_lbreak, bpl_lmax, bpl_alpha1, bpl_alpha2
 
     Raises 'NotImplementedError' for unknown abbreviation.
     """
 
     # TODO: this would better go into a try-except block
-    LF = LF_conf.split(':')
-    LF_type = LF[0]
-    params = [float(param) for param in LF[1:]]
-
+    LF_type = LF
     if LF_type == "SC":
-        return SC_LuminosityFunction(mean_luminosity=params[0])
+        return SC_LuminosityFunction(mean_luminosity=mean_luminosity, )
     if LF_type == "LG":
-        return LG_LuminosityFunction(mean_luminosity=params[0], width=params[1])
+        width = kwargs.get('lg_width', 1.0)
+        return LG_LuminosityFunction(mean_luminosity=mean_luminosity, 
+                                     width=width)
     if LF_type == "PL":
-        return PL_LuminosityFunction(Lmin=params[0], Lmax=params[1], alpha=params[2])
+        lmin = kwargs.get('pl_lmin')
+        lmax = kwargs.get('pl_lmax')
+        alpha = kwargs.get('pl_alpha')
+        return PL_LuminosityFunction(Lmin=lmin, Lmax=lmax, alpha=alpha)
     if LF_type == "BPL":
-        return BPL_LuminosityFunction(Lmin=params[0], Lbreak=params[1], Lmax=params[2], alpha1=params[3], alpha2=params[4])
+        lmin = kwargs.get('bpl_lmin')
+        lmax = kwargs.get('bpl_lmax')
+        lbreak = kwargs.get('bpl_lbreak')
+        alpha1 = kwargs.get('bpl_alpha1')
+        alpha2 = kwargs.get('bpl_alpha2')
+        return BPL_LuminosityFunction(Lmin=lmin, Lbreak=lbreak, Lmax=lmax, 
+                                      alpha1=alpha1, alpha2=alpha2)
 
     raise NotImplementedError("The luminosity function " + LF + " is not implemented.")

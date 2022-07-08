@@ -377,7 +377,7 @@ class SourcePopulation(object):
         if np.ndim(z) > 0:
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
-                spl = scipy.interpolate.UnivariateSpline(zz, 
+                spl = scipy.interpolate.interp1d(zz, 
                         self.cosmology.luminosity_distance(zz))
                 return spl(z)
         return self.cosmology.luminosity_distance(z)
@@ -780,7 +780,7 @@ class LuminosityEvolution(object):
         if np.ndim(z) > 0:
             if len(z) > 1000:
                 zz = np.linspace(0., 10., 500)
-                spl = scipy.interpolate.UnivariateSpline(zz,
+                spl = scipy.interpolate.interp1d(zz,
                         self.cosmology.luminosity_distance(zz))
                 return spl(z)
         return self.cosmology.luminosity_distance(z)

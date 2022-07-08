@@ -33,10 +33,10 @@ class TestFluxPDFSimulation(unittest.TestCase):
         cls.lg_flux_pdf = FluxPDF.flux_pdf(None,
             filename=None,
             LF='LG',
-            sigma = 0.01,
             Evolution="MD2014SFR",
             verbose=False,
-            logFMin=-20)
+            logFMin=-20,
+            lg_width=0.01)
 
     @classmethod
     def tearDownClass(cls):

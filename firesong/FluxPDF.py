@@ -26,14 +26,14 @@ def flux_pdf(outputdir,
              fluxnorm=1.44e-8,
              index=2.28,
              LF="SC",
-             sigma=1.0,
              luminosity=0.0,
              emin=1e4,
              emax=1e7,
              LumMin=1e45, LumMax=1e54, nLbins=500,
              logFMin=-10, logFMax=6, nFluxBins=200,
              with_dFdz=False,
-             verbose=True):
+             verbose=True,
+             **kwargs):
     """
     Simulate a universe of neutrino sources and calculate the PDF of fluxes
 
@@ -106,7 +106,7 @@ def flux_pdf(outputdir,
                                                          emax=emax)
 
     luminosity_function = get_LuminosityFunction(luminosity, LF=LF,
-                                                 sigma=sigma)
+                                                 **kwargs)
 
     delta_gamma = 2-index
     if verbose:

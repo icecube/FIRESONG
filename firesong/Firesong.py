@@ -22,20 +22,21 @@ def firesong_simulation(outputdir,
                         filename='Firesong.out',
                         density=1e-9,
                         Evolution="MD2014SFR",
-                        Evolution_args={},
                         Transient=False,
                         timescale=1000.,
                         zmax=10.,
                         bins=10000,
                         fluxnorm=1.44e-8,
                         index=2.28,
-                        LF="SC:0.0",
+                        LF="SC",
+                        luminosity=0.0,
                         Gammaflux=False,
                         interaction="pgamma",
                         emin=1e4,
                         emax=1e7,
                         seed=None,
-                        verbose=True):
+                        verbose=True, 
+                        **kwargs):
     """
     Simulate a universe of neutrino sources
 
@@ -60,9 +61,8 @@ def firesong_simulation(outputdir,
             astrophysical diffuse flux, E^2dPhi/dE. Units of GeV s^-1 cm^-2 sr^-1
         index (float, optional, default=2.28): Spectral index of diffuse flux
         LF (string, optional, default="SC"): Luminosity function, choose 
-            between standard candle (SC), LogNormal (LG)
-        sigma (float, optional, default=1.0): Width of lognormal distribution
-            if LF="LG"
+            between standard candle (SC), LogNormal (LG), PowerLaw(PL),
+            and Broken PowerLaw, (BPL)
         luminosity (float, optional, default=0.0): Manually fix the 
             luminosity of sources if not equal to 0. Overrides fluxnorm. 
             Units of erg/yr
@@ -76,6 +76,14 @@ def firesong_simulation(outputdir,
         seed (int or None, optional, default=None): random number seed
         verbose (bool, optional, default=True): print simulation paramaters
             if True else suppress printed output
+        **kwargs: the required arguments to be passed to evolution model and 
+             luminosity function. 
+             The currentyl implemented ones are:
+             Log-Normal: lg_width
+             Power-Law: pl_lmin, pl_lmax, pl_alpha
+             Broken Power-Law: bpl_lmin, bpl_lbreak, bpl_lmax, 
+                               bpl_alpha1, bpl_alpha2
+             Please refer to the documentation of 
 
     Returns:
         dict: keys contain simulation results, including the input params
@@ -84,29 +92,23 @@ def firesong_simulation(outputdir,
 
     if Transient:
         population = TransientSourcePopulation(cosmology,
-                                               get_evolution(Evolution, **Evolution_args),
+                                               get_evolution(Evolution, **kwargs),
                                                timescale=timescale)
     else:
-        population = SourcePopulation(cosmology, get_evolution(Evolution, **Evolution_args))
+        population = SourcePopulation(cosmology, get_evolution(Evolution, **kwargs))
 
     N_sample = int(population.Nsources(density, zmax))
 
-    # this works only for SC and LG
-    luminosity = 0.0
+    if luminosity == 0.0:
+        ## If luminosity not specified calculate luminosity from diffuse flux
+        luminosity = population.StandardCandleLuminosity(fluxnorm,
+                                                        density,
+                                                        zmax,
+                                                        index,
+                                                        emin=emin,
+                                                        emax=emax)
 
-    if LF in ["SC", "LG"]:
-        luminosity = float(LF.split(":")[1])
-
-        if luminosity == 0.0:
-            ## If luminosity not specified calculate luminosity from diffuse flux
-            luminosity = population.StandardCandleLuminosity(fluxnorm,
-                                                         density,
-                                                         zmax,
-                                                         index,
-                                                         emin=emin,
-                                                         emax=emax)
-
-    luminosity_function = get_LuminosityFunction(LF)
+    luminosity_function = get_LuminosityFunction(luminosity, LF, **kwargs)
 
     delta_gamma = 2-index
     if verbose:
