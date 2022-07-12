@@ -57,19 +57,7 @@ class Evolution(object):
     def __call__(self, z):
         return self.parametrization(np.log10(1.+z))
 
-class PowerLaw(Evolution):
-    """
-    Power law with extinction term in the form (1 + z)^k * exp(z/xi)
-    """
-    def __init__(self, k, xi):
-        self.k = k
-        self.xi = xi
 
-    def parametrization(self, z):
-        return (1 + z)**self.k * np.exp(z/self.xi)
-
-    def __call__(self, z):
-        return self.parametrization(z)
 
 
 class NoEvolution(Evolution):
@@ -82,6 +70,19 @@ class NoEvolution(Evolution):
     def __str__(self):
         return "No Evolution"
 
+class PowerLaw(Evolution):
+    """
+    Power law with extinction term in the form (1 + z)^k * exp(z/xi)
+    """
+    def __init__(self, k, xi, **kwargs):
+        self.k = k
+        self.xi = xi
+
+    def parametrization(self, z):
+        return (1 + z)**self.k * np.exp(z/self.xi)
+
+    def __call__(self, z):
+        return self.parametrization(z)
 
 class HopkinsBeacom2006StarFormationRate(Evolution):
     """ 
