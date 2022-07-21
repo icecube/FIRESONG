@@ -173,8 +173,8 @@ class cosmo_distance(object):
             return prefactor*(D_ratio*np.sqrt(1+self.ok0*D_ratio**2.)\
             -np.arcsinh(np.sqrt(np.abs(self.ok0))*D_ratio)/np.sqrt(np.abs(self.ok0)))
         else:
-            D_m = self.transverse_comoving_distance(z)
-            D_ratio = D_m/self.D_h
+            D_m = transverse_comoving_distance(z)
+            D_ratio = D_m/D_h
             return prefactor*(D_ratio*np.sqrt(1+self.ok0*D_ratio**2.)\
              -np.arcsin(np.sqrt(np.abs(self.ok0))*D_ratio)/np.sqrt(np.abs(self.ok0)))
 

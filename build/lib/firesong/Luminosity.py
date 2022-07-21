@@ -177,8 +177,7 @@ class PL_LuminosityFunction(LuminosityFunction):
         if self.index == -2:
             self.Fmin = self.mean / (self.width*np.log(10))
         else:
-            self.Fmin = (self.index+2.)/(self.index+1.)*self.mean\
-                        *(10**(self.width*(self.index+1.))-1)/(10**(self.width*(self.index+2.))-1)
+            self.Fmin = (self.index+2.)/(self.index+1.)*self.mean
 
         self.Fmax = self.Fmin*10**self.width
 
