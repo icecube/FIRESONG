@@ -48,7 +48,7 @@ class Evolution(object):
     """
     Abstract class to handle all evolution models
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
 
     def parametrization(self, x):
@@ -484,7 +484,7 @@ class SourcePopulation(object):
             integral = np.ones_like(z) * np.log(emax/emin)
         return E0**index * integral
 
-    def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
+    def StandardCandleSources(self, fluxnorm, density, index, z0=1., z_inf=10.0):
         r""" 
         Given a total diffuse neutrino flux, calculate the individual 
         flux contribution from a single source
@@ -499,16 +499,16 @@ class SourcePopulation(object):
         Args:
             fluxnorm (float): diffuse astrophysical neutrino flux in GeV cm^-2 s^-1
             density (float): local density of neutrino sources in Mpc^-3
-            zmax (float): Maximum redshift considered
             index (float): Spectral index of the flux
             z0 (float, optional, default=1.): Redshift of the source in 
                 question
+            z_inf (float): Maximum redshift of the sources
 
         Returns:
             float: fluxnorm of a source at redshift z0
         """
-        norm = self.RedshiftIntegral(zmax)
-        Ntotal = self.Nsources(density, zmax)
+        norm = self.RedshiftIntegral(z_inf)
+        Ntotal = self.Nsources(density, z_inf)
         all_sky_flux = 4 * np.pi * fluxnorm
 
         # Here the integral on redshift is done from 0 to 10.
@@ -517,12 +517,12 @@ class SourcePopulation(object):
             scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(2-index) /
                                  self.LuminosityDistance(z)**2. *
                                  self.RedshiftDistribution(z) / norm,
-                                 0, 10.)[0]
+                                 0, z_inf)[0]
 
         return Fluxnorm
 
-    def StandardCandleLuminosity(self, fluxnorm, density, zmax, index,
-                                 emin, emax, E0=1e5):
+    def StandardCandleLuminosity(self, fluxnorm, density, index,
+                                 emin, emax, E0=1e5, z_inf=10.0):
         """ 
         Calculates the standard candle luminosity that characterizes a 
         population of sources which have a fixed total flux
@@ -530,17 +530,17 @@ class SourcePopulation(object):
         Args:
             fluxnorm (float): diffuse astrophysical neutrino flux in GeV cm^-2 s^-1
             density (float): local density of neutrino sources in Mpc^-3
-            zmax (float): Maximum redshift considered
             index (float): Spectral index of the flux
             emin (float): Minimum neutrino energy in GeV
             emax (float): Maximum neutrino energy in GeV
             E0 (float, optional, default=1): pivot energy in GeV
+            z_inf (float): Maximum redshift of the sources
 
         Returns:
             float: characteristic luminosity of the population
         """
 
-        flux = self.StandardCandleSources(fluxnorm, density, zmax, index, z0=1)
+        flux = self.StandardCandleSources(fluxnorm, density, index, z0=1, z_inf=z_inf)
         luminosity = self.Flux2Lumi(flux, index, emin, emax, z=1, E0=E0)
         return luminosity
 
@@ -585,7 +585,7 @@ class TransientSourcePopulation(SourcePopulation):
         """
         return super(TransientSourcePopulation, self).RedshiftDistribution(z) / (1.+z)
 
-    def StandardCandleSources(self, fluxnorm, density, zmax, index, z0=1.):
+    def StandardCandleSources(self, fluxnorm, density, index, z0=1., z_inf=10.0):
         r""" 
         Given a total diffuse neutrino flux, calculate the individual 
         fluence contribution from a single standard candle source,
@@ -601,10 +601,10 @@ class TransientSourcePopulation(SourcePopulation):
         Args:
             fluxnorm (float): diffuse astrophysical neutrino flux in GeV cm^-2 s^-1
             density (float): local density of neutrino sources in Mpc^-3
-            zmax (float): Maximum redshift considered
             index (float): Spectral index of the flux
             z0 (float, optional, default=1.): Redshift of the source in 
                 question
+            z_inf (float): Maximum redshift of the sources
 
         Returns:
             float: fluence of a source at redshift z0 in GeV/cm^2
