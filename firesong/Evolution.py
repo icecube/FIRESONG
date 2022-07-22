@@ -609,8 +609,8 @@ class TransientSourcePopulation(SourcePopulation):
         Returns:
             float: fluence of a source at redshift z0 in GeV/cm^2
         """
-        norm = self.RedshiftIntegral(zmax)
-        Ntotal = self.Nsources(density, zmax)
+        norm = self.RedshiftIntegral(z_inf)
+        Ntotal = self.Nsources(density, z_inf)
         all_sky_flux = 4 * np.pi * fluxnorm * self.yr2sec
 
         # As above, the integral is done from redshift 0 to 10.
@@ -618,7 +618,7 @@ class TransientSourcePopulation(SourcePopulation):
             scipy.integrate.quad(lambda z: ((1.+z)/(1.+z0))**(3-index) /
                                  (self.LuminosityDistance(z)**2.) *
                                  self.RedshiftDistribution(z) / norm,
-                                 0, 10.)[0]
+                                 0, z_inf)[0]
 
         return fluence
 

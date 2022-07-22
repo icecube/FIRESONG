@@ -126,7 +126,6 @@ class TestSourcePopulation(unittest.TestCase):
     def test_Diffuse2SC(self):
         self.assertEqual(self.pop.StandardCandleSources(1e-8,
                                                         1e-9,
-                                                        zmax=10.,
                                                         index=2.0),
                          9.244753729666597e-11)
 
