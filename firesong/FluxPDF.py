@@ -106,7 +106,6 @@ def flux_pdf(outputdir,
         ## If luminosity not specified calculate luminosity from diffuse flux
         luminosity = population.StandardCandleLuminosity(fluxnorm,
                                                          density,
-                                                         zmax,
                                                          index,
                                                          emin=emin,
                                                          emax=emax)

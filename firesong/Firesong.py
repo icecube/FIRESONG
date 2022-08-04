@@ -54,7 +54,8 @@ def firesong_simulation(outputdir,
             transient neutrino sources instead of steady sources
         timescale (float, optional, default=1000): Timescale in seconds
             for transient sources
-        zmax (float, optional, default=10.): Farthest redshift to consider
+        zmax (float, optional, default=10.): Ignore sources farther than this
+            redshift.
         bins (int, optional, default=1000): Number of bins used when creating
             the redshift PDF
         fluxnorm (float, optional, default=1.44e-8): Normalization on the total
@@ -80,7 +81,7 @@ def firesong_simulation(outputdir,
              luminosity function. 
              The currentyl implemented ones are:
              Log-Normal: lg_width
-             Power-Law: pl_lmin, pl_lmax, pl_alpha
+             Power-Law: (pl_lmin, pl_lmax, pl_alpha) OR (pl_width, pl_alpha)
              Broken Power-Law: bpl_lmin, bpl_lbreak, bpl_lmax, 
                                bpl_alpha1, bpl_alpha2
              Please refer to the doc strings in Luminosity.py for more details.
@@ -103,7 +104,6 @@ def firesong_simulation(outputdir,
         ## If luminosity not specified calculate luminosity from diffuse flux
         luminosity = population.StandardCandleLuminosity(fluxnorm,
                                                         density,
-                                                        zmax,
                                                         index,
                                                         emin=emin,
                                                         emax=emax)
